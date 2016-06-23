@@ -1,0 +1,9 @@
+{
+	"api":"http://localhost:8080/api",
+	"reload":60000,
+	"map":"http://localhost:8080/meshviewer",
+	"statistics":{
+		"one":"http://ffhb.h.sum7.de:8080/dashboard-solo/file/Short.json?panelId=1&fullscreen&var-interval_group=60s&theme=light&from=1466165052000&var-title={{NODEID}}&var-node={{NODEID}}",
+		"all":"http://ffhb.h.sum7.de:8080/dashboard-solo/file/Short.json?panelId=1&fullscreen&var-interval_group=60s&theme=light&from=1466165052000&var-title=All"
+	}
+}
