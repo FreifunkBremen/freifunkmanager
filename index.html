@@ -9,24 +9,21 @@
 
 		<!-- Add to homescreen for Chrome on Android -->
 		<meta name="mobile-web-app-capable" content="yes">
-		<link rel="icon" sizes="192x192" href="images/android-desktop.png">
 
 		<!-- Add to homescreen for Safari on iOS -->
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<meta name="apple-mobile-web-app-title" content="Material Design Lite">
-		<link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
+		<meta name="apple-mobile-web-app-title" content="Event Manager">
 
 		<!-- Tile icon for Win8 (144x144 + tile color) -->
-		<meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
 		<meta name="msapplication-TileColor" content="#3372DF">
 
-		<link rel="shortcut icon" href="https://raw.githubusercontent.com/FreifunkBremen/logo/master/notext.png">
+		<link rel="shortcut icon" href="img/logo.png">
 
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-		<link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.pink-amber.min.css">
-		<link rel="stylesheet" href="styles.css">
+		<!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">-->
+		<link rel="stylesheet" href="css/icon.css">
+		<link rel="stylesheet" href="css/material.pink-amber.min.css">
+		<link rel="stylesheet" href="css/styles.css">
 	</head>
 	<body>
 		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
@@ -49,8 +46,8 @@
 				</div>
 			</header>
 			<div class="mdl-layout__drawer">
-				<header class="logo">
-					<img src="https://raw.githubusercontent.com/FreifunkBremen/logo/master/logo.png">
+				<header>
+					<img src="img/logo.png" class="logo"/> Event Manager
 				</header>
 				<nav class="mdl-navigation">
 					<a class="mdl-navigation__link" href="#nodes"><i class="material-icons mdl-badge mdl-badge--overlap" role="presentation" id="menu_nodes">view_list</i>Nodes</a>
@@ -69,6 +66,13 @@
 			<button class="mdl-snackbar__action" type="button"></button>
 		</div>
 		<script src="bower_components/material-design-lite/material.min.js"></script>
-		<script src="lib/store.js"></script>
+		<script src="js/lib.js"></script>
+		<script src="js/store.js"></script>
+		<script src="js/route/nodes.js"></script>
+		<script src="js/route/aliases.js"></script>
+		<script src="js/route/map.js"></script>
+		<script src="js/route/statistic.js"></script>
+		<script src="js/router.js"></script>
+		<script src="js/init.js"></script>
 	</body>
 </html>
