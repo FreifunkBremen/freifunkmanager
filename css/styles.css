@@ -9,7 +9,7 @@ html, body {
   border-radius: 24px;
 }*/
 
-container > iframe{
+#container > iframe{
 	border: 0 solid #000;
 	margin: 0;
 	padding: 0;
@@ -31,4 +31,11 @@ container > iframe{
 	/*padding:20px 0 20px 0;*/
 	padding:20px 0 0;
 	margin:0px;
+}
+
+#dialog-editNode{
+	min-width:75%;
+}
+#dialog-editNode-map{
+	height:300px;
 }

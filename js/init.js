@@ -1,11 +1,15 @@
 send('GET',"config.json").then(function(config){
 	internal.config = config
-	if(localStorageTest()){
+	createModel()
+	localStorage.removeItem("nodes")
+	localStorage.removeItem("aliases")
+	if(false && localStorageTest()){
 		internal.nodes = JSON.parse(localStorage.getItem("nodes"))
 		internal.aliases = JSON.parse(localStorage.getItem("aliases"))
 		if(!internal.nodes){
 			send('GET',internal.config.api+"/nodes").then(function(data){
 				internal.nodes = data
+				internal.lastload = new Date()
 			})
 		}
 		if(!internal.aliases){
@@ -13,12 +17,12 @@ send('GET',"config.json").then(function(config){
 				internal.aliases = data
 			})
 		}
+	}else{
+		refreshData()
 	}
-	menuAliases.setAttribute("data-badge",Object.keys(internal.aliases).length)
-	menuNodes.setAttribute("data-badge",Object.keys(internal.nodes).length)
+	updateBange()
 	setInterval(function () {
 		refreshData()
-		route()
 	}, config.reload);
 	route()
 })

@@ -2,6 +2,20 @@
 	"api":"http://localhost:8080/api",
 	"reload":60000,
 	"map":"http://localhost:8080/meshviewer",
+	"editmap":{
+		"view":[53.0702,8.815],
+		"zoom":16,
+		"geojson":"/data/meshviewer.geojson",
+		"tiles":{
+			"url":"https://otile{s}-s.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.jpg",
+			"option":{
+				"subdomains": "1234",
+				"type": "osm",
+				"attribution": "Tiles &copy; <a href=\"https://www.mapquest.com/\" target=\"_blank\">MapQuest</a>, Data CC-BY-SA OpenStreetMap",
+				"maxZoom": 18
+			}
+		}
+	},
 	"statistics":{
 		"one":"http://ffhb.h.sum7.de:8080/dashboard-solo/file/Short.json?panelId=1&fullscreen&var-interval_group=60s&theme=light&from=1466165052000&var-title={{NODEID}}&var-node={{NODEID}}",
 		"all":"http://ffhb.h.sum7.de:8080/dashboard-solo/file/Short.json?panelId=1&fullscreen&var-interval_group=60s&theme=light&from=1466165052000&var-title=All"

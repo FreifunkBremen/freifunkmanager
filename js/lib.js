@@ -33,3 +33,17 @@ function localStorageTest() {
 		return false
 	}
 }
+
+
+function sshUrl(nodeid){
+	if(internal.nodes[nodeid]){
+		node = internal.nodes[nodeid]
+		ip ='z-'
+		for(var i=0;i<node.nodeinfo.network.addresses.length;i++){
+				if(ip[0]> node.nodeinfo.network.addresses[i][0])
+					ip = node.nodeinfo.network.addresses[i]
+		}
+		return '<a href="ssh://root@['+ip+']">SSH</a>'
+	}
+	return ''
+}

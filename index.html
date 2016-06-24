@@ -20,10 +20,13 @@
 
 		<link rel="shortcut icon" href="img/logo.png">
 
-		<!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">-->
-		<link rel="stylesheet" href="css/icon.css">
-		<link rel="stylesheet" href="css/material.pink-amber.min.css">
-		<link rel="stylesheet" href="css/styles.css">
+		<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+		<link rel="stylesheet" href="bower_components/Leaflet.label/dist/leaflet.label.css" />
+		<link rel="stylesheet" href="css/font.css" />
+		<link rel="stylesheet" href="css/icon.css" />
+		<link rel="stylesheet" href="css/material.pink-amber.min.css" />
+		<link rel="stylesheet" href="bower_components/dialog-polyfill/dialog-polyfill.css" />
+		<link rel="stylesheet" href="css/styles.css" />
 	</head>
 	<body>
 		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
@@ -40,15 +43,17 @@
 							<label class="mdl-textfield__label" for="search">Enter Node name</label>
 						</div>
 					</div>
+					<div id="lastLoad">
+					</div>
 					<label class="mdl-button mdl-js-button mdl-button--icon" id="refresh">
 						<i class="material-icons">refresh</i>
 					</label>
 				</div>
 			</header>
 			<div class="mdl-layout__drawer">
-				<header>
+				<span class="mdl-layout-title">
 					<img src="img/logo.png" class="logo"/> Event Manager
-				</header>
+				</span>
 				<nav class="mdl-navigation">
 					<a class="mdl-navigation__link" href="#nodes"><i class="material-icons mdl-badge mdl-badge--overlap" role="presentation" id="menu_nodes">view_list</i>Nodes</a>
 					<a class="mdl-navigation__link" href="#aliases"><i class="material-icons mdl-badge mdl-badge--overlap" role="presentation" id="menu_aliases">replay</i>Undone Changes</a>
@@ -65,9 +70,26 @@
 			<div class="mdl-snackbar__text"></div>
 			<button class="mdl-snackbar__action" type="button"></button>
 		</div>
+		<dialog class="mdl-dialog" id="dialog-editNode">
+			<h4 class="mdl-dialog__title">Loading...</h4>
+			<div class="mdl-dialog__content">
+				<p>Loading...</p>
+			</div>
+			<div id="dialog-editNode-map"></div>
+			<div class="mdl-dialog__actions">
+				<button type="button" class="mdl-button save">Save</button>
+				<button type="button" class="mdl-button close">Close</button>
+			</div>
+		</dialog>
+		<script src="bower_components/leaflet/dist/leaflet.js"></script>
+		<script src="bower_components/Leaflet.label/dist/leaflet.label.js"></script>
 		<script src="bower_components/material-design-lite/material.min.js"></script>
+		<script src="bower_components/dialog-polyfill/dialog-polyfill.js"></script>
+		<script src="bower_components/moment/min/moment.min.js"></script>
 		<script src="js/lib.js"></script>
 		<script src="js/store.js"></script>
+		<script src="js/global.js"></script>
+		<script src="js/editModel.js"></script>
 		<script src="js/route/nodes.js"></script>
 		<script src="js/route/aliases.js"></script>
 		<script src="js/route/map.js"></script>

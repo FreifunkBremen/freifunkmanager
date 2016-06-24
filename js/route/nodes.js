@@ -3,16 +3,17 @@ function routeNodesPrivEvent(nodeid,attr,attr2){
 	return function (e){
 		var input = e.which || e.keyCode;
 		if (input === 13) { // 13 is enter
+			value = e.target.value || e.srcElement.value || ''
 			if(internal.aliases[nodeid] == undefined){
 				internal.aliases[nodeid] = {}
 			}
 			if(attr2 == undefined){
-				internal.aliases[nodeid][attr] = e.srcElement.value
+				internal.aliases[nodeid][attr] = value
 			}else{
 				if(internal.aliases[nodeid][attr] == undefined){
 					internal.aliases[nodeid][attr] = {}
 				}
-				internal.aliases[nodeid][attr][attr2] = e.srcElement.value
+				internal.aliases[nodeid][attr][attr2] = value
 			}
 			send('POST',internal.config.api+'/aliases/alias/'+nodeid,internal.aliases[nodeid])
 		}
@@ -32,7 +33,7 @@ function routeNodes(){
 				+ '<th>Clients</th>'
 				+ '<th>Ch</th>'
 				+ '<th>Tx</th>'
-				+ '<th>Ort</th>'
+				+ '<th>Edit</th>'
 				+ '<th>SSH</th>'
 			+ '</tr>'
 		+ '</thead>'
@@ -40,8 +41,10 @@ function routeNodes(){
 	Object.keys(internal.nodes).map(function(key){
 		fill += '<tr>'
 						+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2" style="padding:0px 2px;text-align:center;">'
-							+ '<i class="material-icons" style="color:'+((internal.nodes[key].flags.online)?'green':'red')+';">camera</i></td>'
-						+ '<td class="mdl-data-table__cell--non-numeric mdt-table__cell-input" rowspan="2" style="padding-left:0px;">'
+							+ '<span style="color:'+((internal.nodes[key].flags.online)?'green':'red')+';">&#x25cf;</span><br/>'
+							+ moment(internal.nodes[key].lastseen).fromNow(true)
+							+'</td>'
+						+ '<td class="mdl-data-table__cell--non-numeric mdt-table__cell-input" rowspan="2">'
 							+ '<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">'
 								+ '<input class="mdl-textfield__input" type="text" id="hostname_'+key+'" value="'+internal.nodes[key].nodeinfo.hostname+'"/>'
 								+ '<label class="mdl-textfield__label" for="hostname_'+key+'">'+key+'</label>'
@@ -56,8 +59,8 @@ function routeNodes(){
 					+ '<td>'
 						+ '<input class="mdl-textfield__input" type="number" id="freq24_tx_'+key+'" value="'+((internal.nodes[key].nodeinfo.settings !== undefined)?internal.nodes[key].nodeinfo.settings.freq24.txpower:'')+'"/>'
 					+ '</td>'
-					+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2"><i class="material-icons">place</i></td>'
-					+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2">SSH</td>'
+					+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2"><i class="material-icons" id="edit_'+key+'">edit</i></td>'
+					+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2">'+sshUrl(key)+'</td>'
 				+ '</tr>'
 				+ '<tr>'
 					+ '<td class="mdl-data-table__cell--non-numeric" style="padding-left:18px;">5Ghz</td>'
@@ -79,7 +82,9 @@ function routeNodes(){
 		document.getElementById("freq24_ch_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'freq24','channel'))
 		document.getElementById("freq24_tx_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'freq24','txpower'))
 		document.getElementById("freq5_ch_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'freq5','channel'))
-		document.getElementById("freq5_tx_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'freq5','txpower'))
+		document.getElementById("edit_"+key).addEventListener('click', function(){
+			editModel(key)
+		})
 	})
 
 }
