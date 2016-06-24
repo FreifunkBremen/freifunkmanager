@@ -19,8 +19,7 @@ function createModel(){
 		L.geoJson(data,{
 			pointToLayer: function (feature, latlng){
 				feature.properties.radius = 10
-				m = L.circleMarker(latlng,feature.properties)
-				return m
+				return L.circleMarker(latlng,feature.properties)
 			},
 			onEachFeature:function(feature, layer) {
 				layer.bindLabel(feature.properties.name)
