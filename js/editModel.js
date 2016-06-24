@@ -18,30 +18,31 @@ function createModel(){
 	send('GET',internal.config.editmap.geojson).then(function(data){
 		L.geoJson(data,{
 			pointToLayer: function (feature, latlng){
-				/*
 				feature.properties.radius = 10
-				feature.properties.color = feature.properties["marker-color"]
-				feature.properties.fillColor = feature.properties["marker-color"]
-				feature.properties.fillOpacity = 0.5
-				*/
-				m = L.marker(latlng,{
-    radius: 8,
-    fillColor: "#ff7800",
-    color: "#000",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8
-})
-				m.bindLabel(feature.properties.name)
+				m = L.circleMarker(latlng,feature.properties)
 				return m
+			},
+			onEachFeature:function(feature, layer) {
+				layer.bindLabel(feature.properties.name)
+			},
+			style:function(feature){
+				if(feature.geometry.type=='LineString')
+					return {color:feature.properties["stroke"],
+						stroke:true,
+						weight: 5,
+						lineCap:'round',
+						lineJoin:'round'}
+				return {
+					color:feature.properties["marker-color"],
+					fillColor:feature.properties["marker-color"],
+					fillOpacity: 0.2,
+					weight: 2,
+					stroke: true
+				}
 			}
 		}).addTo(dialogEditNodeMap)
 	})
-	dialogEditNodeMapCurrent = L.circle(internal.config.editmap.view, 500,{
-		radius: 500,
-		color: 'red',
-		fillColor: '#f03',
-		fillOpacity: 0.5,
+	dialogEditNodeMapCurrent = L.marker(internal.config.editmap.view,{
 		draggable: true
 	}).addTo(dialogEditNodeMap)
 
@@ -89,4 +90,6 @@ function editModel(key){
 	dialogEditNodeMapCurrent.bindLabel("Move Node: "+key)
 
 	dialogEditNode.showModal()
+	//WOrkaround
+	dialogEditNodeMap._onResize()
 }
