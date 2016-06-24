@@ -41,7 +41,7 @@ function routeNodes(){
 	Object.keys(internal.nodes).map(function(key){
 		fill += '<tr>'
 						+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2" style="padding:0px 2px;text-align:center;">'
-							+ '<span style="color:'+((internal.nodes[key].flags.online)?'green':'red')+';">&#x25cf;</span><br/>'
+							+ '<span style="font-size:20px;color:'+((internal.nodes[key].flags.online)?'green':'red')+';">&#x25cf;</span><br/>'
 							+ moment(internal.nodes[key].lastseen).fromNow(true)
 							+'</td>'
 						+ '<td class="mdl-data-table__cell--non-numeric mdt-table__cell-input" rowspan="2">'
