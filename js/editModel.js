@@ -60,8 +60,9 @@ function createModel(){
 			internal.aliases[nodeid].location = {}
 		}
 		pos = dialogEditNodeMapCurrent.getLatLng()
-		internal.aliases[nodeid].location.latitude = pos[0]
-		internal.aliases[nodeid].location.longitude = pos[1]
+		console.log(pos)
+		internal.aliases[nodeid].location.latitude = pos.lat
+		internal.aliases[nodeid].location.longitude = pos.lng
 		internal.aliases[nodeid].hostname = dialogEditNodeContent.querySelector('input[name="hostname"]').value
 		console.log("save",internal.aliases[nodeid],dialogEditNodeMapCurrent.getLatLng())
 		send('POST',internal.config.api+'/aliases/alias/'+nodeid,internal.aliases[nodeid]).then(function(){
