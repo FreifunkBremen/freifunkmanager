@@ -54,10 +54,10 @@ function routeNodes(){
 						+ '<td class="mdl-data-table__cell--non-numeric">2Ghz</td>'
 						+ '<td>'+internal.nodes[key].statistics.clients.wifi24+'</td>'
 					+ '<td>'
-						+ '<input class="mdl-textfield__input" type="number" id="freq24_ch_'+key+'" value="'+((internal.nodes[key].nodeinfo.settings !== undefined)?internal.nodes[key].nodeinfo.settings.freq24.channel:'')+'"/>'
+						+ '<input class="mdl-textfield__input" type="number" id="freq24_ch_'+key+'" value="'+((internal.nodes[key].nodeinfo.wireless.channel2 !== undefined)?internal.nodes[key].nodeinfo.wireless.channel2:'')+'"/>'
 					+ '</td>'
 					+ '<td>'
-						+ '<input class="mdl-textfield__input" type="number" id="freq24_tx_'+key+'" value="'+((internal.nodes[key].nodeinfo.settings !== undefined)?internal.nodes[key].nodeinfo.settings.freq24.txpower:'')+'"/>'
+						+ '<input class="mdl-textfield__input" type="number" id="freq24_tx_'+key+'" value="'+((internal.nodes[key].nodeinfo.wireless.txpower2 !== undefined)?internal.nodes[key].nodeinfo.wireless.txpower2:'')+'"/>'
 					+ '</td>'
 					+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2"><i class="material-icons" id="edit_'+key+'">edit</i></td>'
 					+ '<td class="mdl-data-table__cell--non-numeric" rowspan="2">'+sshUrl(key)+'</td>'
@@ -66,10 +66,10 @@ function routeNodes(){
 					+ '<td class="mdl-data-table__cell--non-numeric" style="padding-left:18px;">5Ghz</td>'
 					+ '<td>'+ internal.nodes[key].statistics.clients.wifi5+'</td>'
 					+ '<td>'
-						+ '<input class="mdl-textfield__input" type="number" id="freq5_ch_'+key+'" value="'+((internal.nodes[key].nodeinfo.settings !== undefined)?internal.nodes[key].nodeinfo.settings.freq5.channel:'')+'"/>'
+						+ '<input class="mdl-textfield__input" type="number" id="freq5_ch_'+key+'" value="'+((internal.nodes[key].nodeinfo.wireless.channel5 !== undefined)?internal.nodes[key].nodeinfo.wireless.channel5:'')+'"/>'
 					+ '</td>'
 					+ '<td style="padding-right:18px;">'
-						+ '<input class="mdl-textfield__input" type="number" id="freq5_tx_'+key+'" value="'+((internal.nodes[key].nodeinfo.settings !== undefined)?internal.nodes[key].nodeinfo.settings.freq5.txpower:'')+'"/>'
+						+ '<input class="mdl-textfield__input" type="number" id="freq5_tx_'+key+'" value="'+((internal.nodes[key].nodeinfo.wireless.txpower5 !== undefined)?internal.nodes[key].nodeinfo.wireless.txpower5:'')+'"/>'
 					+ '</td>'
 					+ '</td>'
 				+ '</tr>'
@@ -79,9 +79,10 @@ function routeNodes(){
 
 	Object.keys(internal.nodes).map(function(key){
 		document.getElementById("hostname_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'hostname',null))
-		document.getElementById("freq24_ch_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'freq24','channel'))
-		document.getElementById("freq24_tx_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'freq24','txpower'))
-		document.getElementById("freq5_ch_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'freq5','channel'))
+		document.getElementById("freq24_ch_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'wireless','channel2'))
+		document.getElementById("freq24_tx_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'wireless','txpower2'))
+		document.getElementById("freq5_ch_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'wireless','channel5'))
+		document.getElementById("freq5_tx_"+key).addEventListener('keypress', routeNodesPrivEvent(key,'wireless','txpower5'))
 		document.getElementById("edit_"+key).addEventListener('click', function(){
 			editModel(key)
 		})
