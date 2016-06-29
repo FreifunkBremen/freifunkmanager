@@ -13,6 +13,8 @@ function routeNodesPrivEvent(nodeid,attr,attr2){
 				if(internal.aliases[nodeid][attr] == undefined){
 					internal.aliases[nodeid][attr] = {}
 				}
+				if(attr == "wireless")
+					value = parseInt(value)
 				internal.aliases[nodeid][attr][attr2] = value
 			}
 			send('POST',internal.config.api+'/aliases/alias/'+nodeid,internal.aliases[nodeid])
