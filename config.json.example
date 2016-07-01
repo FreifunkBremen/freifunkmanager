@@ -3,6 +3,10 @@
 	"reload":60000,
 	"map":"http://localhost:8080/meshviewer",
 	"editmap":{
+		"icon":{
+			"warn":{"wifi24":20,"wifi5":20},
+			"crit":{"wifi24":30,"wifi5":30}
+		},
 		"view":[53.0702,8.815],
 		"zoom":16,
 		"geojson":"/data/meshviewer.geojson",

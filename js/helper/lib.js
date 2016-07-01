@@ -7,9 +7,6 @@ function send(method,url,data) {
 			if (req.status == 200) {
 				resolve(req.response);
 			}
-			else {
-				reject(Error(req.statusText));
-			}
 		};
 
 		req.onerror = function() {
@@ -21,7 +18,11 @@ function send(method,url,data) {
 		}else{
 			req.send();
 		}
-	}).then(JSON.parse);
+	}).then(function(data){
+		if(data[0]=='{')
+			return JSON.parse(data)
+		return data
+	});
 }
 function localStorageTest() {
 	var test = 'test'
