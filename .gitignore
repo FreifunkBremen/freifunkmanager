@@ -1,2 +1,4 @@
-bower_components
 config.json
+# cross projects
+meshviewer/
+data/

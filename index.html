@@ -1,100 +1,13 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 	<head>
 		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-		<title>Eventmanager</title>
-
-		<!-- Add to homescreen for Chrome on Android -->
-		<meta name="mobile-web-app-capable" content="yes">
-
-		<!-- Add to homescreen for Safari on iOS -->
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<meta name="apple-mobile-web-app-title" content="Event Manager">
-
-		<!-- Tile icon for Win8 (144x144 + tile color) -->
-		<meta name="msapplication-TileColor" content="#3372DF">
-
-		<link rel="shortcut icon" href="img/logo.png">
-
-		<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
-		<link rel="stylesheet" href="bower_components/Leaflet.label/dist/leaflet.label.css" />
-		<link rel="stylesheet" href="css/font.css" />
-		<link rel="stylesheet" href="css/icon.css" />
-		<link rel="stylesheet" href="css/material.pink-amber.min.css" />
-		<link rel="stylesheet" href="bower_components/dialog-polyfill/dialog-polyfill.css" />
-		<link rel="stylesheet" href="css/styles.css" />
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="icon" href="favicon.ico" type="image/x-icon"/>
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+		<script src="app.js"></script>
 	</head>
 	<body>
-		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
-			<header class="mdl-layout__header">
-				<div class="mdl-layout__header-row">
-					<span class="mdl-layout-title"></span>
-					<div class="mdl-layout-spacer"></div>
-					<div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
-						<label class="mdl-button mdl-js-button mdl-button--icon" for="search">
-							<i class="material-icons">search</i>
-						</label>
-						<div class="mdl-textfield__expandable-holder">
-							<input class="mdl-textfield__input" type="text" id="search">
-							<label class="mdl-textfield__label" for="search">Enter Node name</label>
-						</div>
-					</div>
-					<div id="lastLoad">
-					</div>
-					<label class="mdl-button mdl-js-button mdl-button--icon" id="refresh">
-						<i class="material-icons">refresh</i>
-					</label>
-				</div>
-			</header>
-			<div class="mdl-layout__drawer">
-				<span class="mdl-layout-title">
-					<img src="img/logo.png" class="logo"/> Event Manager
-				</span>
-				<nav class="mdl-navigation">
-					<a class="mdl-navigation__link" href="#nodes"><i class="material-icons mdl-badge mdl-badge--overlap" role="presentation" id="menu_nodes">view_list</i>Nodes</a>
-					<a class="mdl-navigation__link" href="#aliases"><i class="material-icons mdl-badge mdl-badge--overlap" role="presentation" id="menu_aliases">replay</i>Undone Changes</a>
-					<a class="mdl-navigation__link" href="#map"><i class="material-icons" role="presentation">map</i>Map</a>
-					<a class="mdl-navigation__link" href="#statistics"><i class="material-icons" role="presentation">trending_up</i>Statistic</a>
-				</nav>
-			</div>
-			<main class="mdl-layout__content mdl-color--grey-100">
-				<div class="mdl-grid demo-content" id="container">
-				</div>
-			</main>
-		</div>
-		<div id="toast" class="mdl-js-snackbar mdl-snackbar">
-			<div class="mdl-snackbar__text"></div>
-			<button class="mdl-snackbar__action" type="button"></button>
-		</div>
-		<dialog class="mdl-dialog" id="dialog-editNode">
-			<h4 class="mdl-dialog__title">Loading...</h4>
-			<div class="mdl-dialog__content">
-				<p>Loading...</p>
-			</div>
-			<div id="dialog-editNode-map"></div>
-			<div class="mdl-dialog__actions">
-				<button type="button" class="mdl-button save">Save</button>
-				<button type="button" class="mdl-button close">Close</button>
-			</div>
-		</dialog>
-		<script src="bower_components/leaflet/dist/leaflet.js"></script>
-		<script src="bower_components/Leaflet.label/dist/leaflet.label.js"></script>
-		<script src="bower_components/material-design-lite/material.min.js"></script>
-		<script src="bower_components/dialog-polyfill/dialog-polyfill.js"></script>
-		<script src="bower_components/moment/min/moment.min.js"></script>
-		<script src="js/lib.js"></script>
-		<script src="js/store.js"></script>
-		<script src="js/global.js"></script>
-		<script src="js/editModel.js"></script>
-		<script src="js/route/nodes.js"></script>
-		<script src="js/route/aliases.js"></script>
-		<script src="js/route/map.js"></script>
-		<script src="js/route/statistic.js"></script>
-		<script src="js/router.js"></script>
-		<script src="js/init.js"></script>
 	</body>
 </html>

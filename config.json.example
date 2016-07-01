@@ -1,11 +1,15 @@
 {
-	"api":"http://localhost:8080/api",
+	"api":"http://ffhb.h.sum7.de/api",
 	"reload":60000,
-	"map":"http://localhost:8080/meshviewer",
-	"editmap":{
+	"meshviewer":"http://ffhb.h.sum7.de/meshviewer",
+	"map":{
+		"icon":{
+			"warn":{"wifi24":20,"wifi5":20},
+			"crit":{"wifi24":30,"wifi5":30}
+		},
 		"view":[53.0702,8.815],
 		"zoom":16,
-		"geojson":"/data/meshviewer.geojson",
+		"geojson":"http://ffhb.h.sum7.de/data/meshviewer.geojson",
 		"tiles":{
 			"url":"https://otile{s}-s.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.jpg",
 			"option":{
@@ -16,7 +20,7 @@
 			}
 		}
 	},
-	"statistics":{
+	"grafana":{
 		"one":"http://ffhb.h.sum7.de:8080/dashboard-solo/file/Short.json?panelId=1&fullscreen&var-interval_group=60s&theme=light&from=1466165052000&var-title={{NODEID}}&var-node={{NODEID}}",
 		"all":"http://ffhb.h.sum7.de:8080/dashboard-solo/file/Short.json?panelId=1&fullscreen&var-interval_group=60s&theme=light&from=1466165052000&var-title=All"
 	}
