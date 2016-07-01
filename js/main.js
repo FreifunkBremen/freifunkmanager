@@ -1,34 +1,34 @@
 define(["helper/router","helper/storage","menu","controller/nodes","controller/map","controller/frame"],
 function (Router, storage, menu, controllerNodes, controllerMap, controllerFrame) {
 	return function(config){
-		var store = storage(config)
-		store.refresh()
-		store.autorefresh(config.reload)
+		var store = storage(config);
+		store.refresh();
+		store.autorefresh(config.reload);
 
-		document.title = "eventmanager"
-
-
-		menu(document.body,store)
-		el = document.createElement("div")
-		el.classList.add("content")
-		document.body.appendChild(el)
+		document.title = "eventmanager";
 
 
-		var map = controllerMap(el,config)
-		store.addNotify(map)
+		menu(document.body,store);
+		el = document.createElement("div");
+		el.classList.add("content");
+		document.body.appendChild(el);
 
-		var nodes = controllerNodes(el,config)
-		store.addNotify(nodes)
+
+		var map = controllerMap(el,config);
+		store.addNotify(map);
+
+		var nodes = controllerNodes(el,config);
+		store.addNotify(nodes);
 
 		Router.config({
 			mode: 'hash'
 		})
-		.add(/statistics/, controllerFrame(el,config.statistics.all))
+		.add(/grafana/, controllerFrame(el,config.grafana.all))
 		.add(/meshviewer/, controllerFrame(el,config.meshviewer))
 		.add(/list/, nodes.controller)
 		.add(/map\/(.*)/, map.controller)
 		.add(/map/, map.controller)
 		.add(nodes.controller)
-		.check().listen()
-		}
-})
+		.check().listen();
+	};
+});

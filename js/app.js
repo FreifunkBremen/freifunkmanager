@@ -7,7 +7,7 @@ require.config({
 	},
 	shim: {
 	}
-})
+});
 require(["main", "helper/lib"], function (main) {
-	send("GET","config.json").then(main)
-})
+	send("GET","config.json").then(main);
+});

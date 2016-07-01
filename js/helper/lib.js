@@ -20,31 +20,31 @@ function send(method,url,data) {
 		}
 	}).then(function(data){
 		if(data[0]=='{')
-			return JSON.parse(data)
-		return data
+			return JSON.parse(data);
+		return data;
 	});
 }
 function localStorageTest() {
-	var test = 'test'
+	var test = 'test';
 	try {
-		localStorage.setItem(test, test)
-		localStorage.removeItem(test)
-		return true
+		localStorage.setItem(test, test);
+		localStorage.removeItem(test);
+		return true;
 	} catch(e) {
-		return false
+		return false;
 	}
 }
 
 
 function sshUrl(nodeid){
 	if(internal.nodes[nodeid]){
-		node = internal.nodes[nodeid]
-		ip ='z-'
+		node = internal.nodes[nodeid];
+		ip ='z-';
 		for(var i=0;i<node.nodeinfo.network.addresses.length;i++){
 				if(ip[0]> node.nodeinfo.network.addresses[i][0])
-					ip = node.nodeinfo.network.addresses[i]
+					ip = node.nodeinfo.network.addresses[i];
 		}
-		return '<a href="ssh://root@['+ip+']">SSH</a>'
+		return '<a href="ssh://root@['+ip+']">SSH</a>';
 	}
-	return ''
+	return '';
 }

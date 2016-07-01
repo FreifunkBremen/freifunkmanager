@@ -1,13 +1,13 @@
 define(function(){
-	var data
+	var data;
 	return function(el,config){
 		return {
 			storageNotify: function(d){
-				data = d
+				data = d;
 			},
 			controller: function(){
-				el.innerHTML = "Not implemented"
+				el.innerHTML = "Not implemented";
 			}
-		}
-	}
-})
+		};
+	};
+});
