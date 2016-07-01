@@ -13,7 +13,7 @@ define(["helper/lib","moment"],function(lib,moment){
 		}
 
 		var refresh = function(){
-			send('GET',config.editmap.geojson).then(function(d){
+			send('GET',config.map.geojson).then(function(d){
 					data.geojson = d
 					notify()
 			})

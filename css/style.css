@@ -1,7 +1,7 @@
 @font-face {
 	font-family: 'FontAwesome';
-	src: url('../bower_components/font-awesome/fonts/fontawesome-webfont.eot?v=4.6.3');
-	src: url('../bower_components/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.6.3') format('embedded-opentype'), url('../bower_components/font-awesome/fonts/fontawesome-webfont.woff2?v=4.6.3') format('woff2'), url('../bower_components/font-awesome/fonts/fontawesome-webfont.woff?v=4.6.3') format('woff'), url('../bower_components/font-awesome/fonts/fontawesome-webfont.ttf?v=4.6.3') format('truetype'), url('../bower_components/font-awesome/fonts/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular') format('svg');
+	src: url('../fonts/fontawesome-webfont.eot?v=4.6.3');
+	src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.6.3') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.6.3') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.6.3') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.6.3') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -14,6 +14,38 @@ body{
 	outline: 0px;
 	background: rgba(0, 0, 0, 0.12);
 }
+button,input{
+	color:black;
+	background-color: lavender;
+	border:1px solid black;
+	border-radius: 5px;
+	padding: 8px;
+	margin: 5px;
+	font-size: 14px;
+}
+table{
+	border-collapse: collapse;
+}
+table.table{
+	width: 100%;
+}
+.table th, .table td{
+	padding: 8px;
+	border-bottom: 1px solid #ddd;
+}
+.table td{
+	text-align: right;
+}
+.table td.text{
+	text-align: left;
+}
+.table tr:nth-child(even){
+	background-color: #f2f2f2;
+}
+.table th{
+	background-color: #dc0067;
+	color: white;
+}
 .content, .content > .map{
 	width:100%;
 	height:100%;
@@ -24,6 +56,11 @@ header.menu{
 	top:12px;
 	right:12px;
 	z-index: 3000;
+}
+.content > iframe{
+	width: 100%;
+	height: 99%;
+	border: none;
 }
 i.icon{
 	font: normal normal normal 12px/1 FontAwesome;
@@ -59,7 +96,7 @@ header.menu .icons i span{
 	cursor: pointer;
 	position: absolute;
 	top: 12px;
-	right: 12px;
+	right: 0px;
 	width: 1.6em;
 	z-index: 3000;
 	color: black;
@@ -92,6 +129,14 @@ header.menu .icons i span{
 	font-weight: lighter;
 }
 .nodeicon-label table{
+	width: 100%
+}
+.nodeicon-label table td{
+	border-top:1px solid #999;
+	text-align: right;
+}
+.nodeicon-label table td:first-child{
+	text-align: left;
 }
 .nodeicon.offline{
 	background-color: rgba(255,0,0,0.5);

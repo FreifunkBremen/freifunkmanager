@@ -13,17 +13,18 @@ define(['leaflet','leaflet.label','controller/sidebar'],function(leaflet,leaflet
 
 
 		leaflet.tileLayer(
-			config.editmap.tiles.url,
-			config.editmap.tiles.option).addTo(map)
-		map.setView(config.editmap.view,config.editmap.zoom)
+			config.map.tiles.url,
+			config.map.tiles.option).addTo(map)
+		map.setView(config.map.view,config.map.zoom)
 
 		var geoJsonOption = {
-				pointToLayer: function (feature, latlng){
+			pointToLayer: function (feature, latlng){
 				feature.properties.radius = 10
 				return leaflet.circleMarker(latlng, feature.properties)
 			},
 			onEachFeature: function(feature, layer) {
-				layer.bindLabel(feature.properties.name)
+				if(feature.properties.name.length >0)
+					layer.bindLabel(feature.properties.name)
 			},
 			style: function(feature){
 				if(feature.geometry.type === "LineString" || feature.geometry.type === "Polygon")
@@ -74,19 +75,19 @@ define(['leaflet','leaflet.label','controller/sidebar'],function(leaflet,leaflet
 				var wifi24="-",wifi5="-",ch24="-",ch5="-",tx24="-",tx5="-"
 				if(node.statistics !== undefined && node.statistics.clients !== undefined){
 					wifi24 = node.statistics.clients.wifi24
-					if(wifi24 < config.editmap.icon.warn.wifi24 && wifi24 > 0)
+					if(wifi24 < config.map.icon.warn.wifi24 && wifi24 > 0)
 						className += ' client24'
-					else if(wifi24 < config.editmap.icon.crit.wifi24 && wifi24 >= config.editmap.icon.warn.wifi24)
+					else if(wifi24 < config.map.icon.crit.wifi24 && wifi24 >= config.map.icon.warn.wifi24)
 						className += ' client24-warn'
-					else if(wifi24 >= config.editmap.icon.crit.wifi24)
+					else if(wifi24 >= config.map.icon.crit.wifi24)
 						className += ' client24-crit'
 
 					wifi5 = node.statistics.clients.wifi5
-					if(config.editmap.icon.warn.wifi5 < 20 && wifi5 > 0)
+					if(config.map.icon.warn.wifi5 < 20 && wifi5 > 0)
 						className += ' client5'
-					else if(wifi5 < config.editmap.icon.crit.wifi5 && wifi5 >= config.editmap.icon.warn.wifi5)
+					else if(wifi5 < config.map.icon.crit.wifi5 && wifi5 >= config.map.icon.warn.wifi5)
 						className += ' client5-warn'
-					else if(wifi5 >= config.editmap.icon.crit.wifi5)
+					else if(wifi5 >= config.map.icon.crit.wifi5)
 						className += ' client5-crit'
 				}
 				if(node.nodeinfo.wireless !== undefined){
@@ -95,17 +96,16 @@ define(['leaflet','leaflet.label','controller/sidebar'],function(leaflet,leaflet
 					tx24 = (node.nodeinfo.wireless.txpower24)?node.nodeinfo.wireless.txpower24:'-'
 					tx5 = (node.nodeinfo.wireless.txpower5)?node.nodeinfo.wireless.txpower5:'-'
 				}
-
 				m.bindLabel(node.nodeinfo.hostname+" <div class=\"nodeicon-label\">("+key+")"+
-					"<table><tr><td></td><td>Cl</td><td>Ch</td><td>Tx</td></tr>"+
-					"<tr><td>2.4 Ghz</td><td>"+wifi24+"</td><td>"+ch24+"</td><td>"+tx24+"</td></tr>"+
-					"<tr><td>5 Ghz</td><td>"+wifi5+"</td><td>"+ch5+"</td><td>"+tx5+"</td></tr>"+
+					"<table><tr><th></th><th>Cl</th><th>Ch</th><th>Tx</th></tr>"+
+					"<tr><td>2.4G</td><td>"+wifi24+"</td><td>"+ch24+"</td><td>"+tx24+"</td></tr>"+
+					"<tr><td>5G</td><td>"+wifi5+"</td><td>"+ch5+"</td><td>"+tx5+"</td></tr>"+
 					"</table>"+
 					"</div>"
 				)
 				if(currentNode && currentNode == key){
 					className += ' select'
-					map.setView(m.getLatLng(),config.editmap.zoom)
+					map.setView(m.getLatLng(),config.map.zoom)
 					bar.setSelected(key)
 				}
 				m.setIcon(leaflet.divIcon({className: className}))

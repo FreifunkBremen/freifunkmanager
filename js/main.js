@@ -1,5 +1,5 @@
-define(["helper/router","helper/storage","menu","controller/nodes","controller/map"],
-function (Router, storage, menu, controllerNodes, controllerMap) {
+define(["helper/router","helper/storage","menu","controller/nodes","controller/map","controller/frame"],
+function (Router, storage, menu, controllerNodes, controllerMap, controllerFrame) {
 	return function(config){
 		var store = storage(config)
 		store.refresh()
@@ -23,6 +23,8 @@ function (Router, storage, menu, controllerNodes, controllerMap) {
 		Router.config({
 			mode: 'hash'
 		})
+		.add(/statistics/, controllerFrame(el,config.statistics.all))
+		.add(/meshviewer/, controllerFrame(el,config.meshviewer))
 		.add(/list/, nodes.controller)
 		.add(/map\/(.*)/, map.controller)
 		.add(/map/, map.controller)

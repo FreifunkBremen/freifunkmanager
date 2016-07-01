@@ -32,9 +32,10 @@ define(["helper/lib"],function(){
 
 
 		var table = document.createElement("table")
-		table.innerHTML = "<tr><td></td><td>Cl</td><td>Ch</td><td>Tx</td></tr>"
+		table.classList.add("table")
+		table.innerHTML = "<tr><th></th><th>Cl</th><th>Ch</th><th>Tx</th></tr>"
 		var row24 = document.createElement("tr")
-		row24.innerHTML = "<td>2.4 Ghz</td>"
+		row24.innerHTML = "<td class=\"text\">2.4 Ghz</td>"
 		var cellClient24 = document.createElement("td")
 		row24.appendChild(cellClient24)
 		var cellCh24 = document.createElement("td")
@@ -44,7 +45,7 @@ define(["helper/lib"],function(){
 		table.appendChild(row24)
 
 		var row5 = document.createElement("tr")
-		row5.innerHTML = "<td>5 Ghz</td>"
+		row5.innerHTML = "<td class=\"text\">5 Ghz</td>"
 		var cellClient5 = document.createElement("td")
 		row5.appendChild(cellClient5)
 		var cellCh5 = document.createElement("td")

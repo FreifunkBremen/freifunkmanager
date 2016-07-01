@@ -1,8 +1,8 @@
 {
 	"api":"http://localhost:8080/api",
 	"reload":60000,
-	"map":"http://localhost:8080/meshviewer",
-	"editmap":{
+	"meshviewer":"http://localhost:8080/meshviewer",
+	"map":{
 		"icon":{
 			"warn":{"wifi24":20,"wifi5":20},
 			"crit":{"wifi24":30,"wifi5":30}
