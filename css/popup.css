@@ -1,0 +1,18 @@
+.popup {
+	position: fixed;
+	border-radius: 5px 5px 0px 0px;
+	background-color: grey;
+	color: white;
+	bottom: 0px;
+	width: 70%;
+	left:15%;
+	height: 32px;
+	padding: 10px;
+	z-index: 3500;
+}
+.popup.hidden{
+	bottom: -50px;
+}
+.popup a {
+	float: right;
+}

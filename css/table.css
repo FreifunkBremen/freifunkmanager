@@ -1,0 +1,55 @@
+table{
+	border-collapse: collapse;
+}
+table.table{
+	width: 100%;
+}
+.table th, .table td{
+	padding: 8px;
+	border-bottom: 1px solid #ddd;
+}
+.table td{
+	text-align: right;
+}
+.table td.text{
+	text-align: left;
+}
+.table tr:nth-child(even){
+	background-color: rgba(242, 242, 242, 0.4);;
+}
+.table th{
+	background-color: #dc0067;
+	background:-webkit-gradient(linear, left top, left bottom, from(#dc0067), to(#dc0050));
+	background:-moz-linear-gradient(top, #dc0067, #dc0050);
+	color: white;
+}
+.table small{
+	display: block;
+}
+.table i.icon{
+	margin-right: 15px;
+}
+.table td.split span{
+	display: block;
+}
+.table .sort-header:after{
+	float:right;
+	font-family: FontAwesome;
+	font-size: 1em;
+	visibility: hidden;
+	opacity: 0.6;
+	content: '\f0dc';
+}
+.table .sort-up:after, .table .sort-down:after{
+	visibility: visible;
+}
+.table .sort-header:hover:after{
+	visibility: visible;
+	opacity: 0.8;
+}
+.table .sort-up:after{
+	content: '\f0de';
+}
+.table .sort-down:after{
+	content: '\f0dd';
+}

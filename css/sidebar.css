@@ -1,0 +1,28 @@
+.sidebar.hidden{
+	display: none;
+}
+.sidebar .icon i{
+	cursor: pointer;
+	position: absolute;
+	top: 12px;
+	right: 0px;
+	width: 1.6em;
+	z-index: 3000;
+	color: black;
+	font: normal normal normal 24px/1 FontAwesome;
+}
+.sidebar{
+	background: rgba(255, 255, 255, 0.9);
+	z-index: 2000;
+	position: absolute;
+	left: 0px;
+	height: 100%;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16),0 3px 6px rgba(0,0,0,0.23);
+	width: 320pt;
+}
+@media screen and (max-width: 630pt){
+	.sidebar{
+		top: 500px;
+		width: 100%;
+	}
+}

@@ -1,53 +1,95 @@
-define(function(){
+define(["tablesort", "tablesort.numeric"],function(){
 	var data;
 	return function(el,map){
 		var title = document.createElement("h1"),
 			table = document.createElement("table"),
 			thead = document.createElement("thead"),
-			tbody = document.createElement("tbody");
+			tbody = document.createElement("tbody"),
+			sort;
 		title.textContent = "Undone Changes";
 		table.appendChild(thead);
 		table.appendChild(tbody);
 		table.classList.add("table");
 
-		thead.innerHTML = "<tr><th>Node</th><th>Freq</th><th>Channel</th><th>Power</th><th>Location</th></tr>";
+		thead.innerHTML = "<tr><th>Node</th><th class=\"no-sort\">Freq</th><th>Channel</th><th>Power</th><th>Location</th></tr>";
+		console.log(Tablesort);
+
+		var toChangeIcon = function(el){
+			var icon = document.createElement("i");
+			icon.classList.add("icon");
+			icon.textContent = "\uf096";
+			el.appendChild(icon);
+		};
 
 		var row = function(nodeid,alias,node){
-			var icon,td,
+			var icon,td,split1,split2,text,
 				tr = document.createElement("tr");
 
 			//Node
 			td = document.createElement("td");
 			td.classList.add("text");
 			if(alias.hostname && alias.hostname != node.nodeinfo.hostname){
-				icon = document.createElement("i");
-				icon.classList.add("icon");
-				icon.textContent = "\uf096";
-				td.appendChild(icon);
+				toChangeIcon(td);
 			}
 			td.appendChild(document.createTextNode((alias.hostname)?alias.hostname:node.nodeinfo.hostname));
-			var textNodeID = document.createElement("small");
-			textNodeID.textContent = nodeid;
-			td.appendChild(textNodeID);
+			text = document.createElement("small");
+			text.textContent = nodeid;
+			td.appendChild(text);
 			tr.appendChild(td);
 
 			td = document.createElement("td");
 			td.classList.add("split");
-			var freq24 = document.createTextNode("2.4 Ghz");
-			var freq5 = document.createTextNode("5 Ghz");
+			var freq24 = document.createElement("span");
+			freq24.textContent = "2.4 Ghz";
+			var freq5 = document.createElement("span");
+			freq5.textContent = "5 Ghz";
 			td.appendChild(freq24);
 			td.appendChild(freq5);
 			tr.appendChild(td);
 
 			td = document.createElement("td");
 			td.classList.add("split");
-			var ch24 = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.channel24)?alias.wireless.channel24:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel24)?node.nodeinfo.wireless.channel24:'-'));
-			var ch5 = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.channel5)?alias.wireless.channel5:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel5)?node.nodeinfo.wireless.channel5:'-'));
-			td.appendChild(ch24);
-			td.appendChild(ch5);
+			split1 = document.createElement("span");
+			split2 = document.createElement("span");
+			text = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.channel24)?alias.wireless.channel24:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel24)?node.nodeinfo.wireless.channel24:'-'));
+			if(alias && alias.wireless !== undefined && alias.wireless.channel24 &&
+				node.nodeinfo.wireless && node.nodeinfo.wireless.channel24 &&
+				alias.wireless.channel24 != node.nodeinfo.wireless.channel24){
+				toChangeIcon(text);
+			}
+			split1.appendChild(text);
+			text = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.channel5)?alias.wireless.channel5:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel5)?node.nodeinfo.wireless.channel5:'-'));
+			if(alias && alias.wireless !== undefined && alias.wireless.channel5 &&
+				node.nodeinfo.wireless && node.nodeinfo.wireless.channel5 &&
+				alias.wireless.channel5 != node.nodeinfo.wireless.channel5){
+				toChangeIcon(text);
+			}
+			split2.appendChild(text);
+			td.appendChild(split1);
+			td.appendChild(split2);
 			tr.appendChild(td);
 
 			td = document.createElement("td");
+			td.classList.add("split");
+			split1 = document.createElement("span");
+			split2 = document.createElement("span");
+
+			text = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.txpower24)?alias.wireless.txpower24:((node.nodeinfo.wireless && node.nodeinfo.wireless.txpower24)?node.nodeinfo.wireless.txpower24:'-'));
+			if(alias && alias.wireless !== undefined && alias.wireless.txpower24 &&
+				node.nodeinfo.wireless && node.nodeinfo.wireless.txpower24 &&
+				alias.wireless.txpower24 != node.nodeinfo.wireless.txpower24){
+				toChangeIcon(text);
+			}
+			split1.appendChild(text);
+			text = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.txpower5)?alias.wireless.txpower5:((node.nodeinfo.wireless && node.nodeinfo.wireless.txpower5)?node.nodeinfo.wireless.txpower5:'-'));
+			if(alias && alias.wireless !== undefined && alias.wireless.txpower5 &&
+				node.nodeinfo.wireless && node.nodeinfo.wireless.txpower5 &&
+				alias.wireless.txpower5 != node.nodeinfo.wireless.txpower5){
+				toChangeIcon(text);
+			}
+			split2.appendChild(text);
+			td.appendChild(split1);
+			td.appendChild(split2);
 			tr.appendChild(td);
 
 			//Location
@@ -57,11 +99,7 @@ define(function(){
 				node.nodeinfo.location.latitude != alias.location.latitude &&
 				node.nodeinfo.location.longitude != alias.location.longitude
 			){
-				td.classList.add("text");
-				icon = document.createElement("i");
-				icon.classList.add("icon");
-				icon.textContent = "\uf096";
-				td.appendChild(icon);
+				toChangeIcon(td);
 			}
 			td.classList.add("text");
 			icon = document.createElement("i");
@@ -73,9 +111,10 @@ define(function(){
 			};
 			td.appendChild(icon);
 			tr.appendChild(td);
-
-
 			tbody.appendChild(tr);
+			if(sort === undefined)
+				sort = new Tablesort(table);
+			sort.refresh();
 		};
 
 		var render = function() {

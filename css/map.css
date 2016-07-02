@@ -1,0 +1,49 @@
+.nodeicon{
+	background-color: rgba(0,255,0,0.5);
+	border: 2px solid white;
+	border-radius: 10px;
+	width:3px;
+	height: 3px;
+}
+.nodeicon-label{
+	font-size: 12px;
+	font-weight: lighter;
+}
+.nodeicon-label table{
+	width: 100%
+}
+.nodeicon-label table td{
+	border-top:1px solid #999;
+	text-align: right;
+}
+.nodeicon-label table td:first-child{
+	text-align: left;
+}
+.nodeicon.offline{
+	background-color: rgba(255,0,0,0.5);
+}
+.nodeicon.select{
+	background-color: green;
+}
+.nodeicon.select.offline{
+	background-color: red;
+	border-color: black;
+}
+.nodeicon.client24{
+	border-left: 3px solid blue;
+}
+.nodeicon.client5{
+	border-right: 3px solid blue;
+}
+.nodeicon.client24-warn{
+	border-left: 3px solid yellow;
+}
+.nodeicon.client5-warn{
+	border-right: 3px solid yellow;
+}
+.nodeicon.client24-crit{
+	border-left: 3px solid red;
+}
+.nodeicon.client5-crit{
+	border-right: 3px solid red;
+}
