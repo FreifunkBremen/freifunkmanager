@@ -1,5 +1,5 @@
-define(["helper/router","helper/storage","menu","controller/nodes","controller/map","controller/frame"],
-function (Router, storage, menu, controllerNodes, controllerMap, controllerFrame) {
+define(["helper/router","helper/storage","menu","popup","controller/nodes","controller/aliases","controller/map","controller/frame"],
+function (Router, storage, menu, popup, controllerNodes, controllerAliases, controllerMap, controllerFrame) {
 	return function(config){
 		var store = storage(config);
 		store.refresh();
@@ -17,7 +17,13 @@ function (Router, storage, menu, controllerNodes, controllerMap, controllerFrame
 		var map = controllerMap(el,config);
 		store.addNotify(map);
 
-		var nodes = controllerNodes(el,config);
+		var aliases = controllerAliases(el,map);
+		store.addNotify(aliases);
+
+		var popupInstance = popup(document.body,map);
+		store.addNotifyNew(popupInstance);
+
+		var nodes = controllerNodes(el);
 		store.addNotify(nodes);
 
 		Router.config({
@@ -25,7 +31,8 @@ function (Router, storage, menu, controllerNodes, controllerMap, controllerFrame
 		})
 		.add(/grafana/, controllerFrame(el,config.grafana.all))
 		.add(/meshviewer/, controllerFrame(el,config.meshviewer))
-		.add(/list/, nodes.controller)
+		.add(/aliases/, aliases.controller)
+		.add(/nodes/, nodes.controller)
 		.add(/map\/(.*)/, map.controller)
 		.add(/map/, map.controller)
 		.add(nodes.controller)

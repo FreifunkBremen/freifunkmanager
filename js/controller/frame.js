@@ -3,7 +3,7 @@ define(function(){
 		var frame = document.createElement("iframe");
 		frame.src = url;
 		return function(){
-			el.innerHTML = "";
+			el.textContent = "";
 			el.appendChild(frame);
 		};
 	};

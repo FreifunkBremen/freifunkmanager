@@ -1,12 +1,12 @@
 define(function(){
 	var data;
-	return function(el,config){
+	return function(el){
 		return {
 			storageNotify: function(d){
 				data = d;
 			},
 			controller: function(){
-				el.innerHTML = "Not implemented";
+				el.textContent = "Not implemented";
 			}
 		};
 	};

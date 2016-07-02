@@ -5,7 +5,11 @@ define(["helper/lib","moment"],function(lib,moment){
 
 		if(localStorageTest()){
 			data.nodes = JSON.parse(localStorage.getItem("nodes"));
+			if(!data.nodes)
+				data.nodes = {};
 			data.aliases = JSON.parse(localStorage.getItem("aliases"));
+			if(!data.aliases)
+				data.aliases = {};
 		}
 
 		var notify =  function(){
@@ -30,8 +34,8 @@ define(["helper/lib","moment"],function(lib,moment){
 			});
 			send('GET',config.api+"/nodes").then(function(d){
 				Object.keys(d).map(function(key){
-					if(data.nodes === undefined && data.nodes[key] === undefined){
-						notifyNew(key,data[key]);
+					if(data.nodes === undefined || data.nodes[key] === undefined){
+						notifyNew(key,d[key]);
 					}
 					data.nodes[key] = d[key];
 				});

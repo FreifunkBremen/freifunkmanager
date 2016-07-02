@@ -7,23 +7,30 @@ define(function(){
 		menu.appendChild(right);
 		el.appendChild(menu);
 
-		var buttonList = document.createElement("i");
-		buttonList.innerHTML = "";
-		buttonList.onclick = function () {
-			window.location.href = "#list";
+		var buttonNodes = document.createElement("i");
+		buttonNodes.textContent = "";
+		buttonNodes.onclick = function () {
+			window.location.href = "#nodes";
 		};
-		right.appendChild(buttonList);
+		right.appendChild(buttonNodes);
 
 		var buttonMap = document.createElement("i");
-		buttonMap.innerHTML = '\uf278';
+		buttonMap.textContent = '\uf278';
 		buttonMap.onclick = function () {
 			window.location.href = "#map";
 		};
 		right.appendChild(buttonMap);
 
+		var buttonAliases = document.createElement("i");
+		buttonAliases.textContent = "\uf0ec";
+		buttonAliases.onclick = function () {
+			window.location.href = "#aliases";
+		};
+		right.appendChild(buttonAliases);
+
 		var buttonStatistic = document.createElement("i");
 		buttonStatistic.classList.add("mini");
-		buttonStatistic.innerHTML = "";
+		buttonStatistic.textContent = "";
 		buttonStatistic.onclick = function () {
 			window.location.href = "#grafana";
 		};
@@ -31,7 +38,7 @@ define(function(){
 
 		var buttonMeshviewer = document.createElement("i");
 		buttonMeshviewer.classList.add("mini");
-		buttonMeshviewer.innerHTML = '\uf279';
+		buttonMeshviewer.textContent = '\uf279';
 		buttonMeshviewer.onclick = function () {
 			window.location.href = "#meshviewer";
 		};
@@ -39,7 +46,7 @@ define(function(){
 
 
 		var buttonRefresh = document.createElement("i");
-		buttonRefresh.innerHTML = "";
+		buttonRefresh.textContent = "";
 		var refreshtime = document.createElement("span");
 		store.setTimeSinceUpdate(refreshtime);
 		buttonRefresh.appendChild(refreshtime);

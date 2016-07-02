@@ -128,14 +128,18 @@ define(['leaflet','controller/sidebar','leaflet.label'],function(L,Sidebar){
 		};
 
 		return {
+			render: function(nodeid){
+				currentNode = nodeid;
+				render();
+			},
 			storageNotify: function(d){
 				data = d;
 				bar.storageNotify(d);
 				render();
 			},
 			controller: function(){
-				currentNode = arguments[0];
-				el.innerHTML = "";
+				currentNode = (arguments[0])?arguments[0].toLowerCase():null;
+				el.textContent = "";
 				el.appendChild(sideBarEl);
 				el.appendChild(mapEl);
 			}

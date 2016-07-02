@@ -20,9 +20,9 @@ define(["helper/lib"],function(){
 		sidebar.appendChild(controll);
 
 		var iconClose = document.createElement('i');
-		iconClose.innerHTML = "\uf00d";
+		iconClose.textContent = "\uf00d";
 		controll.appendChild(iconClose);
-		iconClose.addEventListener("click",close);
+		iconClose.onclick = close;
 
 		var content = document.createElement("div");
 		content.classList.add("content");
@@ -64,16 +64,16 @@ define(["helper/lib"],function(){
 		var btnSave = document.createElement("button");
 		var saveIcon = document.createElement('i');
 		saveIcon.classList.add("icon");
-		saveIcon.innerHTML = "\uf0c7";
+		saveIcon.textContent = "\uf0c7";
 		btnSave.appendChild(saveIcon);
-		btnSave.innerHTML += " Save";
+		btnSave.appendChild(document.createTextNode(" Save"));
 		content.appendChild(btnSave);
 
 		if (navigator.geolocation) {
 			var btnGps = document.createElement("button");
 			var gpsIcon = document.createElement('i');
 			gpsIcon.classList.add("icon");
-			gpsIcon.innerHTML = "\uf124";
+			gpsIcon.textContent = "\uf124";
 			btnGps.appendChild(gpsIcon);
 			content.appendChild(btnGps);
 
@@ -81,13 +81,26 @@ define(["helper/lib"],function(){
 				var pos = [position.coords.latitude,position.coords.longitude];
 				marker.setLatLng(pos);
 				marker._map.setView(pos);
+
+				if(data.aliases[nodeid] === undefined)
+					data.aliases[nodeid] = {};
+				alias = data.aliases[nodeid];
+				if(alias.location === undefined){
+					alias.location = {};
+				}
+				pos = marker.getLatLng();
+				alias.location.latitude = pos.lat;
+				alias.location.longitude = pos.lng;
+				send('POST',config.api+'/aliases/alias/'+nodeid,alias).then(function(){
+					close();
+				});
 			};
-			btnGps.addEventListener("click",function() {
+			btnGps.onclick = function() {
 				navigator.geolocation.getCurrentPosition(setToGps);
-			});
+			};
 		}
 
-		btnSave.addEventListener("click",function() {
+		btnSave.onclick = function() {
 			if(data.aliases[nodeid] === undefined)
 				data.aliases[nodeid] = {};
 			alias = data.aliases[nodeid];
@@ -101,22 +114,22 @@ define(["helper/lib"],function(){
 			send('POST',config.api+'/aliases/alias/'+nodeid,alias).then(function(){
 				close();
 			});
-		});
+		};
 
 		var render = function(){
 			if(nodeid !== undefined){
 				var node = data.nodes[nodeid];
 				var alias = data.aliases[nodeid];
 				sidebar.classList.remove("hidden");
-				lblNodeid.innerHTML = "Nodeid:"+nodeid;
+				lblNodeid.textContent = "Nodeid:"+nodeid;
 				inHostname.value = ((alias && alias.hostname)?alias.hostname:node.nodeinfo.hostname);
 
-				cellClient24.innerHTML = (node.statistics !== undefined && node.statistics.clients !== undefined)?node.statistics.clients.wifi24:'-';
-				cellClient5.innerHTML = (node.statistics !== undefined && node.statistics.clients !== undefined)?node.statistics.clients.wifi5:'-';
-				cellCh24.innerHTML = (alias && alias.wireless && alias.wireless.channel24)?alias.wireless.channel24:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel24)?node.nodeinfo.wireless.channel24:'-');
-				cellCh5.innerHTML = (alias && alias.wireless && alias.wireless.channel5)?alias.wireless.channel5:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel5)?node.nodeinfo.wireless.channel5:'-');
-				cellTx24.innerHTML = (alias && alias.wireless && alias.wireless.txpower24)?alias.wireless.txpower24:((node.nodeinfo.wireless && node.nodeinfo.wireless.txpower24)?node.nodeinfo.wireless.txpower24:'-');
-				cellTx5.innerHTML = (alias && alias.wireless && alias.wireless.txpower5)?alias.wireless.txpower5:((node.nodeinfo.wireless && node.nodeinfo.wireless.txpower5)?node.nodeinfo.wireless.txpower5:'-');
+				cellClient24.textContent = (node.statistics !== undefined && node.statistics.clients !== undefined)?node.statistics.clients.wifi24:'-';
+				cellClient5.textContent = (node.statistics !== undefined && node.statistics.clients !== undefined)?node.statistics.clients.wifi5:'-';
+				cellCh24.textContent = (alias && alias.wireless && alias.wireless.channel24)?alias.wireless.channel24:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel24)?node.nodeinfo.wireless.channel24:'-');
+				cellCh5.textContent = (alias && alias.wireless && alias.wireless.channel5)?alias.wireless.channel5:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel5)?node.nodeinfo.wireless.channel5:'-');
+				cellTx24.textContent = (alias && alias.wireless && alias.wireless.txpower24)?alias.wireless.txpower24:((node.nodeinfo.wireless && node.nodeinfo.wireless.txpower24)?node.nodeinfo.wireless.txpower24:'-');
+				cellTx5.textContent = (alias && alias.wireless && alias.wireless.txpower5)?alias.wireless.txpower5:((node.nodeinfo.wireless && node.nodeinfo.wireless.txpower5)?node.nodeinfo.wireless.txpower5:'-');
 
 			}else{
 				sidebar.classList.add("hidden");
