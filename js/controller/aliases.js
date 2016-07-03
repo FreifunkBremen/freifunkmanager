@@ -12,7 +12,6 @@ define(["tablesort", "tablesort.numeric"],function(){
 		table.classList.add("table");
 
 		thead.innerHTML = "<tr><th>Node</th><th class=\"no-sort\">Freq</th><th>Channel</th><th>Power</th><th>Location</th></tr>";
-		console.log(Tablesort);
 
 		var toChangeIcon = function(el){
 			var icon = document.createElement("i");
@@ -28,10 +27,10 @@ define(["tablesort", "tablesort.numeric"],function(){
 			//Node
 			td = document.createElement("td");
 			td.classList.add("text");
-			if(alias.hostname && alias.hostname != node.nodeinfo.hostname){
+			if(alias && alias.hostname && node.nodeinfo && alias.hostname != node.nodeinfo.hostname){
 				toChangeIcon(td);
 			}
-			td.appendChild(document.createTextNode((alias.hostname)?alias.hostname:node.nodeinfo.hostname));
+			td.appendChild(document.createTextNode((alias && alias.hostname)?alias.hostname:node.nodeinfo.hostname));
 			text = document.createElement("small");
 			text.textContent = nodeid;
 			td.appendChild(text);

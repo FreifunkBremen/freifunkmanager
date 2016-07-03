@@ -45,3 +45,9 @@ button,input{
 i.icon{
 	font: normal normal normal 12px/1 FontAwesome;
 }
+i.icon.online{
+	color: green;
+}
+i.icon.offline{
+	color: red;
+}

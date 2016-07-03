@@ -23,7 +23,7 @@ function (Router, storage, menu, popup, controllerNodes, controllerAliases, cont
 		var popupInstance = popup(document.body,map);
 		store.addNotifyNew(popupInstance);
 
-		var nodes = controllerNodes(el);
+		var nodes = controllerNodes(el,map);
 		store.addNotify(nodes);
 
 		Router.config({
