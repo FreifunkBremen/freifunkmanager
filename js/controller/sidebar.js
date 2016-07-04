@@ -79,8 +79,10 @@ define(["helper/lib"],function(){
 
 			var setToGps = function(position){
 				var pos = [position.coords.latitude,position.coords.longitude];
-				marker.setLatLng(pos);
-				marker._map.setView(pos);
+				if(marker){
+					marker.setLatLng(pos);
+					marker._map.setView(pos);
+				}
 
 				if(data.aliases[nodeid] === undefined)
 					data.aliases[nodeid] = {};
@@ -88,9 +90,9 @@ define(["helper/lib"],function(){
 				if(alias.location === undefined){
 					alias.location = {};
 				}
-				pos = marker.getLatLng();
-				alias.location.latitude = pos.lat;
-				alias.location.longitude = pos.lng;
+				alias.hostname = inHostname.value;
+				alias.location.latitude = position.coords.latitude;
+				alias.location.longitude = position.coords.longitude;
 				send('POST',config.api+'/aliases/alias/'+nodeid,alias).then(function(){
 					close();
 				});
@@ -104,12 +106,14 @@ define(["helper/lib"],function(){
 			if(data.aliases[nodeid] === undefined)
 				data.aliases[nodeid] = {};
 			alias = data.aliases[nodeid];
-			if(alias.location === undefined){
-				alias.location = {};
+			if(marker){
+				if(alias.location === undefined){
+					alias.location = {};
+				}
+				pos = marker.getLatLng();
+				alias.location.latitude = pos.lat;
+				alias.location.longitude = pos.lng;
 			}
-			pos = marker.getLatLng();
-			alias.location.latitude = pos.lat;
-			alias.location.longitude = pos.lng;
 			alias.hostname = inHostname.value;
 			send('POST',config.api+'/aliases/alias/'+nodeid,alias).then(function(){
 				close();

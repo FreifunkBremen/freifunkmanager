@@ -60,7 +60,12 @@ define(['leaflet','controller/sidebar','leaflet.label'],function(L,Sidebar){
 			}
 
 			var nodes = Object.keys(data.nodes).filter(function(key){
-				return data.nodes[key].nodeinfo && data.nodes[key].nodeinfo.location;
+				if((data.nodes[key].nodeinfo && data.nodes[key].nodeinfo.location) || 
+					(data.aliases[key] && data.aliases[key].location))
+					return true;
+				if(currentNode && currentNode == key)
+					bar.setSelected(key,null,function(){});
+				return false;
 			}).map(function(key){
 				var node = data.nodes[key];
 				var alias = data.aliases[key];

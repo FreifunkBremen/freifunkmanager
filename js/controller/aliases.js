@@ -54,14 +54,14 @@ define(["tablesort", "tablesort.numeric"],function(){
 			if(alias && alias.wireless !== undefined && alias.wireless.channel24 &&
 				node.nodeinfo.wireless && node.nodeinfo.wireless.channel24 &&
 				alias.wireless.channel24 != node.nodeinfo.wireless.channel24){
-				toChangeIcon(text);
+				toChangeIcon(split1);
 			}
 			split1.appendChild(text);
 			text = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.channel5)?alias.wireless.channel5:((node.nodeinfo.wireless && node.nodeinfo.wireless.channel5)?node.nodeinfo.wireless.channel5:'-'));
 			if(alias && alias.wireless !== undefined && alias.wireless.channel5 &&
 				node.nodeinfo.wireless && node.nodeinfo.wireless.channel5 &&
 				alias.wireless.channel5 != node.nodeinfo.wireless.channel5){
-				toChangeIcon(text);
+				toChangeIcon(split2);
 			}
 			split2.appendChild(text);
 			td.appendChild(split1);
@@ -77,14 +77,14 @@ define(["tablesort", "tablesort.numeric"],function(){
 			if(alias && alias.wireless !== undefined && alias.wireless.txpower24 &&
 				node.nodeinfo.wireless && node.nodeinfo.wireless.txpower24 &&
 				alias.wireless.txpower24 != node.nodeinfo.wireless.txpower24){
-				toChangeIcon(text);
+				toChangeIcon(split1);
 			}
 			split1.appendChild(text);
 			text = document.createTextNode((alias && alias.wireless !== undefined && alias.wireless.txpower5)?alias.wireless.txpower5:((node.nodeinfo.wireless && node.nodeinfo.wireless.txpower5)?node.nodeinfo.wireless.txpower5:'-'));
 			if(alias && alias.wireless !== undefined && alias.wireless.txpower5 &&
 				node.nodeinfo.wireless && node.nodeinfo.wireless.txpower5 &&
 				alias.wireless.txpower5 != node.nodeinfo.wireless.txpower5){
-				toChangeIcon(text);
+				toChangeIcon(split2);
 			}
 			split2.appendChild(text);
 			td.appendChild(split1);
@@ -94,9 +94,9 @@ define(["tablesort", "tablesort.numeric"],function(){
 			//Location
 			td = document.createElement("td");
 			if(alias.location !== undefined &&
-				node.nodeinfo.location !== undefined &&
+				((node.nodeinfo.location !== undefined &&
 				node.nodeinfo.location.latitude != alias.location.latitude &&
-				node.nodeinfo.location.longitude != alias.location.longitude
+				node.nodeinfo.location.longitude != alias.location.longitude) || node.nodeinfo.location === undefined)
 			){
 				toChangeIcon(td);
 			}

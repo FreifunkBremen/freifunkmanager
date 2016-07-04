@@ -31,6 +31,10 @@ button,input{
 	font-size: 14px;
 }
 
+input:invalid {
+  border: 3px solid red;
+}
+
 .content, .content > .map{
 	width:100%;
 	height:100%;
