@@ -8,6 +8,11 @@ require.config({
 		"tablesort.numeric": "../bower_components/tablesort/src/sorts/tablesort.numeric"
 	},
 	shim: {
+		"leaflet.label": ["leaflet"],
+		"tablesort": {
+			exports: "Tablesort"
+		},
+		"tablesort.numeric": ["tablesort"],
 	}
 });
 require(["main", "helper/lib"], function (main) {
