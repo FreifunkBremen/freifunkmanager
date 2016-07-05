@@ -9,7 +9,7 @@
 		},
 		"view":[53.0702,8.815],
 		"zoom":16,
-		"geojson":"http://ffhb.h.sum7.de/data/meshviewer.geojson",
+		"geojson":"https://raw.githubusercontent.com/FreifunkBremen/internal-maps/master/breminale.geojson",
 		"tiles":{
 			"url":"https://otile{s}-s.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.jpg",
 			"option":{
