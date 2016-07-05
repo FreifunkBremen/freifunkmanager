@@ -1,5 +1,5 @@
 {
-  "name": "eventmanager",
+  "name": "freifunkmanager",
   "version": "1.0.0",
   "description": "Eventmanager for respond-collector",
   "main": "Gruntfile.js",
@@ -25,12 +25,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FreifunkBremen/eventmanager.git"
+    "url": "git+https://github.com/FreifunkBremen/freifunkmanager.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/FreifunkBremen/eventmanager/issues"
+    "url": "https://github.com/FreifunkBremen/freifunkmanager/issues"
   },
-  "homepage": "https://github.com/FreifunkBremen/eventmanager#readme"
+  "homepage": "https://github.com/FreifunkBremen/freifunkmanager#readme"
 }
