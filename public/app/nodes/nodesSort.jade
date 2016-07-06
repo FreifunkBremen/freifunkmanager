@@ -1,0 +1,40 @@
+table.table.table-striped.table-condensed( ng-table="tableParams")
+	tr(ng-repeat='row in $data',ng-class="{'danger':!row.flags.online}",ng-form="rowForm",demo-tracked-table-row="row")
+		td(data-title="'Last'",sortable="'lastseen'", am-time-ago="row.lastseen")
+		td(data-title="'ID'", filter="{nodeid: 'text'}", sortable="'nodeid'") {{row.nodeid}}
+		td(data-title="'Group'",sortable="'nodeinfo.owner.contact'",filter="{'nodeinfo.owner.contact': 'text'}",ng-switch="row.isEditing")
+			span(ng-switch-default) {{row.nodeinfo.owner.contact}}
+			div.controls(ng-switch-when="true",ng-class="rowForm.group.$invalid ? 'has-error' : ''")
+				input.editable-input.form-control.input-sm(type="text",name="group",pattern="[a-zA-Z0-9-]*",ng-model='row.nodeinfo.owner.contact')
+		td(data-title="'Hostname'", filter="{'nodeinfo.hostname': 'text'}", sortable="'nodeinfo.hostname'",ng-switch="row.isEditing")
+			span(ng-switch-default)  {{row.nodeinfo.hostname}}
+			div.controls(ng-switch-when="true",ng-class="rowForm.hostname.$invalid ? 'has-error' : ''")
+				input.editable-input.form-control.input-sm(type="text" name="hostname",pattern="[a-zA-Z0-9-]*",ng-model='row.nodeinfo.hostname',required)
+		td(data-title="'First'",sortable="'firstseen'", am-time-ago="row.firstseen")
+		td.split.text-right(data-title="'Freq'")
+			span 2.4 Ghz
+			span 5 Ghz
+		td.split.text-right(data-title="'Clients'", sortable="'statistics.clients.wifi24'")
+			span {{row.statistics.clients.wifi24}}
+			span {{row.statistics.clients.wifi5}}
+		td.text-right.split(data-title="'Channel'",filter="{'nodeinfo.wireless.channel5': 'number'}", sortable="'nodeinfo.wireless.channel5'",ng-switch="row.isEditing")
+			span(ng-switch-default) {{row.nodeinfo.wireless.channel24}}
+			div.controls(ng-switch-when="true",ng-class="rowForm.channel24.$invalid ? 'has-error' : ''")
+				input.editable-input.form-control.input-sm(type="text" name="channel24",ng-model='row.nodeinfo.wireless.channel24',required)
+			span(ng-switch-default) {{row.nodeinfo.wireless.channel5}}
+			div.controls(ng-switch-when="true",ng-class="rowForm.channel5.$invalid ? 'has-error' : ''")
+				input.editable-input.form-control.input-sm(type="text" name="channel5",ng-model='row.nodeinfo.wireless.channel5',required)
+		td.text-right.split(data-title="'Power'",filter="{'txpower24': 'number'}",ng-switch="row.isEditing")
+			span(ng-switch-default) {{row.nodeinfo.wireless.txpower24}}
+			div.controls(ng-switch-when="true",ng-class="rowForm.txpower24.$invalid ? 'has-error' : ''")
+				input.editable-input.form-control.input-sm(type="text" name="txpower24",ng-model='row.nodeinfo.wireless.txpower24',required)
+			span(ng-switch-default) {{row.nodeinfo.wireless.channel5}}
+			div.controls(ng-switch-when="true",ng-class="rowForm.txpower5.$invalid ? 'has-error' : ''")
+				input.editable-input.form-control.input-sm(type="text" name="txpower5",ng-model='row.nodeinfo.wireless.txpower5',required)
+		td(data-title="'Options'")
+			.btn.btn-success.btn-sm(ng-click="save(row, rowForm)",ng-if="row.isEditing",ng-disabled="rowForm.$pristine || rowForm.$invalid")
+				span.glyphicon.glyphicon-ok
+			.btn.btn-warning.btn-sm(ng-click="cancel(row, rowForm)",ng-if="row.isEditing")
+				span.glyphicon.glyphicon-remove
+			.btn.btn-primary.btn-sm(ng-click="row.isEditing = true",ng-if="!row.isEditing")
+				span.glyphicon.glyphicon-pencil

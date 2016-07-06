@@ -1,0 +1,28 @@
+{
+  "name": "freifunkmanager",
+  "homepage": "https://github.com/FreifunkBremen/freifunkmanager",
+  "authors": [
+    "Martin Geno <geno+dev@fireorbit.de>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ng-table": "^1.0.0",
+    "angular-ui-router": "^0.3.1",
+    "angular-resource": "^1.5.7",
+    "angular-bootstrap": "^1.3.3",
+    "bootstrap": "^3.3.6",
+    "angular-moment": "^0.10.3",
+    "angular-web-notification": "^0.0.83",
+    "ui-leaflet": "^1.0.1",
+    "angular-cookies": "^1.5.7"
+  }
+}

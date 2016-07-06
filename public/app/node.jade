@@ -1,0 +1,19 @@
+
+.container
+	.page-header
+		h1 {{node.nodeinfo.hostname}}
+		small {{nodeid}}
+	form(name="rowForm",ng-submit="save()")
+		.form-group(ng-class="rowForm.group.$invalid ? 'has-error' : ''")
+			label(for="formGroup") Group
+			input.form-control(id="formGroup",placeholder="Group",type="text",name="group",pattern="[a-zA-Z0-9-]*",ng-model='node.nodeinfo.owner.contact')
+		.form-group(ng-class="rowForm.hostname.$invalid ? 'has-error' : ''")
+			label(for="formHostname") Hostname
+			input.form-control(id="formHostname",placeholder="Hostname",type="text",name="hostname",pattern="[a-zA-Z0-9-]*",ng-model='node.nodeinfo.hostname',required)
+		leaflet(geojson=geojson,center=center,markers=markers)
+		button.btn.btn-default(type="submit")
+			span.glyphicon.glyphicon-floppy-disk(aria-hidden="true")
+			| Save
+		span.btn.btn-default(ng-click="gps()")
+			span.glyphicon.glyphicon-map-marker(aria-hidden="true")
+			| GPS

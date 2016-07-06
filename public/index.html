@@ -1,0 +1,72 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<base href="/">
+		<title>Freifunk Manager</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+		<!-- build:css(public) app/vendor.css -->
+			<!-- bower:css -->
+			<link rel="stylesheet" href="bower_components/ng-table/dist/ng-table.css" />
+			<link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+			<!-- endbower -->
+			<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+		<!-- endbuild -->
+		<!-- build:css({.tmp,public}) app/app.css -->
+		<link rel="stylesheet" href="app/app.css">
+			<!-- injector:css -->
+			<!-- endinjector -->
+		<!-- endbuild -->
+	</head>
+	<body ng-app="ffhb">
+		<!--[if lt IE 9]>
+			<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+		<![endif]-->
+		<!-- Add your site or application content here -->
+
+		<div ui-view=""></div>
+		<!-- build:js(public) app/vendor.js -->
+			<!-- bower:js -->
+			<script src="bower_components/jquery/dist/jquery.js"></script>
+			<script src="bower_components/angular/angular.js"></script>
+			<script src="bower_components/ng-table/dist/ng-table.js"></script>
+			<script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+			<script src="bower_components/angular-resource/angular-resource.js"></script>
+			<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+			<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+			<script src="bower_components/moment/moment.js"></script>
+			<script src="bower_components/angular-moment/angular-moment.js"></script>
+			<script src="bower_components/HTML5-Desktop-Notifications2/desktop-notify.js"></script>
+			<script src="bower_components/angular-web-notification/angular-web-notification.js"></script>
+			<script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
+			<script src="bower_components/leaflet/dist/leaflet-src.js"></script>
+			<script src="bower_components/ui-leaflet/dist/ui-leaflet.js"></script>
+			<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+			<!-- endbower -->
+			<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+		<!-- endbuild -->
+		<!-- build:js({.tmp,public}) app/app.js -->
+		<script src="app/app.js"></script>
+			<!-- injector:js -->
+			<script src="app/changes.js"></script>
+			<script src="app/index.js"></script>
+			<script src="app/main.js"></script>
+			<script src="app/node.js"></script>
+			<script src="app/nodes/nodes.js"></script>
+			<script src="app/nodes/nodesGroup.js"></script>
+			<script src="app/nodes/nodesSort.js"></script>
+			<script src="components/basicauth.js"></script>
+			<script src="components/config.js"></script>
+			<script src="components/store.js"></script>
+			<!-- endinjector -->
+		<!-- endbuild -->
+	</body>
+</html>

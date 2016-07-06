@@ -1,0 +1,9 @@
+/node_modules
+/public/bower_components
+/build
+
+/tmp
+/.tmp
+*.log
+
+/public/translations.js
