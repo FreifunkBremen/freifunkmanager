@@ -12,7 +12,7 @@ angular.module('ffhb')
 		});
 		function render(prom){
 			prom.then(function(data){
-				var result = Object.keys(data.nodes).map(function(nodeid){
+				var result = Object.keys(data.merged).map(function(nodeid){
 					data.merged[nodeid].nodeid = nodeid;
 					return data.merged[nodeid];
 				});

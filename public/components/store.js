@@ -24,6 +24,7 @@ angular.module('ffhb')
 		myservice._initialized = false;
 		myservice._data = $cookieStore.get('data') ||{
 				nodes: {},nodesCount:0,
+				merged: {},
 				aliases: {},aliasesCount:0
 			};
 		var geojsonDeferred = $q.defer();
@@ -32,22 +33,26 @@ angular.module('ffhb')
 		});
 		myservice.getGeojson = geojsonDeferred.promise;
 
-		myservice.refresh = function() {
+		myservice.refresh = function(notify) {
 			var dataDeferred = $q.defer();
 			$http.get(config.api+'/nodes').success(function(nodes) {
 				$http.get(config.api+'/aliases').success(function(aliases) {
-					Object.keys(nodes).map(function(key){
-						if(myservice._data.nodes === undefined || myservice._data.nodes[key] === undefined){
-							notifyNew(key);
-						}
-						if(myservice._data.nodes !== undefined && myservice._data.nodes[key].flags.offline){
-							notifyOffline(key);
-						}
-						myservice._data.nodes[key] = nodes[key];
-					});
+					if(notify){
+						Object.keys(nodes).map(function(key){
+							if(myservice._data.nodes === undefined || myservice._data.nodes[key] === undefined){
+								notifyNew(key);
+							}
+							if(myservice._data.nodes !== undefined && myservice._data.nodes[key] !== undefined && myservice._data.nodes[key].flags.offline){
+								notifyOffline(key);
+							}
+							myservice._data.nodes[key] = nodes[key];
+						});
+					}else {
+						myservice._data.nodes = nodes;
+					}
 					angular.copy(nodes, myservice._data.merged);
 					Object.keys(aliases).map(function(key){
-						var node = myservice._data.merged[key],
+						var node = myservice._data.nodes[key],
 							alias = aliases[key];
 						node.nodeinfo.hostname = alias.hostname;
 						if(!node.nodeinfo.owner){
@@ -98,7 +103,7 @@ angular.module('ffhb')
 			myservice.getData = dataDeferred.promise;
 			return dataDeferred.promise;
 		};
-		myservice.refresh();
+		myservice.refresh(false);
 
 		myservice.saveNode = function(nodeid){
 			var result = $q.defer();
@@ -109,7 +114,7 @@ angular.module('ffhb')
 					'owner':node.owner.contact
 				}).then(function(){
 					result.resolve(true);
-					myservice.refresh();
+					myservice.refresh(true);
 				});
 			}else{
 				result.resolve(false);
@@ -120,7 +125,7 @@ angular.module('ffhb')
 
 		if(config.refresh){
 			$interval(function () {
-				myservice.refresh();
+				myservice.refresh(true);
 			}, config.refresh);
 		}
 
