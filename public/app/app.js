@@ -5,8 +5,9 @@ angular.module('ffhb', [
 	'ngResource',
 	'ngCookies',
 	'ui.router',
-	'angularMoment',
+	'ui.bootstrap',
 	'ui-leaflet',
+	'angularMoment',
 	'Authentication',
 	'angular-web-notification',
 	'config'

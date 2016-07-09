@@ -38,3 +38,5 @@ table.table.table-striped.table-condensed( ng-table="tableParams")
 				span.glyphicon.glyphicon-remove
 			.btn.btn-primary.btn-sm(ng-click="row.isEditing = true",ng-if="!row.isEditing")
 				span.glyphicon.glyphicon-pencil
+			a.btn.btn-default(ui-sref="app.node({nodeid: row.nodeid})")
+				span.glyphicon.glyphicon-qrcode
