@@ -133,7 +133,7 @@ angular.module('ffhb')
 					result.resolve(true);
 					myservice.refresh(true);
 				},function(){
-					$rootScope.passphrase = '';
+					$rootScope.globals.passphrase = '';
 				});
 			}else{
 				result.resolve(false);

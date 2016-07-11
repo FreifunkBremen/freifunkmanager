@@ -21,7 +21,6 @@ angular.module('ffhb', [
 		amMoment.changeLocale('de');
 		$rootScope.globals = $cookieStore.get('globals') || {};
 		if ($rootScope.globals.currentUser) {
-			$rootScope.passphrase = '*****';
 			$http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata; // jshint ignore:line
 		}
 	});
