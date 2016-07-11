@@ -3,6 +3,7 @@
 table.table.table-striped.table-condensed( ng-table="tableParams")
 	tr(ng-repeat='row in $data',demo-tracked-table-row="row")
 		td(data-title="'Nodeid'", sortable="'row.nodeid'", filter="{'nodeid': 'text'}") {{row.nodeid}}
+		td(data-title="'Group'", sortable="'row.owner'", filter="{'owner': 'text'}") {{row.owner}}
 		td(data-title="'Hostname'", sortable="'row.hostname'", filter="{'hostname': 'text'}") {{row.hostname}}
 		td.split.text-right(data-title="'Freq'")
 			span 2.4 Ghz

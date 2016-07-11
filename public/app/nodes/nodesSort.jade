@@ -28,7 +28,7 @@ table.table.table-striped.table-condensed( ng-table="tableParams")
 			span(ng-switch-default) {{row.nodeinfo.wireless.txpower24}}
 			div.controls(ng-switch-when="true",ng-class="rowForm.txpower24.$invalid ? 'has-error' : ''")
 				input.editable-input.form-control.input-sm(type="text" name="txpower24",ng-model='row.nodeinfo.wireless.txpower24',required)
-			span(ng-switch-default) {{row.nodeinfo.wireless.channel5}}
+			span(ng-switch-default) {{row.nodeinfo.wireless.txpower5}}
 			div.controls(ng-switch-when="true",ng-class="rowForm.txpower5.$invalid ? 'has-error' : ''")
 				input.editable-input.form-control.input-sm(type="text" name="txpower5",ng-model='row.nodeinfo.wireless.txpower5',required)
 		td(data-title="'Options'")

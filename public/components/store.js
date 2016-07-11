@@ -52,7 +52,7 @@ angular.module('ffhb')
 					}
 					angular.copy(nodes, myservice._data.merged);
 					Object.keys(aliases).map(function(key){
-						var node = myservice._data.nodes[key],
+						var node = myservice._data.merged[key],
 							alias = aliases[key];
 						node.nodeinfo.hostname = alias.hostname;
 						if(!node.nodeinfo.owner){
@@ -108,13 +108,32 @@ angular.module('ffhb')
 		myservice.saveNode = function(nodeid){
 			var result = $q.defer();
 			if(myservice._data.merged && myservice._data.merged[nodeid]){
-				var node = myservice._data.merged[nodeid];
-				$http.post(config.api+'/aliases/alias/'+nodeid,{
-					'hostname':node.nodeinfo.hostname,
-					'owner':node.owner.contact
-				}).then(function(){
+				var node = myservice._data.merged[nodeid],
+					obj = {
+						'hostname':node.nodeinfo.hostname,
+						'owner':node.nodeinfo.owner.contact||'',
+						'location': {},
+						'wireless': {}
+					};
+					if(node.nodeinfo.location){
+						obj.location = {
+							'latitude': node.nodeinfo.location.latitude||0,
+							'longitude': node.nodeinfo.location.longitude||0
+						};
+					}
+					if(node.nodeinfo.wireless){
+						obj.wireless = {
+							'channel24': node.nodeinfo.wireless.channel24||0,
+							'channel5': node.nodeinfo.wireless.channel5||0,
+							'txpower24': node.nodeinfo.wireless.txpower24||0,
+							'txpower5': node.nodeinfo.wireless.txpower5||0
+						};
+					}
+				$http.post(config.api+'/aliases/alias/'+nodeid,obj).then(function(){
 					result.resolve(true);
 					myservice.refresh(true);
+				},function(){
+					$rootScope.passphrase = '';
 				});
 			}else{
 				result.resolve(false);

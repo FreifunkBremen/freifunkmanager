@@ -1,11 +1,13 @@
 'use strict';
 
 angular.module('ffhb')
-	.controller('MainCtrl',function($scope,$interval,store,$state,AuthenticationService){
+	.controller('MainCtrl',function($rootScope,$scope,$interval,store,$state,AuthenticationService){
 		$scope.isOpen = false;
 		$scope.$state = $state;
 		$scope.refresh = store.refresh;
-		$scope.passphrase = '';
+		if($rootScope.passphrase === undefined){
+			$rootScope.passphrase = '';
+		}
 		var timediff = new Date(1970,1,1);
 
 		function render(prom){
@@ -28,6 +30,9 @@ angular.module('ffhb')
 
 
 		$scope.passphraseUpdate = function(){
-			AuthenticationService.SetCredentials('client',$scope.passphrase);
+			if($rootScope.passphrase !== undefined && $rootScope.passphrase !== '' && $rootScope.passphrase !== '*****'){
+				console.log("set new basicauth");
+				AuthenticationService.SetCredentials('client',$rootScope.passphrase);
+			}
 		};
 	});
