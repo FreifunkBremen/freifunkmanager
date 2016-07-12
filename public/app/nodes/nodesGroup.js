@@ -3,10 +3,10 @@
 angular.module('ffhb')
 	.controller('NodesGroupCtrl',function(NgTableParams,$scope,store){
 		$scope.tableParams = new NgTableParams({
-			sorting: { hostname: 'asc' },
+			sorting: { 'nodeinfo.hostname': 'asc' },
 			group: 'nodeinfo.owner.contact',
 			total: 0,
-			count: 50
+			count: 100
 		}, {
 			dataset: []
 		});

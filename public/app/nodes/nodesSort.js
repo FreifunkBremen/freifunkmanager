@@ -3,9 +3,9 @@
 angular.module('ffhb')
 	.controller('NodesSortCtrl',function(NgTableParams,$scope,store){
 		$scope.tableParams = new NgTableParams({
-			sorting: { hostname: 'asc' },
+			sorting: { 'nodeinfo.hostname': 'asc' },
 			total: 0,
-			count: 50
+			count: 100
 		}, {
 			dataset: []
 		});

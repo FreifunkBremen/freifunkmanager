@@ -36,7 +36,7 @@ angular.module('config', [])
 					}
 				}
 			},
-			geojson: 'https://meshviewer.breminale.ffhb.de/data/meshviewer.geojson',
-			refresh: 60000
+			geojson: 'https://mgmt.ffhb.de/meshviewer.geojson',
+			refresh: false
 		};
 	});

@@ -3,6 +3,7 @@
 angular.module('ffhb')
 	.controller('NodeCtrl',function($stateParams,$scope,store,config,leafletData){
 		$scope.nodeid = $stateParams.nodeid;
+		$scope.loadingGPS = false;
 		$scope.node = {};
 		angular.extend($scope, {
 			center: config.map.view,
@@ -50,6 +51,7 @@ angular.module('ffhb')
 			}
 		});
 		var setToGps = function(position){
+			$scope.loadingGPS = false;
 			var pos = [position.coords.latitude,position.coords.longitude];
 			if($scope.node !== undefined && $scope.node.nodeinfo !== undefined){
 				$scope.node.nodeinfo.location = {
@@ -67,6 +69,7 @@ angular.module('ffhb')
 		$scope.gps = function() {
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(setToGps);
+				$scope.loadingGPS = true;
 			}else{
 				window.alert('No Permission for location');
 			}
