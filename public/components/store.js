@@ -123,10 +123,10 @@ angular.module('ffhb')
 					}
 					if(node.nodeinfo.wireless){
 						obj.wireless = {
-							'channel24': node.nodeinfo.wireless.channel24||0,
-							'channel5': node.nodeinfo.wireless.channel5||0,
-							'txpower24': node.nodeinfo.wireless.txpower24||0,
-							'txpower5': node.nodeinfo.wireless.txpower5||0
+							'channel24': parseInt(node.nodeinfo.wireless.channel24)||0,
+							'channel5': parseInt(node.nodeinfo.wireless.channel5)||0,
+							'txpower24': parseInt(node.nodeinfo.wireless.txpower24)||0,
+							'txpower5': parseInt(node.nodeinfo.wireless.txpower5)||0
 						};
 					}
 				$http.post(config.api+'/aliases/alias/'+nodeid,obj).then(function(){

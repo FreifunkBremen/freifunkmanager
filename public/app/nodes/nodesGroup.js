@@ -11,24 +11,17 @@ angular.module('ffhb')
 			dataset: []
 		});
 		var originalData = {};
-		function resetRow(row, rowForm){
-			row.isEditing = false;
-			rowForm.$setPristine();
-			return _.findWhere(originalData, function(r){
-				return r.id === row.id;
-			});
-		}
 		$scope.cancel = function(row, rowForm) {
 			console.log('cancel',row,rowForm);
 			row.isEditing = false;
-			var originalRow = resetRow(row, rowForm);
-			angular.extend(row, originalRow);
+			rowForm.$setPristine();
+			originalData[row.nodeid] = angular.copy(row);
 		};
 		$scope.save = function(row, rowForm) {
 			console.log('save',row,rowForm);
 			row.isEditing = false;
-			var originalRow = resetRow(row, rowForm);
-			angular.extend(originalRow, row);
+			rowForm.$setPristine();
+			row = angular.copy(originalData[row.nodeid]);
 			store.saveNode(row.nodeid);
 		};
 

@@ -10,35 +10,33 @@ angular.module('ffhb')
 			dataset: []
 		});
 		var originalData = {};
-		function resetRow(row, rowForm){
-			row.isEditing = false;
-			rowForm.$setPristine();
-			return _.findWhere(originalData, function(r){
-				return r.id === row.id;
+		function find(nodeid){
+			var node = originalData.filter(function(row){
+				return row.nodeid === nodeid;
 			});
+			return node[0];
 		}
 		$scope.cancel = function(row, rowForm) {
-			console.log('cancel',row,rowForm);
+			console.log('cancel',row);
 			row.isEditing = false;
-			var originalRow = resetRow(row, rowForm);
-			angular.extend(row, originalRow);
+			rowForm.$setPristine();
+			angular.copy(find(row.nodeid),row);
 		};
 		$scope.save = function(row, rowForm) {
-			console.log('save',row,rowForm);
+			console.log('save',row);
 			row.isEditing = false;
-			var originalRow = resetRow(row, rowForm);
-			angular.extend(originalRow, row);
+			rowForm.$setPristine();
+			angular.copy(row,find(row.nodeid));
 			store.saveNode(row.nodeid);
 		};
 
 		function render(prom){
 			prom.then(function(data){
-				var result = Object.keys(data.merged).map(function(nodeid){
+				originalData = Object.keys(data.merged).map(function(nodeid){
 					data.merged[nodeid].nodeid = nodeid;
 					return data.merged[nodeid];
 				});
-				originalData = result;
-				$scope.tableParams.settings({dataset: angular.copy(result),total: data.nodesCount});
+				$scope.tableParams.settings({dataset: angular.copy(originalData),total: data.nodesCount});
 			});
 		}
 		render(store.getData);

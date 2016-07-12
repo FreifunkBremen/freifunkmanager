@@ -3,7 +3,13 @@
 	.page-header
 		h1 {{node.nodeinfo.hostname}}
 		small {{nodeid}}
+
 	form(name="rowForm",ng-submit="save()")
+		.form-group
+			label Online
+			p.form-control-static
+				span.glyphicon(ng-class="{'glyphicon-ok':node.flags.online,'glyphicon-remove':!node.flags.online}")
+				span(am-time-ago="node.lastseen")
 		.form-group(ng-class="rowForm.group.$invalid ? 'has-error' : ''")
 			label(for="formGroup") Group
 			input.form-control(id="formGroup",placeholder="Group",type="text",name="group",pattern="[a-zA-Z0-9-]*",ng-model='node.nodeinfo.owner.contact')
