@@ -30,6 +30,9 @@ table.table.table-striped.table-condensed( ng-table="tableParams")
 			span(ng-switch-default) {{row.nodeinfo.wireless.channel5}}
 			div.controls(ng-switch-when="true",ng-class="rowForm.channel5.$invalid ? 'has-error' : ''")
 				input.editable-input.form-control.input-sm(type="text" name="channel5",ng-model='row.nodeinfo.wireless.channel5',required)
+		td.text-right.split(data-title="'Noise'")
+			span {{row.statistics.wireless.airtime24.noise}}
+			span {{row.statistics.wireless.airtime5.noise}}
 		td.text-right.split(data-title="'Power'",filter="{'txpower24': 'number'}",ng-switch="row.isEditing")
 			span(ng-switch-default) {{row.nodeinfo.wireless.txpower24}}
 			div.controls(ng-switch-when="true",ng-class="rowForm.txpower24.$invalid ? 'has-error' : ''")
@@ -46,3 +49,11 @@ table.table.table-striped.table-condensed( ng-table="tableParams")
 				span.glyphicon.glyphicon-pencil
 			a.btn.btn-default(ui-sref="app.node({nodeid: row.nodeid})")
 				span.glyphicon.glyphicon-qrcode
+	tr
+		td(colspan=5) Online: {{sum.online}}/{{sum.all}}
+		td.split.text-right(data-title="'Freq'")
+			span 2.4 Ghz
+			span 5 Ghz
+		td.split(colspan=5)
+			span {{sum.client24}}
+			span {{sum.client5}}

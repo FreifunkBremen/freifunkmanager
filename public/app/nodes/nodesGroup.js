@@ -2,6 +2,12 @@
 
 angular.module('ffhb')
 	.controller('NodesGroupCtrl',function(NgTableParams,$scope,store){
+		$scope.sum = {
+			all: 0,
+			online: 0,
+			client24: 0,
+			client5: 0
+		};
 		$scope.tableParams = new NgTableParams({
 			sorting: { 'nodeinfo.hostname': 'asc' },
 			group: 'nodeinfo.owner.contact',
@@ -27,12 +33,25 @@ angular.module('ffhb')
 
 		function render(prom){
 			prom.then(function(data){
-				var result = Object.keys(data.merged).map(function(nodeid){
-					data.merged[nodeid].nodeid = nodeid;
-					return data.merged[nodeid];
+				$scope.sum = {
+					all: data.nodesCount,
+					online: 0,
+					client24: 0,
+					client5: 0
+				};
+				originalData = Object.keys(data.merged).map(function(nodeid){
+					var merg = data.merged[nodeid];
+					merg.nodeid = nodeid;
+					if(merg.flags.online){
+						$scope.sum.online++;
+					}
+					if(merg.statistics !== undefined && merg.statistics.clients !== undefined){
+						$scope.sum.client24 += merg.statistics.clients.wifi24;
+						$scope.sum.client5 += merg.statistics.clients.wifi5;
+					}
+					return merg;
 				});
-				originalData = result;
-				$scope.tableParams.settings({dataset: angular.copy(result),total: data.nodesCount});
+				$scope.tableParams.settings({dataset: angular.copy(originalData),total: data.nodesCount});
 			});
 		}
 		render(store.getData);
