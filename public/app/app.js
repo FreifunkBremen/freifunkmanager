@@ -3,7 +3,7 @@
 angular.module('ffhb', [
 	'ngTable',
 	'ngResource',
-	'ngCookies',
+	'angularLocalStorage',
 	'ui.router',
 	'ui.bootstrap',
 	'ui-leaflet',

@@ -1,6 +1,6 @@
 'use strict';
 angular.module('ffhb')
-	.factory('store', function($state, $q, $http, $rootScope,config,$interval,$cookieStore,webNotification) {
+	.factory('store', function($state, $q, $http, $rootScope,config,$interval,storage,webNotification) {
 		function notifyNew(nodeid){
 			webNotification.showNotification('New Node',{
 				body: '"'+nodeid+'"',
@@ -22,7 +22,7 @@ angular.module('ffhb')
 
 		var myservice = {};
 		myservice._initialized = false;
-		myservice._data = $cookieStore.get('data') ||{
+		myservice._data = storage.get('data') ||{
 				nodes: {},nodesCount:0,
 				merged: {},
 				aliases: {},aliasesCount:0
@@ -96,7 +96,7 @@ angular.module('ffhb')
 					if (myservice._initialized) {
 						$rootScope.$broadcast('store', dataDeferred.promise);
 					}
-					$cookieStore.put('data',myservice._data);
+					storage.set('data',myservice._data);
 					myservice._initialized = true;
 				});
 			});

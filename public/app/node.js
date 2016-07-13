@@ -2,7 +2,7 @@
 
 angular.module('ffhb')
 	.controller('NodeCtrl',function($stateParams,$scope,store,config,leafletData){
-		$scope.nodeid = $stateParams.nodeid;
+		$scope.nodeid = $stateParams.nodeid.toLowerCase();
 		$scope.loadingGPS = false;
 		$scope.node = {};
 		angular.extend($scope, {
@@ -14,7 +14,7 @@ angular.module('ffhb')
 				title: 'Marker',
 				draggable: true,
 				label: {
-					message: 'Node:'+$stateParams.nodeid,
+					message: 'Node:'+$scope.nodeid,
 					options: {
 						noHide: true
 					}
@@ -29,7 +29,7 @@ angular.module('ffhb')
 		});
 		function render(prom){
 			prom.then(function(data){
-				$scope.node = data.merged[$stateParams.nodeid];
+				$scope.node = data.merged[$scope.nodeid];
 				if($scope.node !== undefined && $scope.node.nodeinfo !== undefined){
 					$scope.markers.node.lat = $scope.node.nodeinfo.location.latitude;
 					$scope.markers.node.lng = $scope.node.nodeinfo.location.longitude;
@@ -47,7 +47,7 @@ angular.module('ffhb')
 					'latitude': args.model.lat,
 					'longitude': args.model.lng
 				};
-				store.saveNode($stateParams.nodeid);
+				store.saveNode($scope.nodeid);
 			}
 		});
 		var setToGps = function(position){
@@ -61,7 +61,7 @@ angular.module('ffhb')
 				leafletData.getMap().then(function(map) {
 					map.setView(pos);
 				});
-				store.saveNode($stateParams.nodeid);
+				store.saveNode($scope.nodeid);
 				$scope.markers.node.lat = position.coords.latitude;
 				$scope.markers.node.lng = position.coords.longitude;
 			}

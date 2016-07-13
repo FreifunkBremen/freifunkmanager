@@ -7,7 +7,52 @@ angular.module('ffhb')
 			total: 0,
 			count: 100
 		}, {
-			dataset: []
+			dataset: [{
+				lastseen: new Date(),
+				firstseen: new Date(),
+				nodeid: 'loading',
+				nodeinfo: {
+					hostname: 'loading',
+					owner: {
+						contact: 'loading'
+					},
+					wireless: {
+						channel24: 0,
+						channel5: 0,
+						txpower24: 0,
+						txpower5: 0
+					}
+				},
+				statistics: {
+					clients: {
+						wifi24: 0,
+						wifi5: 0
+					}
+				}
+			},
+			{
+				lastseen: new Date(),
+				firstseen: new Date(),
+				nodeid: 'loading',
+				nodeinfo: {
+					hostname: 'loading',
+					owner: {
+						contact: 'loading'
+					},
+					wireless: {
+						channel24: 0,
+						channel5: 0,
+						txpower24: 0,
+						txpower5: 0
+					}
+				},
+				statistics: {
+					clients: {
+						wifi24: 0,
+						wifi5: 0
+					}
+				}
+			}]
 		});
 		var originalData = {};
 		function find(nodeid){

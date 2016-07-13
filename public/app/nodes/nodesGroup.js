@@ -8,7 +8,7 @@ angular.module('ffhb')
 			total: 0,
 			count: 100
 		}, {
-			dataset: []
+			dataset: [{}]
 		});
 		var originalData = {};
 		$scope.cancel = function(row, rowForm) {
