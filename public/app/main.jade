@@ -18,9 +18,12 @@
 					a(nav navbar-nav) Map
 			ui.nav.navbar-nav.navbar-right
 				li
+					a.bt.btn-link(ng-click="autorefreshUpdate()")
+						span.glyphicon(ng-class="{'glyphicon-ok':autorefresh,'glyphicon-remove':!autorefresh}")
+				li
 					a.btn.btn-link(ng-click="refresh()")
 						span.glyphicon.glyphicon-refresh(aria-hidden="true")
 						| {{timeRefresh}} Sec
 			form.navbar-form.navbar-right(ng-class="{'has-warning':globals.currentUser.authdata}")
 				input.form-control(type="password",ng-change="passphraseUpdate()",ng-model="passphrase",placeholder="Passphrase")
-div(ui-view="",style="margin-top:100px;")
+div(ui-view="",style="margin-top:53px;")

@@ -33,10 +33,12 @@ angular.module('ffhb')
 			})
 			.state('app.mapwithNodeid',{
 				url:'/map/:nodeid',
-				templateUrl: 'app/nodes/nodes.html'
+				templateUrl: 'app/map/index.html',
+				controller: 'MapCtrl'
 			})
 			.state('app.map',{
 				url:'/map',
-				templateUrl: 'app/nodes/nodes.html'
+				templateUrl: 'app/map/index.html',
+				controller: 'MapCtrl'
 			});
 	}]);

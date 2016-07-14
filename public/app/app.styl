@@ -8,3 +8,38 @@ form > .btn+.btn
 
 .map.node
 	height 300px
+.map.global
+	height 92vh
+
+.angular-leaflet-map.map
+	.node
+		width 3px
+		height 3px
+		background-color rgba(0,0,255,0.5)
+		border 2px solid white
+		border-radius 10px
+	.node.offline
+		background-color rgba(255,0,0,0.5)
+	.node.client24
+		border-left 3px solid green
+	.node.client5
+		border-right 3px solid green
+	.node.client24-warn
+		border-left 3px solid yellow
+	.node.client5-warn
+		border-right 3px solid yellow
+	.node.client24-crit
+		border-left 3px solid red;
+	.node.client5-crit
+		border-right 3px solid red
+
+	.nodeicon-label
+		font-size 12px
+		font-weight lighter
+		table
+			width 100%
+			td
+				border-top 1px solid #999;
+				text-align right
+		 	td:first-child
+				text-align left

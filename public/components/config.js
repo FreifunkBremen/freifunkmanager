@@ -5,6 +5,10 @@ angular.module('config', [])
 			api: 'https://mgmt.ffhb.de/api',
 			map: {
 				view: {lat: 53.0702, lng: 8.815, zoom: 16},
+				icon:{
+					warn:{wifi24:20,wifi5:20},
+					crit:{wifi24:30,wifi5:30}
+				},
 				geojson: {
 					pointToLayer: function (feature, latlng){
 						feature.properties.radius = 10;
@@ -37,6 +41,6 @@ angular.module('config', [])
 				}
 			},
 			geojson: 'https://mgmt.ffhb.de/meshviewer.geojson',
-			refresh: false
+			refresh: 15000
 		};
 	});

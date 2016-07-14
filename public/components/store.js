@@ -20,7 +20,7 @@ angular.module('ffhb')
 			},function(){});
 		}
 
-		var myservice = {};
+		var myservice = {}, autorefresher;
 		myservice._initialized = false;
 		myservice._data = storage.get('data') ||{
 				nodes: {},nodesCount:0,
@@ -140,13 +140,17 @@ angular.module('ffhb')
 			}
 			return result.promise;
 		};
+		myservice.autorefresh = function(time){
+			if(autorefresher !== undefined){
+				autorefresher.cancel();
+			}
+			if(time){
+				autorefresher = $interval(function () {
+					myservice.refresh(true);
+				}, time);
+			}
+		};
 
-
-		if(config.refresh){
-			$interval(function () {
-				myservice.refresh(true);
-			}, config.refresh);
-		}
 
 		return myservice;
 	});

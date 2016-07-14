@@ -23,7 +23,7 @@ angular.module('ffhb')
 			events:{}
 		});
 		store.getGeojson.then(function(data){
-			leafletData.getMap().then(function(map) {
+			leafletData.getMap('nodemap').then(function(map) {
 				L.geoJson(data,config.map.geojson).addTo(map);
 			});
 		});
@@ -58,7 +58,7 @@ angular.module('ffhb')
 					'latitude': position.coords.latitude,
 					'longitude': position.coords.longitude
 				};
-				leafletData.getMap().then(function(map) {
+				leafletData.getMap('nodemap').then(function(map) {
 					map.setView(pos);
 				});
 				store.saveNode($scope.nodeid);

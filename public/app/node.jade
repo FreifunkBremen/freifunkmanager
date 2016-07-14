@@ -16,7 +16,7 @@
 		.form-group(ng-class="rowForm.hostname.$invalid ? 'has-error' : ''")
 			label(for="formHostname") Hostname
 			input.form-control(id="formHostname",placeholder="Hostname",type="text",name="hostname",pattern="[a-zA-Z0-9-]*",ng-model='node.nodeinfo.hostname',required)
-		leaflet.map.node(geojson="geojson",center="center",markers="markers",event-broadcast="events")
+		leaflet.map.node(id="nodemap",geojson="geojson",center="center",markers="markers",event-broadcast="events")
 		button.btn.btn-default(type="submit")
 			span.glyphicon.glyphicon-floppy-disk(aria-hidden="true")
 			| Save

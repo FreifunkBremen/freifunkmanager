@@ -9,56 +9,11 @@ angular.module('ffhb')
 			client5: 0
 		};
 		$scope.tableParams = new NgTableParams({
-			sorting: { 'nodeinfo.hostname': 'asc' },
+			sorting: { 'hostname': 'asc' },
 			total: 0,
 			count: 100
 		}, {
-			dataset: [{
-				lastseen: new Date(),
-				firstseen: new Date(),
-				nodeid: 'loading',
-				nodeinfo: {
-					hostname: 'loading',
-					owner: {
-						contact: 'loading'
-					},
-					wireless: {
-						channel24: 0,
-						channel5: 0,
-						txpower24: 0,
-						txpower5: 0
-					}
-				},
-				statistics: {
-					clients: {
-						wifi24: 0,
-						wifi5: 0
-					}
-				}
-			},
-			{
-				lastseen: new Date(),
-				firstseen: new Date(),
-				nodeid: 'loading',
-				nodeinfo: {
-					hostname: 'loading',
-					owner: {
-						contact: 'loading'
-					},
-					wireless: {
-						channel24: 0,
-						channel5: 0,
-						txpower24: 0,
-						txpower5: 0
-					}
-				},
-				statistics: {
-					clients: {
-						wifi24: 0,
-						wifi5: 0
-					}
-				}
-			}]
+			dataset: []
 		});
 		var originalData = {};
 		function find(nodeid){

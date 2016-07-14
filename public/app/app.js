@@ -17,9 +17,10 @@ angular.module('ffhb', [
 		$urlRouterProvider.otherwise('/nodes/sort');
 		//$locationProvider.html5Mode(true).hashPrefix('!');
 		//$httpProvider.defaults.withCredentials = true;
-	}]).run(function(amMoment,$cookieStore,$rootScope,$http) {
+	}]).run(function(amMoment,$cookieStore,$rootScope,$http,config) {
 		amMoment.changeLocale('de');
 		$rootScope.globals = $cookieStore.get('globals') || {};
+		$rootScope.autorefresh = config.refresh;
 		if ($rootScope.globals.currentUser) {
 			$http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata; // jshint ignore:line
 		}
