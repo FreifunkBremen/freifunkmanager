@@ -5,6 +5,10 @@ angular.module('config', [])
 			api: 'https://mgmt.ffhb.de/api',
 			map: {
 				view: {lat: 53.0702, lng: 8.815, zoom: 16},
+				heatMax: {
+					wifi24: 30,
+					wifi5: 100
+				},
 				icon:{
 					warn:{wifi24:20,wifi5:20},
 					crit:{wifi24:30,wifi5:30}
