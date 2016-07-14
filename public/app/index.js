@@ -31,10 +31,10 @@ angular.module('ffhb')
 				templateUrl: 'app/changes.html',
 				controller: 'ChangesCtrl'
 			})
-			.state('app.mapwithNodeid',{
-				url:'/map/:nodeid',
+			.state('app.mapedit',{
+				url:'/map/edit',
 				templateUrl: 'app/map/index.html',
-				controller: 'MapCtrl'
+				controller: 'MapEditCtrl'
 			})
 			.state('app.map',{
 				url:'/map',

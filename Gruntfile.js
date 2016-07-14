@@ -236,7 +236,7 @@ module.exports = function (grunt) {
 				},
 				{
 					expand: true,
-					cwd: 'public/bower_components/leaflet-draw/dist/images',
+					cwd: 'public/bower_components/leaflet/dist/images',
 					dest: 'build/app/images',
 					src: [
 						'*.*'

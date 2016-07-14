@@ -5,7 +5,7 @@ angular.module('ffhb')
 		if($stateParams.nodeid){
 			$scope.nodeid = $stateParams.nodeid.toLowerCase();
 		}
-		var layerControl,nodeLayer,geoLayer;
+		var layerControl,geoLayer,nodeLayer,client24Layer,client5Layer;
 		leafletData.getMap('globalmap').then(function(map) {
 			layerControl = L.control.layers().addTo(map);
 			map.setView([config.map.view.lat, config.map.view.lng],16);
@@ -22,15 +22,30 @@ angular.module('ffhb')
 				leafletData.getMap('globalmap').then(function(map) {
 					if(nodeLayer!==undefined){
 						layerControl.removeLayer(nodeLayer);
+						nodeLayer.clearLayers();
+					}
+					if(client24Layer!==undefined){
+						layerControl.removeLayer(client24Layer);
+						client24Layer.clearLayers();
+					}
+					if(client5Layer!==undefined){
+						layerControl.removeLayer(client5Layer);
+						client5Layer.clearLayers();
 					}
 					nodeLayer = L.markerClusterGroup({maxClusterRadius:20});
+					client24Layer = L.heatLayer([],{max:30});
+					client5Layer = L.heatLayer([],{max:30});
 					Object.keys(data.merged).map(function(nodeid){
 						var node = data.merged[nodeid];
 						if(node.nodeinfo.location !== undefined && node.nodeinfo.location.latitude !== undefined && node.nodeinfo.location.longitude !== undefined){
 							var className = 'node';
+							if(node.flags && !node.flags.online){
+								className += ' offline';
+							}
 							var wifi24='-',wifi5='-',ch24='-',ch5='-',tx24='-',tx5='-';
 							if(node.statistics && node.statistics.clients){
 								wifi24 = node.statistics.clients.wifi24;
+
 								if(wifi24 < config.map.icon.warn.wifi24 && wifi24 > 0){
 									className += ' client24';
 								} else if(wifi24 < config.map.icon.crit.wifi24 && wifi24 >= config.map.icon.warn.wifi24){
@@ -49,6 +64,8 @@ angular.module('ffhb')
 								}
 							}
 							var nodemarker = L.marker([node.nodeinfo.location.latitude, node.nodeinfo.location.longitude],{icon: L.divIcon({className: className})});
+							client24Layer.addLatLng([node.nodeinfo.location.latitude, node.nodeinfo.location.longitude, wifi24]);
+							client5Layer.addLatLng([node.nodeinfo.location.latitude, node.nodeinfo.location.longitude, wifi5]);
 							nodemarker.bindLabel(node.nodeinfo.hostname+' <div class=\'nodeicon-label\'>('+nodeid+')'+
 								'<table><tr><th></th><th>Cl</th><th>Ch</th><th>Tx</th></tr>'+
 								'<tr><td>2.4G</td><td>'+wifi24+'</td><td>'+ch24+'</td><td>'+tx24+'</td></tr>'+
@@ -63,6 +80,10 @@ angular.module('ffhb')
 						}
 					});
 					layerControl.addOverlay(nodeLayer,'Nodes');
+					layerControl.addOverlay(client24Layer,'2.4 Ghz Clients');
+					layerControl.addOverlay(client5Layer,'5 Ghz Clients');
+					client24Layer.addTo(map);
+					client5Layer.addTo(map);
 					nodeLayer.addTo(map);
 				});
 			});
