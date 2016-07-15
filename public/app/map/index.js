@@ -2,9 +2,6 @@
 
 angular.module('ffhb')
 	.controller('MapCtrl',function($state,$stateParams,$scope,store,config,leafletData){
-		if($stateParams.nodeid){
-			$scope.nodeid = $stateParams.nodeid.toLowerCase();
-		}
 		var layerControl,geoLayer,nodeLayer,client24Layer,client5Layer;
 		leafletData.getMap('globalmap').then(function(map) {
 			layerControl = L.control.layers().addTo(map);
@@ -13,7 +10,7 @@ angular.module('ffhb')
 		store.getGeojson.then(function(data){
 			leafletData.getMap('globalmap').then(function(map) {
 				geoLayer = L.geoJson(data,config.map.geojson);
-				layerControl.addOverlay(geoLayer,'GEOJSON');
+				layerControl.addOverlay(geoLayer,'Gelände');
 				geoLayer.addTo(map);
 			});
 		});
@@ -33,8 +30,8 @@ angular.module('ffhb')
 						client5Layer.clearLayers();
 					}
 					nodeLayer = L.markerClusterGroup({maxClusterRadius:20});
-					client24Layer = L.heatLayer([],{max: config.map.heatMax.wifi24});
-					client5Layer = L.heatLayer([],{max: config.map.heatMax.wifi5});
+					client24Layer = L.heatLayer([],{max: config.map.heatMax.wifi24,radius:50,blur:25});
+					client5Layer = L.heatLayer([],{max: config.map.heatMax.wifi5,radius:50,blur:25});
 					Object.keys(data.merged).map(function(nodeid){
 						var node = data.merged[nodeid];
 						if(node.nodeinfo.location !== undefined && node.nodeinfo.location.latitude !== undefined && node.nodeinfo.location.longitude !== undefined){

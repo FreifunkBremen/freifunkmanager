@@ -5,9 +5,11 @@ angular.module('config', [])
 			api: 'https://mgmt.ffhb.de/api',
 			map: {
 				view: {lat: 53.0702, lng: 8.815, zoom: 16},
+				maxZoom: 19,
+				tileLayer: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 				heatMax: {
-					wifi24: 30,
-					wifi5: 100
+					wifi24: 15,
+					wifi5: 50
 				},
 				icon:{
 					warn:{wifi24:20,wifi5:20},

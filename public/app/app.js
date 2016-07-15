@@ -18,6 +18,10 @@ angular.module('ffhb', [
 		//$locationProvider.html5Mode(true).hashPrefix('!');
 		//$httpProvider.defaults.withCredentials = true;
 	}]).run(function(amMoment,$cookieStore,$rootScope,$http,config) {
+		$rootScope.defaults = {
+			maxZoom: config.map.maxZoom,
+			tileLayer: config.map.tileLayer
+		};
 		amMoment.changeLocale('de');
 		$rootScope.globals = $cookieStore.get('globals') || {};
 		$rootScope.autorefresh = config.refresh;

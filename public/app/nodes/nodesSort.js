@@ -9,7 +9,7 @@ angular.module('ffhb')
 			client5: 0
 		};
 		$scope.tableParams = new NgTableParams({
-			sorting: { 'hostname': 'asc' },
+			sorting: { 'nodeinfo.owner.contact': 'asc' },
 			total: 0,
 			count: 100
 		}, {
@@ -45,8 +45,9 @@ angular.module('ffhb')
 					client5: 0
 				};
 				originalData = Object.keys(data.merged).map(function(nodeid){
-					var merg = data.merged[nodeid];
+					var merg = data.merged[nodeid],node = data.nodes[nodeid];
 					merg.nodeid = nodeid;
+					merg.current = { wireless: node.nodeinfo.wireless};
 					if(merg.flags.online){
 						$scope.sum.online++;
 					}
