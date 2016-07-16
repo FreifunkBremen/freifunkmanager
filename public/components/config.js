@@ -2,11 +2,14 @@
 angular.module('config', [])
 	.factory('config', function() {
 		return {
-			api: 'https://mgmt.ffhb.de/api',
+			api: 'https://ffhb.h.sum7.de/api',
+			showOnlyManaged: true,
+			geojson: false,
+			refresh: 15000,
 			map: {
-				view: {lat: 53.0702, lng: 8.815, zoom: 16},
-				maxZoom: 19,
-				tileLayer: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+				view: {lat: 53.07093, lng: 8.79464, zoom: 17},
+				maxZoom: 20,
+				tileLayer: '//tiles.bremen.freifunk.net/{z}/{x}/{y}.png',
 				heatMax: {
 					wifi24: 15,
 					wifi5: 50
@@ -45,8 +48,6 @@ angular.module('config', [])
 						};
 					}
 				}
-			},
-			geojson: 'https://mgmt.ffhb.de/meshviewer.geojson',
-			refresh: 15000
+			}
 		};
 	});

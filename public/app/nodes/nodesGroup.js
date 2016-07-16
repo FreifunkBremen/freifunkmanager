@@ -34,7 +34,7 @@ angular.module('ffhb')
 		function render(prom){
 			prom.then(function(data){
 				$scope.sum = {
-					all: data.nodesCount,
+					all: data.aliasesCount,
 					online: 0,
 					client24: 0,
 					client5: 0

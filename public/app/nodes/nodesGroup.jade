@@ -1,6 +1,6 @@
 table.table.table-striped.table-condensed( ng-table="tableParams")
 	tr.ng-table-group(ng-repeat-start="group in $groups")
-		td(colspan=10)
+		td(colspan=12)
 			a(ng-click="group.$hideRows = !group.$hideRows")
 				span.glyphicon(ng-class="{ 'glyphicon-chevron-right': group.$hideRows, 'glyphicon-chevron-down': !group.$hideRows }")
 				strong {{ group.value }}
@@ -28,6 +28,9 @@ table.table.table-striped.table-condensed( ng-table="tableParams")
 			span(ng-switch-default) {{row.nodeinfo.wireless.channel5}}
 			div.controls(ng-switch-when="true",ng-class="rowForm.channel5.$invalid ? 'has-error' : ''")
 				input.editable-input.form-control.input-sm(type="text" name="channel5",ng-model='row.nodeinfo.wireless.channel5',required)
+		td.text-right.split(data-title="'CurChannel'")
+			span {{row.current.wireless.channel24}}
+			span {{row.current.wireless.channel5}}
 		td.split.text-right(data-title="'Clients'", sortable="'statistics.clients.wifi24'")
 			span {{row.statistics.clients.wifi24}}
 			span {{row.statistics.clients.wifi5}}
@@ -41,6 +44,9 @@ table.table.table-striped.table-condensed( ng-table="tableParams")
 			span(ng-switch-default) {{row.nodeinfo.wireless.txpower5}}
 			div.controls(ng-switch-when="true",ng-class="rowForm.txpower5.$invalid ? 'has-error' : ''")
 				input.editable-input.form-control.input-sm(type="text" name="txpower5",ng-model='row.nodeinfo.wireless.txpower5',required)
+		td.text-right.split(data-title="'CurPower'")
+			span {{row.current.wireless.txpower24}}
+			span {{row.current.wireless.txpower5}}
 		td(data-title="'Options'")
 			.btn.btn-success.btn-sm(ng-click="save(row, rowForm)",ng-if="row.isEditing",ng-disabled="rowForm.$pristine || rowForm.$invalid")
 				span.glyphicon.glyphicon-ok
@@ -55,7 +61,7 @@ table.table.table-striped.table-condensed( ng-table="tableParams")
 		td.split.text-right(data-title="'Freq'")
 			span 2.4 Ghz
 			span 5 Ghz
-		td
+		td(colspan=2)
 		td.text-right.split
 			span {{sum.client24}}
 			span {{sum.client5}}

@@ -28,9 +28,11 @@ angular.module('ffhb')
 				aliases: {},aliasesCount:0
 			};
 		var geojsonDeferred = $q.defer();
-		$http.get(config.geojson).success(function(geojson) {
-			geojsonDeferred.resolve(geojson);
-		});
+		if(config.geojson){
+			$http.get(config.geojson).success(function(geojson) {
+				geojsonDeferred.resolve(geojson);
+			});
+		}
 		myservice.getGeojson = geojsonDeferred.promise;
 
 		myservice.refresh = function(notify) {
@@ -50,8 +52,13 @@ angular.module('ffhb')
 					}else {
 						myservice._data.nodes = nodes;
 					}
-					angular.copy(nodes, myservice._data.merged);
+					if(!config.showOnlyManaged){
+						angular.copy(nodes, myservice._data.merged);
+					}
 					Object.keys(aliases).map(function(key){
+						if(config.showOnlyManaged){
+							myservice._data.merged[key] = angular.copy(nodes[key]);
+						}
 						var node = myservice._data.merged[key],
 							alias = aliases[key];
 						node.nodeinfo.hostname = alias.hostname;

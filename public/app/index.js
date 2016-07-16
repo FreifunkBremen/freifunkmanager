@@ -26,13 +26,8 @@ angular.module('ffhb')
 				templateUrl: 'app/node.html',
 				controller: 'NodeCtrl'
 			})
-			.state('app.changes',{
-				url:'/changes',
-				templateUrl: 'app/changes.html',
-				controller: 'ChangesCtrl'
-			})
 			.state('app.mapedit',{
-				url:'/map/edit',
+				url:'/mapedit',
 				templateUrl: 'app/map/index.html',
 				controller: 'MapEditCtrl'
 			})

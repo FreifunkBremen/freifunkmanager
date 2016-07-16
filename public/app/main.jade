@@ -12,10 +12,10 @@
 			ui.nav.navbar-nav
 				li(ui-sref="app.nodes.sort",ng-class="{ active: $state.includes('app.nodes') }")
 					a(nav navbar-nav) Nodes
-				li(ui-sref="app.changes",ui-sref-active="active")
-					a(nav navbar-nav) Changes
 				li(ui-sref="app.map",ui-sref-active="active")
 					a(nav navbar-nav) Map
+				li(ui-sref="app.mapedit",ui-sref-active="active")
+					a(nav navbar-nav) Edit
 			ui.nav.navbar-nav.navbar-right
 				li
 					a.bt.btn-link(ng-click="autorefreshUpdate()")

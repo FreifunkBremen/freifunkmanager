@@ -22,6 +22,9 @@ table.table.table-striped.table-condensed(ng-table="tableParams")
 			span(ng-switch-default) {{row.nodeinfo.wireless.channel5}}
 			div.controls(ng-switch-when="true",ng-class="rowForm.channel5.$invalid ? 'has-error' : ''")
 				input.editable-input.form-control.input-sm(type="text" name="channel5",ng-model='row.nodeinfo.wireless.channel5',required)
+		td.text-right.split(data-title="'CurChannel'")
+			span {{row.current.wireless.channel24}}
+			span {{row.current.wireless.channel5}}
 		td.split.text-right(data-title="'Clients'")
 			span {{row.statistics.clients.wifi24}}
 			span {{row.statistics.clients.wifi5}}
@@ -52,7 +55,7 @@ table.table.table-striped.table-condensed(ng-table="tableParams")
 			td.split.text-right(data-title="'Freq'")
 				span 2.4 Ghz
 				span 5 Ghz
-			td
+			td(colspan=2)
 			td.text-right.split
 				span {{sum.client24}}
 				span {{sum.client5}}
