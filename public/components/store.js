@@ -142,7 +142,7 @@ angular.module('ffhb')
 		};
 		myservice.autorefresh = function(time){
 			if(autorefresher !== undefined){
-				autorefresher.cancel();
+				$interval.cancel(autorefresher);
 			}
 			if(time){
 				autorefresher = $interval(function () {
@@ -150,7 +150,8 @@ angular.module('ffhb')
 				}, time);
 			}
 		};
-
+		$rootScope.autorefresh = config.refresh;
+		myservice.autorefresh($rootScope.autorefresh);
 
 		return myservice;
 	});
