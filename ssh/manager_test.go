@@ -13,7 +13,7 @@ func TestManager(t *testing.T) {
 	mgmt := NewManager("~/.ssh/id_rsa")
 	assert.NotNil(mgmt, "no new manager created")
 
-	mgmt.ConnectTo(net.ParseIP("2a06:8782:ffbb:1337::127"))
+	mgmt.ConnectTo(net.TCPAddr{IP: net.ParseIP("2a06:8782:ffbb:1337::127"), Port: 22})
 
 	mgmt.Close()
 }

@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net"
 
@@ -34,9 +35,12 @@ func (m *Manager) RunEverywhere(cmd string, handler SSHResultHandler) {
 	}
 }
 
-func (m *Manager) RunOn(host net.IP, cmd string) ([]byte, error) {
-	client := m.ConnectTo(host)
-	return m.run(host.String(), client, cmd)
+func (m *Manager) RunOn(addr net.TCPAddr, cmd string) ([]byte, error) {
+	client := m.ConnectTo(addr)
+	if client != nil {
+		return m.run(addr.IP.String(), client, cmd)
+	}
+	return nil, errors.New("no connection for runOn")
 }
 
 func (m *Manager) run(host string, client *ssh.Client, cmd string) ([]byte, error) {

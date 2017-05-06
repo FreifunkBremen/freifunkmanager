@@ -14,9 +14,11 @@ func (m *Manager) ExecuteEverywhere(cmd string) {
 	}
 }
 
-func (m *Manager) ExecuteOn(host net.IP, cmd string) {
-	client := m.ConnectTo(host)
-	m.execute(host.String(), client, cmd)
+func (m *Manager) ExecuteOn(addr net.TCPAddr, cmd string) {
+	client := m.ConnectTo(addr)
+	if client != nil {
+		m.execute(addr.IP.String(), client, cmd)
+	}
 }
 
 func (m *Manager) execute(host string, client *ssh.Client, cmd string) {

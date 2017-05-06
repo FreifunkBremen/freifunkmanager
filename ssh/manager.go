@@ -37,24 +37,21 @@ func NewManager(file string) *Manager {
 	}
 }
 
-func (m *Manager) ConnectTo(host net.IP) *ssh.Client {
+func (m *Manager) ConnectTo(addr net.TCPAddr) *ssh.Client {
 	m.clientsMUX.Lock()
 	defer m.clientsMUX.Unlock()
 
-	if client, ok := m.clients[host.String()]; ok {
+	if client, ok := m.clients[addr.IP.String()]; ok {
 		return client
 	}
-	addr := net.TCPAddr{
-		IP:   host,
-		Port: 22,
-	}
+
 	client, err := ssh.Dial("tcp", addr.String(), m.config)
 	if err != nil {
 		log.Log.Error(err)
 		return nil
 	}
 
-	m.clients[host.String()] = client
+	m.clients[addr.IP.String()] = client
 	return client
 }
 

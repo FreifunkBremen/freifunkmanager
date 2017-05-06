@@ -13,12 +13,16 @@ import (
 
 	configPackage "github.com/FreifunkBremen/freifunkmanager/config"
 	"github.com/FreifunkBremen/freifunkmanager/lib/log"
+	"github.com/FreifunkBremen/freifunkmanager/runtime"
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
+	"github.com/FreifunkBremen/freifunkmanager/yanic"
 )
 
 var (
-	configFile string
-	config     *configPackage.Config
+	configFile  string
+	config      *configPackage.Config
+	nodes       *runtime.Nodes
+	yanicDialer *yanic.Dialer
 )
 
 func main() {
@@ -30,6 +34,13 @@ func main() {
 	log.Log.Info("starting...")
 
 	sshmanager := ssh.NewManager(config.SSHPrivateKey)
+	nodes := runtime.NewNodes(config.SSHInterface, sshmanager)
+
+	if config.Yanic.Enable {
+		yanicDialer := yanic.Dial(config.Yanic.Type, config.Yanic.Address)
+		yanicDialer.NodeHandler = nodes.AddNode
+		yanicDialer.Start()
+	}
 
 	// Startwebserver
 	router := goji.NewMux()
@@ -55,6 +66,9 @@ func main() {
 
 	// Stop services
 	srv.Close()
+	if config.Yanic.Enable {
+		yanicDialer.Close()
+	}
 	sshmanager.Close()
 
 	log.Log.Info("stop recieve:", sig)

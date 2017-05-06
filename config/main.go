@@ -15,11 +15,17 @@ type Config struct {
 
 	// path to deliver static content
 	Webroot string `toml:"webroot"`
-	// yanic socket
-	YanicSocket string `toml:"yanic_socket"`
 
 	// SSH private key
 	SSHPrivateKey string `toml:"ssh_key"`
+	SSHInterface  string `toml:"ssh_interface"`
+
+	// yanic socket
+	Yanic struct {
+		Enable  bool   `toml:"enable"`
+		Type    string `toml:"type"`
+		Address string `toml:"address"`
+	} `toml:"yanic"`
 }
 
 //reads a config model from path of a yml file
