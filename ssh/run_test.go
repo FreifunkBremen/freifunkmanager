@@ -16,18 +16,16 @@ func TestRun(t *testing.T) {
 
 	mgmt.ConnectTo(net.ParseIP("2a06:8782:ffbb:1337::127"))
 
-	mgmt.RunEverywhere("echo 13", func(result []byte, err error) {
+	mgmt.RunEverywhere("echo 13", SSHResultToStringHandler(func(result string, err error) {
 		assert.NoError(err)
 
-		result = result[:len(result)-1]
-
-		assert.Equal([]byte{'1', '3'}, result)
-	})
+		assert.Equal("13", result)
+	}))
 	result, err := mgmt.RunOn(net.ParseIP("2a06:8782:ffbb:1337::127"), "echo 16")
 	assert.NoError(err)
 
-	result = result[:len(result)-1]
-	resultInt, _ := strconv.Atoi(string(result))
+	str := SSHResultToString(result)
+	resultInt, _ := strconv.Atoi(str)
 
 	assert.Equal(16, resultInt)
 

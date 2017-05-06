@@ -10,9 +10,24 @@ import (
 	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 )
 
-type SSHRunResultHandler func([]byte, error)
+type SSHResultHandler func([]byte, error)
 
-func (m *Manager) RunEverywhere(cmd string, handler SSHRunResultHandler) {
+type SSHResultStringHandler func(string, error)
+
+func SSHResultToString(result []byte) string {
+	if len(result) > 0 {
+		result = result[:len(result)-1]
+	}
+	return string(result)
+}
+
+func SSHResultToStringHandler(handler SSHResultStringHandler) SSHResultHandler {
+	return func(result []byte, err error) {
+		handler(SSHResultToString(result), err)
+	}
+}
+
+func (m *Manager) RunEverywhere(cmd string, handler SSHResultHandler) {
 	for host, client := range m.clients {
 		result, err := m.run(host, client, cmd)
 		handler(result, err)
