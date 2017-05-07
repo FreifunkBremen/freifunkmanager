@@ -10,6 +10,8 @@ import (
 
 //config file of this daemon (for more the config_example.conf in git repository)
 type Config struct {
+	// prevent crashes
+	StatePath string `toml:"state_path"`
 	// address on which the api and static content webserver runs
 	WebserverBind string `toml:"webserver_bind"`
 
