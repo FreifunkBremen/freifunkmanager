@@ -25,14 +25,18 @@ type Node struct {
 	Wireless data.Wireless `json:"wireless"`
 	Owner    string        `json:"owner"`
 	Address  net.IP        `json:"address"`
+	Stats    struct {
+		Wireless data.WirelessStatistics `json:"wireless"`
+		Clients  data.Clients            `json:"clients"`
+	} `json:"statistics"`
 }
 
-func NewNode(node *yanicRuntime.Node) *Node {
-	if nodeinfo := node.Nodeinfo; nodeinfo != nil {
+func NewNode(nodeOrigin *yanicRuntime.Node) *Node {
+	if nodeinfo := nodeOrigin.Nodeinfo; nodeinfo != nil {
 		node := &Node{
 			Hostname: nodeinfo.Hostname,
 			NodeID:   nodeinfo.NodeID,
-			Address:  node.Address,
+			Address:  nodeOrigin.Address,
 		}
 		if owner := nodeinfo.Owner; owner != nil {
 			node.Owner = owner.Contact
@@ -42,6 +46,10 @@ func NewNode(node *yanicRuntime.Node) *Node {
 		}
 		if wireless := nodeinfo.Wireless; wireless != nil {
 			node.Wireless = *wireless
+		}
+		if stats := nodeOrigin.Statistics; stats != nil {
+			node.Stats.Clients = stats.Clients
+			node.Stats.Wireless = stats.Wireless
 		}
 		return node
 	}
