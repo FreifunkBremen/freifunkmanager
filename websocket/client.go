@@ -11,27 +11,25 @@ import (
 const channelBufSize = 100
 
 type Client struct {
-	ip     string
-	ws     *websocket.Conn
-	ch     chan *Message
-	doneCh chan bool
-}
-
-func disconnect(c *Client) {
-	delete(clients, c.ip)
+	ip        string
+	ws        *websocket.Conn
+	ch        chan *Message
+	writeQuit chan bool
+	readQuit  chan bool
 }
 
 func NewClient(ip string, ws *websocket.Conn) *Client {
 
 	if ws == nil {
-		panic("ws cannot be nil")
+		log.Log.Panic("ws cannot be nil")
 	}
 
 	return &Client{
-		ws:     ws,
-		ch:     make(chan *Message, channelBufSize),
-		doneCh: make(chan bool),
-		ip:     ip,
+		ws:        ws,
+		ch:        make(chan *Message, channelBufSize),
+		writeQuit: make(chan bool),
+		readQuit:  make(chan bool),
+		ip:        ip,
 	}
 }
 
@@ -39,22 +37,15 @@ func (c *Client) Write(msg *Message) {
 	select {
 	case c.ch <- msg:
 	default:
-		disconnect(c)
-		log.HTTP(c.ws.Request()).Error("client is disconnected.")
+		delete(clients, c.ip)
+		log.HTTP(c.ws.Request()).Error("client disconnected")
 	}
 }
 
-func (c *Client) Done() {
-	c.doneCh <- true
-}
-
-func (c *Client) allNodes() {
-	for _, node := range nodes.List {
-		c.Write(&Message{State: StateCurrentNode, Node: node})
-	}
-	for _, node := range nodes.ToUpdate {
-		c.Write(&Message{State: StateUpdateNode, Node: node})
-	}
+func (c *Client) Close() {
+	c.writeQuit <- true
+	c.readQuit <- true
+	log.HTTP(c.ws.Request()).Info("client disconnecting...")
 }
 
 // Listen Write and Read request via chanel
@@ -64,6 +55,22 @@ func (c *Client) Listen() {
 	c.listenRead()
 }
 
+func (c *Client) allNodes() {
+	for _, node := range nodes.List {
+		c.Write(&Message{Type: MessageTypeCurrentNode, Node: node})
+	}
+	for _, node := range nodes.ToUpdate {
+		c.Write(&Message{Type: MessageTypeUpdateNode, Node: node})
+	}
+}
+
+func (c *Client) handleMassage(msg *Message) {
+	switch msg.Type {
+	case MessageTypeUpdateNode:
+		nodes.UpdateNode(msg.Node)
+	}
+}
+
 // Listen write request via chanel
 func (c *Client) listenWrite() {
 	for {
@@ -71,9 +78,10 @@ func (c *Client) listenWrite() {
 		case msg := <-c.ch:
 			websocket.JSON.Send(c.ws, msg)
 
-		case <-c.doneCh:
-			disconnect(c)
-			c.doneCh <- true
+		case <-c.writeQuit:
+			close(c.ch)
+			close(c.writeQuit)
+			delete(clients, c.ip)
 			return
 		}
 	}
@@ -84,22 +92,22 @@ func (c *Client) listenRead() {
 	for {
 		select {
 
-		case <-c.doneCh:
-			disconnect(c)
-			c.doneCh <- true
+		case <-c.readQuit:
+			close(c.readQuit)
+			delete(clients, c.ip)
 			return
 
 		default:
 			var msg Message
 			err := websocket.JSON.Receive(c.ws, &msg)
 			if err == io.EOF {
-				log.HTTP(c.ws.Request()).Info("disconnect")
-				c.doneCh <- true
+				close(c.readQuit)
+				c.writeQuit <- true
+				return
 			} else if err != nil {
 				log.HTTP(c.ws.Request()).Error(err)
 			} else {
-				log.HTTP(c.ws.Request()).Info("recieve nodeupdate")
-				nodes.UpdateNode(msg.Node)
+				c.handleMassage(&msg)
 			}
 		}
 	}

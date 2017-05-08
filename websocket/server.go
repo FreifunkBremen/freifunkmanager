@@ -12,48 +12,42 @@ import (
 
 var nodes *runtime.Nodes
 var clients map[string]*Client
-var quit chan struct{}
 
 func Start(nodeBind *runtime.Nodes) {
 	nodes = nodeBind
 	clients = make(map[string]*Client)
-	quit = make(chan struct{})
 
 	http.Handle("/websocket", websocket.Handler(func(ws *websocket.Conn) {
+		r := ws.Request()
+		ip := httpLib.GetRemoteIP(r)
+
 		defer func() {
 			ws.Close()
+			delete(clients, ip)
+			log.HTTP(r).Info("client disconnected")
 		}()
-		r := ws.Request()
+
 		log.HTTP(r).Infof("new client")
-		ip := httpLib.GetRemoteIP(r)
+
 		client := NewClient(ip, ws)
 		clients[ip] = client
 		client.Listen()
+
 	}))
 
 	nodes.AddNotify(Notify)
-	/*
-		for {
-			select {
-			case <-quit:
-				return
-			}
-		}*/
 }
 
 func Notify(node *runtime.Node, real bool) {
-	state := StateUpdateNode
+	msgType := MessageTypeUpdateNode
 	if real {
-		state = StateCurrentNode
+		msgType = MessageTypeCurrentNode
 	}
 	for _, c := range clients {
-		c.Write(&Message{State: state, Node: node})
+		c.Write(&Message{Type: msgType, Node: node})
 	}
 }
 
 func Close() {
-	for _, c := range clients {
-		c.Done()
-	}
-	close(quit)
+	log.Log.Infof("websocket stopped with %d clients", len(clients))
 }

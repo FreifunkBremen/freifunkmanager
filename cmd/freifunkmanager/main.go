@@ -64,7 +64,7 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			panic(err)
+			log.Log.Panic(err)
 		}
 	}()
 

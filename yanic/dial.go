@@ -38,9 +38,11 @@ func (d *Dialer) Start() {
 	go d.parser()
 }
 func (d *Dialer) Close() {
-	close(d.quit)
-	d.conn.Close()
-	close(d.queue)
+	if d != nil {
+		d.conn.Close()
+		close(d.queue)
+		close(d.quit)
+	}
 }
 
 func (d *Dialer) reciever() {

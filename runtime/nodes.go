@@ -41,11 +41,16 @@ func (nodes *Nodes) AddNode(n *yanic.Node) {
 
 	if cNode := nodes.List[node.NodeID]; cNode != nil {
 		cNode.Lastseen = time.Now()
-		if _, ok := nodes.ToUpdate[node.NodeID]; ok {
+		cNode.Stats = node.Stats
+		if uNode, ok := nodes.ToUpdate[node.NodeID]; ok {
+			uNode.Lastseen = time.Now()
+			uNode.Stats = node.Stats
 			if nodes.List[node.NodeID].IsEqual(node) {
 				delete(nodes.ToUpdate, node.NodeID)
 				nodes.List[node.NodeID] = node
 				nodes.notify(node, true)
+			} else {
+				nodes.notify(uNode, false)
 			}
 		} else {
 			nodes.List[node.NodeID] = node
