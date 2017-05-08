@@ -22,7 +22,7 @@ type Dialer struct {
 func Dial(ctype, addr string) *Dialer {
 	conn, err := net.Dial(ctype, addr)
 	if err != nil {
-		log.Log.Panic("yanic dial failed")
+		log.Log.Panicf("yanic dial to %s:%s failed", ctype, addr)
 	}
 	dialer := &Dialer{
 		conn:  conn,

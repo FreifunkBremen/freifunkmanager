@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	logger "github.com/Sirupsen/logrus"
+
+	httpLib "github.com/FreifunkBremen/freifunkmanager/lib/http"
 )
 
 // current logger with configuration
@@ -21,12 +23,8 @@ func init() {
 // Function to add the information of a http request to the log
 // Input: pointer to the http request r
 func HTTP(r *http.Request) *logger.Entry {
-	ip := r.Header.Get("X-Forwarded-For")
-	if len(ip) <= 1 {
-		ip = r.RemoteAddr
-	}
 	return Log.WithFields(logger.Fields{
-		"remote": ip,
+		"remote": httpLib.GetRemoteIP(r),
 		"method": r.Method,
 		"url":    r.URL.RequestURI(),
 	})

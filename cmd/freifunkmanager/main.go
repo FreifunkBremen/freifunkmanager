@@ -9,14 +9,14 @@ import (
 	"time"
 
 	"github.com/NYTimes/gziphandler"
-	goji "goji.io"
-	"goji.io/pat"
 
 	configPackage "github.com/FreifunkBremen/freifunkmanager/config"
+	httpLib "github.com/FreifunkBremen/freifunkmanager/lib/http"
 	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 	"github.com/FreifunkBremen/freifunkmanager/lib/worker"
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
+	"github.com/FreifunkBremen/freifunkmanager/websocket"
 	"github.com/FreifunkBremen/freifunkmanager/yanic"
 )
 
@@ -38,10 +38,10 @@ func main() {
 	sshmanager := ssh.NewManager(config.SSHPrivateKey)
 	nodes := runtime.NewNodes(config.StatePath, config.SSHInterface, sshmanager)
 	nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
-	nodesSaveWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Saver)
+	nodesSaveWorker := worker.NewWorker(time.Duration(3)*time.Second, nodes.Saver)
 
-	nodesUpdateWorker.Start()
-	nodesSaveWorker.Start()
+	go nodesUpdateWorker.Start()
+	go nodesSaveWorker.Start()
 
 	if config.Yanic.Enable {
 		yanicDialer := yanic.Dial(config.Yanic.Type, config.Yanic.Address)
@@ -49,15 +49,19 @@ func main() {
 		yanicDialer.Start()
 	}
 
-	// Startwebserver
-	router := goji.NewMux()
+	websocket.Start(nodes)
 
-	router.Handle(pat.New("/*"), gziphandler.GzipHandler(http.FileServer(http.Dir(config.Webroot))))
+	// Startwebserver
+	http.HandleFunc("/nodes", func(w http.ResponseWriter, r *http.Request) {
+		httpLib.Write(w, nodes)
+		log.HTTP(r).Info("done")
+	})
+	http.Handle("/", gziphandler.GzipHandler(http.FileServer(http.Dir(config.Webroot))))
 
 	srv := &http.Server{
-		Addr:    config.WebserverBind,
-		Handler: router,
+		Addr: config.WebserverBind,
 	}
+
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 			panic(err)
@@ -72,6 +76,7 @@ func main() {
 	sig := <-sigs
 
 	// Stop services
+	websocket.Close()
 	srv.Close()
 	if config.Yanic.Enable {
 		yanicDialer.Close()

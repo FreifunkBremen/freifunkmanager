@@ -49,6 +49,9 @@ func NewNode(node *yanicRuntime.Node) *Node {
 }
 
 func (n *Node) SSHUpdate(ssh *ssh.Manager, iface string, oldnode *Node) {
+	if oldnode == nil {
+		return
+	}
 	addr := n.GetAddress(iface)
 	if n.Hostname != oldnode.Hostname {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateHostname, n.Hostname))
