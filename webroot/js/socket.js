@@ -19,10 +19,8 @@ var socket = {readyState:0};
 
     if(msg.type === "current") {
       store.updateReal(msg.node);
-      gui.update();
     } else if (msg.type === "to-update") {
       store.update(msg.node);
-      gui.update();
     } else {
       gui.disable(e);
     }
