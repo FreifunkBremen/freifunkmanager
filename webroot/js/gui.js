@@ -1,19 +1,25 @@
 var gui = {};
 
 (function(){
+  var notify;
 
-  gui.enable = function enable(){
+  gui.render = function render(){
+    var status = document.getElementsByClassName('menu')[0];
+    if (status === undefined){
+      return;
+    }
+    status.classList.remove('orange','red');
+    if(socket.readyState !== 1){
+      status.classList.add(((socket.readyState===0 || socket.readyState===2)?'orange':(socket.readyState===1)?'':'red'));
+    }
 
+    notify = new Notify(document.getElementsByClassName('notifications')[0]);
   };
-
-  gui.render = function render (){
-    console.log(store.will())
-  }
-  gui.disable = function disable(err){
-    document.querySelector('.loader p.error').innerHTML = err
-      + '<br /><br /><button onclick="location.reload(true)" class="ui labeled icon button"><i class="bomb icon"></i>Try to reload</button>';
+  gui.update = function update(){
+    console.log(store.will());
   };
-  gui.connecting = function connecting(){
-
+  gui.notify = function notifyWalker(type, text){
+    notify.notify(type, text);
   };
+  // gui.render();
 })();

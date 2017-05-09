@@ -1,14 +1,17 @@
-var socket = {};
+var socket = {readyState:0};
 
 (function(){
 
   function onerror(err) {
-    gui.disable("Es besteht ein Verbindungsproblem!");
     console.warn(err);
+    if(socket.readyState !== 3){
+      gui.notify("error","Es gibt Übertragungsprobleme!");
+      gui.render();
+    }
   }
 
   function onopen() {
-    gui.enable();
+    gui.render();
   }
 
   function onmessage(e) {
@@ -16,26 +19,31 @@ var socket = {};
 
     if(msg.type === "current") {
       store.updateReal(msg.node);
-      gui.render();
-
+      gui.update();
     } else if (msg.type === "to-update") {
       store.update(msg.node);
-      gui.render();
+      gui.update();
     } else {
       gui.disable(e);
     }
+    gui.render();
   }
 
   function onclose(){
-    gui.disable("Es besteht ein Verbindungsproblem!<br/> <small>(Automatische Neuverbindung)</small>");
     console.log("socket closed by server");
+    gui.notify("warn","Es besteht ein Verbindungsproblem!");
+    gui.render();
     setTimeout(connect, 5000);
   }
 
   function sendnode(node) {
     var msg = {node:node};
     var string = JSON.stringify(msg);
-    socket.send(string);
+    if(socket.send(string)){
+      gui.notify("success","Node '"+node.node_id+"' mit neuen Werten wurde gespeichert.");
+    }else{
+      gui.notify("error","Node '"+node.node_id+"' konnte nicht gespeichert werden!");
+    }
   }
 
   function connect() {

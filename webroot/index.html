@@ -9,23 +9,20 @@
     <script src="//localhost:35729/livereload.js"></script>
     <script src="/js/config.js"></script>
     <script src="/js/store.js"></script>
+    <script src="/js/notify.js"></script>
     <script src="/js/gui.js"></script>
     <script src="/js/socket.js"></script>
     <script src="/js/app.js"></script>
   </head>
   <body>
-    <div class="loader">
-      <p>
-        Lade
-        <br />
-        <img src="/img/logo.jpg" class="spinner" />
-        <br />
-        Karten &amp; Knoten...
-      </p>
-      <p class="error"></p>
-      <noscript>
-        <strong>JavaScript required</strong>
-      </noscript>
+    <div class="ui stackable inverted menu">
+      <div class="item">
+        <img src="/img/logo.jpg">
+      </div>
     </div>
+    <div class="notifications"></div>
+    <noscript>
+      <strong>JavaScript required</strong>
+    </noscript>
   </body>
 </html>

@@ -1,11 +1,4 @@
-
-.loader {
-  color: #dc0067;
-  font-size: 1.8em;
-  line-height: 2;
-  margin: 30vh auto;
-  text-align: center;
-}
-.loader img {
-  
+.notifications {
+  position: absolute;
+  right: 1em;
 }
