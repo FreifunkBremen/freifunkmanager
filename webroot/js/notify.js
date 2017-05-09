@@ -1,39 +1,43 @@
-var messages = [];
+var notify = {container:{},messages:[]};
 
-function Notify(container){
-  /*
-  var container = document.createElement('div');
-  container.classList.add('messages');
-  el.appendChild(container);
-  */
-  console.log("init notify",container);
+
+(function(){
   if ("Notification" in window) {
     Notification.requestPermission();
   }
+
+  function removeLast (){
+    notify.messages.splice(0, 1);
+    if(notify.container.firstElementChild)
+      notify.container.removeChild(notify.container.firstElementChild);
+  }
+
   function renderMsg(msg){
     var msgBox = document.createElement('div');
     msgBox.classList.add("notify",msg.type);
     msgBox.innerHTML = msg.text;
-    container.appendChild(msgBox);
+    notify.container.appendChild(msgBox);
     msgBox.addEventListener('click', function(){
-      container.removeChild(msgBox);
-      if (messages.indexOf(msg) !== -1) {
-        messages.splice(messages.indexOf(msg), 1);
+      notify.container.removeChild(msgBox);
+      if (notify.messages.indexOf(msg) !== -1) {
+        notify.messages.splice(notify.messages.indexOf(msg), 1);
       }
     });
   }
-  self.notify = function(type, text){
+
+  setInterval(removeLast,15000);
+
+  notify.send = function(type, text){
     if("Notification" in window && Notification.permission === "granted") {
-      n = new Notification(text,{body:type,icon:'/img/logo.jpg'});
+      new Notification(text,{body:type,icon:'/img/logo.jpg'});
       return;
     }
-    var msg = {type:type,text:text};
-    if(messages.length > 10){
-      messages.splice(0, 1);
-      container.removeChild(container.firstElementChild);
+    if(notify.messages.length > 10){
+      removeLast();
     }
-    messages.push(msg);
+    var msg = {type:type,text:text};
+    notify.messages.push(msg);
     renderMsg(msg);
   };
-  return self;
-}
+
+})()

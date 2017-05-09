@@ -5,7 +5,7 @@ var socket = {readyState:0};
   function onerror(err) {
     console.warn(err);
     if(socket.readyState !== 3){
-      gui.notify("error","Es gibt Übertragungsprobleme!");
+      notify.send("error","Es gibt Übertragungsprobleme!");
       gui.render();
     }
   }
@@ -31,7 +31,7 @@ var socket = {readyState:0};
 
   function onclose(){
     console.log("socket closed by server");
-    gui.notify("warn","Es besteht ein Verbindungsproblem!");
+    notify.send("warn","Es besteht ein Verbindungsproblem!");
     gui.render();
     setTimeout(connect, 5000);
   }
@@ -40,9 +40,9 @@ var socket = {readyState:0};
     var msg = {node:node};
     var string = JSON.stringify(msg);
     if(socket.send(string)){
-      gui.notify("success","Node '"+node.node_id+"' mit neuen Werten wurde gespeichert.");
+      notify.send("success","Node '"+node.node_id+"' mit neuen Werten wurde gespeichert.");
     }else{
-      gui.notify("error","Node '"+node.node_id+"' konnte nicht gespeichert werden!");
+      notify.send("error","Node '"+node.node_id+"' konnte nicht gespeichert werden!");
     }
   }
 
