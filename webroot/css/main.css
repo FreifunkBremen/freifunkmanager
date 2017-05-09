@@ -1,4 +1,118 @@
+body {
+  position: relative;
+  margin: 0px;
+  font-size: 15px;
+  color: #333;
+  line-height: 1;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+.status {
+  float: right;
+  background: #009ee0;
+  width: 50px;
+  height: 50px;
+}
+.status.connecting {
+  background: #ffb400;
+}
+.status.offline {
+  background: #dc0067;
+}
+header {
+  background-color: #373636;
+  max-width: 100%;
+  height: 50px;
+}
+header > div {
+  display: inline-block;
+}
+nav {
+  display: inline-block;
+  font-weight: 700;
+  width: 100%;
+}
+nav ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+nav li {
+  float:left;
+  display: inline-block;
+}
+nav li:hover, nav.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+nav li a, nav li span {
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none !important;
+  text-align: center;
+  text-transform: uppercase;
+  color: inherit;
+  box-sizing: border-box;
+  padding: 1.1em .5em;
+  min-width: 10em;
+  height: 50px;
+}
+nav > ul > .item-1 {
+  background: #ffb400;
+  color: #000;
+}
+nav > ul > .item-2 {
+  background: #dc0067;
+  color: #fff;
+}
+nav > ul > .item-3 {
+  background: #ccc;
+  color: #000;
+}
 .notifications {
   position: absolute;
   right: 1em;
+}
+
+.notify {
+  position: relative;
+  min-height: 1em;
+  margin: 1em 0;
+  padding: 1em 1.5em;
+  color: rgba(0,0,0,.87);
+  -webkit-transition: opacity .1s ease,color .1s ease,background .1s ease,box-shadow .1s ease;
+  transition: opacity .1s ease,color .1s ease,background .1s ease,box-shadow .1s ease;
+  box-shadow: 0 0 0 1px rgba(34,36,38,.22) inset, 0 0 0 0 transparent;
+  background: #ccc;
+  color: #000;
+}
+.notify.success {
+  background: #009ee0;
+  color: #fff;
+}
+.notify.warn {
+  background: #ffb400;
+  color: #000;
+}
+.notify.error {
+  background: #dc0067;
+  color: #fff;
+}
+
+button {
+    display: inline-block;
+    padding: .5em 1em;
+    border-radius: 2em;
+    color: #fff;
+    background-color: #dc0067;
+    text-align: center;
+}
+button:hover {
+  background: lighten(#dc0067, 5%);
+}
+
+a.btn:hover {
+  text-decoration: none;
+}
+a {
+    color: #dc0067;
+    text-decoration: none;
 }

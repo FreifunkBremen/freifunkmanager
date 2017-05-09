@@ -6,12 +6,13 @@ function Notify(container){
   container.classList.add('messages');
   el.appendChild(container);
   */
-   if ("Notification" in window) {
-     Notification.requestPermission();
-   }
+  console.log("init notify",container);
+  if ("Notification" in window) {
+    Notification.requestPermission();
+  }
   function renderMsg(msg){
     var msgBox = document.createElement('div');
-    msgBox.classList.add("ui",msg.type,"message");
+    msgBox.classList.add("notify",msg.type);
     msgBox.innerHTML = msg.text;
     container.appendChild(msgBox);
     msgBox.addEventListener('click', function(){

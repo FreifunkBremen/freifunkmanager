@@ -4,16 +4,17 @@ var gui = {};
   var notify;
 
   gui.render = function render(){
-    var status = document.getElementsByClassName('menu')[0];
+    var status = document.getElementsByClassName('status')[0];
     if (status === undefined){
+      console.log("unable to render");
       return;
     }
-    status.classList.remove('orange','red');
+    status.classList.remove('connecting','offline');
     if(socket.readyState !== 1){
-      status.classList.add(((socket.readyState===0 || socket.readyState===2)?'orange':(socket.readyState===1)?'':'red'));
+      status.classList.add(((socket.readyState===0 || socket.readyState===2)?'connecting':(socket.readyState===1)?'':'offline'));
     }
 
-    notify = new Notify(document.getElementsByClassName('notifications')[0]);
+    notify = Notify(document.getElementsByClassName('notifications')[0]);
   };
   gui.update = function update(){
     console.log(store.will());
@@ -21,5 +22,5 @@ var gui = {};
   gui.notify = function notifyWalker(type, text){
     notify.notify(type, text);
   };
-  // gui.render();
+  gui.render();
 })();
