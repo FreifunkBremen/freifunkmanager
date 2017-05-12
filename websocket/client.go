@@ -37,7 +37,9 @@ func (c *Client) Write(msg *Message) {
 	select {
 	case c.ch <- msg:
 	default:
+		clientsMutex.Lock()
 		delete(clients, c.ip)
+		clientsMutex.Unlock()
 		log.HTTP(c.ws.Request()).Error("client disconnected")
 	}
 }
@@ -81,7 +83,9 @@ func (c *Client) listenWrite() {
 		case <-c.writeQuit:
 			close(c.ch)
 			close(c.writeQuit)
+			clientsMutex.Lock()
 			delete(clients, c.ip)
+			clientsMutex.Unlock()
 			return
 		}
 	}
@@ -94,7 +98,9 @@ func (c *Client) listenRead() {
 
 		case <-c.readQuit:
 			close(c.readQuit)
+			clientsMutex.Lock()
 			delete(clients, c.ip)
+			clientsMutex.Unlock()
 			return
 
 		default:

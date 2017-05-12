@@ -104,23 +104,54 @@ thead {
 thead tr th{
   border-bottom: 4px solid #dc0067;
 }
+table th > input {
+  border: none;
+  color: #000;
+  font-weight: bold;
+  background: #fff;
+}
+table th.sortable.sort-down:after {
+  content: " \25BC"
+}
+table th.sortable.sort-up:after {
+  content: " \25B2"
+}
+table th.sortable:not(.sort-down):not(.sort-up):after {
+  content: " \25B4\25BE";
+}
+table.nodes {
+  width: 100%;
+}
 
-table th.sort-down:after {
-  content: " \25BE"
+table.nodes td > span{
+  display: block;
 }
-table th.sort-up:after {
-  content: " \25B4"
+table.nodes tbody tr:nth-child(even) {
+  background: #eee;
+}
+table.nodes tbody tr:nth-child(odd) {
+  background: #fff;
+}
+table.nodes tbody tr:hover {
+  background: #ccc;
+}
+table.nodes tbody tr.offline{
+  background: #ffb400;
+}
+table.nodes tbody tr.offline:hover{
+  background: #dc0067;
 }
 
-button {
-    display: inline-block;
-    padding: .5em 1em;
-    border-radius: 2em;
-    color: #fff;
-    background-color: #dc0067;
-    text-align: center;
+.btn {
+  display: inline-block;
+  padding: .3em .5em;
+  border-radius: 1em;
+  color: #fff;
+  background-color: #dc0067;
+  text-align: center;
+  cursor: pointer;
 }
-button:hover {
+.btn:hover {
   background: lighten(#dc0067, 5%);
 }
 
@@ -128,6 +159,6 @@ a.btn:hover {
   text-decoration: none;
 }
 a {
-    color: #dc0067;
-    text-decoration: none;
+  color: #dc0067;
+  text-decoration: none;
 }

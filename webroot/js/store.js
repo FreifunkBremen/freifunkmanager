@@ -12,10 +12,14 @@ var store = {
   };
   store.will = function() {
     return Object.keys(store.list).map(function(nodeid){
+      var node;
       if (store.toupdate[nodeid]) {
-        return store.toupdate[nodeid];
+        node = store.toupdate[nodeid];
+      } else{
+        node = store.list[nodeid];
       }
-      return store.list[nodeid];
+      node._wireless = store.list[nodeid].wireless;
+      return node;
     });
   };
 })();

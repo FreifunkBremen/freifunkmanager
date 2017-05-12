@@ -3,8 +3,9 @@ package runtime
 import (
 	"encoding/json"
 	"os"
-	"time"
+	"sync"
 
+	"github.com/FreifunkBremen/yanic/jsontime"
 	yanic "github.com/FreifunkBremen/yanic/runtime"
 
 	"github.com/FreifunkBremen/freifunkmanager/lib/log"
@@ -18,6 +19,7 @@ type Nodes struct {
 	statePath  string
 	iface      string
 	notifyFunc []func(*Node, bool)
+	sync.Mutex
 }
 
 func NewNodes(path string, iface string, mgmt *ssh.Manager) *Nodes {
@@ -37,13 +39,15 @@ func (nodes *Nodes) AddNode(n *yanic.Node) {
 	if node == nil {
 		return
 	}
+	node.Lastseen = jsontime.Now()
 	logger := log.Log.WithField("method", "AddNode").WithField("node_id", node.NodeID)
-
+	nodes.Lock()
+	nodes.Unlock()
 	if cNode := nodes.List[node.NodeID]; cNode != nil {
-		cNode.Lastseen = time.Now()
+		cNode.Lastseen = jsontime.Now()
 		cNode.Stats = node.Stats
 		if uNode, ok := nodes.ToUpdate[node.NodeID]; ok {
-			uNode.Lastseen = time.Now()
+			uNode.Lastseen = jsontime.Now()
 			uNode.Stats = node.Stats
 			if nodes.List[node.NodeID].IsEqual(node) {
 				delete(nodes.ToUpdate, node.NodeID)
@@ -59,7 +63,6 @@ func (nodes *Nodes) AddNode(n *yanic.Node) {
 		logger.Debugf("know already these node")
 		return
 	}
-	node.Lastseen = time.Now()
 	// session := nodes.ssh.ConnectTo(node.Address)
 	result, err := nodes.ssh.RunOn(node.GetAddress(nodes.iface), "uptime")
 	if err != nil {
@@ -87,6 +90,8 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 		log.Log.Warn("no new node to update")
 		return
 	}
+	nodes.Lock()
+	defer nodes.Unlock()
 	if n, ok := nodes.List[node.NodeID]; ok {
 		go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 	}
@@ -95,6 +100,8 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 }
 
 func (nodes *Nodes) Updater() {
+	nodes.Lock()
+	defer nodes.Unlock()
 	for nodeid := range nodes.ToUpdate {
 		if node := nodes.List[nodeid]; node != nil {
 			go node.SSHSet(nodes.ssh, nodes.iface)
@@ -116,6 +123,8 @@ func (nodes *Nodes) load() {
 }
 
 func (nodes *Nodes) Saver() {
+	nodes.Lock()
 	yanic.SaveJSON(nodes, nodes.statePath)
+	nodes.Unlock()
 	log.Log.Debug("saved state file")
 }

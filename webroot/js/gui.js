@@ -8,18 +8,15 @@ var router = new Navigo(null, true, '#');
   router.on({
     '/list': function () {
       clean();
-      console.log("list view");
       guiList.bind(document.querySelector('main'));
       guiList.render();
     },
     '/map':function(){
       clean();
-      console.log("map view");
       domlib.newAt(main,"div").innerHTML = "Map";
     },
     '/statistics':function(){
       clean();
-      console.log("stats view");
       domlib.newAt(document.querySelector('main'),"div").innerHTML = "Stats";
     },
     '/n/:nodeID': {

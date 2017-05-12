@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"net/http"
+	"sync"
 
 	"golang.org/x/net/websocket"
 
@@ -12,6 +13,7 @@ import (
 
 var nodes *runtime.Nodes
 var clients map[string]*Client
+var clientsMutex sync.Mutex
 
 func Start(nodeBind *runtime.Nodes) {
 	nodes = nodeBind
@@ -23,14 +25,18 @@ func Start(nodeBind *runtime.Nodes) {
 
 		defer func() {
 			ws.Close()
+			clientsMutex.Lock()
 			delete(clients, ip)
+			clientsMutex.Unlock()
 			log.HTTP(r).Info("client disconnected")
 		}()
 
 		log.HTTP(r).Infof("new client")
 
 		client := NewClient(ip, ws)
+		clientsMutex.Lock()
 		clients[ip] = client
+		clientsMutex.Unlock()
 		client.Listen()
 
 	}))
@@ -43,9 +49,11 @@ func Notify(node *runtime.Node, real bool) {
 	if real {
 		msgType = MessageTypeCurrentNode
 	}
+	clientsMutex.Lock()
 	for _, c := range clients {
 		c.Write(&Message{Type: msgType, Node: node})
 	}
+	clientsMutex.Unlock()
 }
 
 func Close() {
