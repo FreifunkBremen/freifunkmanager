@@ -2,7 +2,9 @@ package ssh
 
 import (
 	"net"
+	"strings"
 	"sync"
+	"time"
 
 	"golang.org/x/crypto/ssh"
 
@@ -11,9 +13,10 @@ import (
 
 // the SSH Connection Manager for multiple connections
 type Manager struct {
-	config     *ssh.ClientConfig
-	clients    map[string]*ssh.Client
-	clientsMUX sync.Mutex
+	config           *ssh.ClientConfig
+	clients          map[string]*ssh.Client
+	clientsBlacklist map[string]time.Time
+	clientsMUX       sync.Mutex
 }
 
 // create a new SSH Connection Manager by ssh file
@@ -32,14 +35,22 @@ func NewManager(file string) *Manager {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	return &Manager{
-		config:  sshConfig,
-		clients: make(map[string]*ssh.Client),
+		config:           sshConfig,
+		clients:          make(map[string]*ssh.Client),
+		clientsBlacklist: make(map[string]time.Time),
 	}
 }
 
 func (m *Manager) ConnectTo(addr net.TCPAddr) *ssh.Client {
 	m.clientsMUX.Lock()
 	defer m.clientsMUX.Unlock()
+	if t, ok := m.clientsBlacklist[addr.IP.String()]; ok {
+		if time.Now().Add(-time.Hour * 24).After(t) {
+			return nil
+		} else {
+			delete(m.clientsBlacklist, addr.IP.String())
+		}
+	}
 
 	if client, ok := m.clients[addr.IP.String()]; ok {
 		return client
@@ -47,7 +58,12 @@ func (m *Manager) ConnectTo(addr net.TCPAddr) *ssh.Client {
 
 	client, err := ssh.Dial("tcp", addr.String(), m.config)
 	if err != nil {
-		log.Log.Error(err)
+		if strings.Contains(err.Error(), "no supported methods remain") {
+			m.clientsBlacklist[addr.IP.String()] = time.Now()
+			log.Log.Warnf("node was set on the blacklist: %s", err)
+		} else {
+			log.Log.Error(err)
+		}
 		return nil
 	}
 
