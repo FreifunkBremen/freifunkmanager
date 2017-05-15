@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sync"
 
+	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 	"golang.org/x/net/websocket"
 
 	httpLib "github.com/FreifunkBremen/freifunkmanager/lib/http"
@@ -14,6 +15,7 @@ import (
 var nodes *runtime.Nodes
 var clients map[string]*Client
 var clientsMutex sync.Mutex
+var stats *runtimeYanic.GlobalStats
 
 func Start(nodeBind *runtime.Nodes) {
 	nodes = nodeBind
@@ -41,17 +43,24 @@ func Start(nodeBind *runtime.Nodes) {
 
 	}))
 
-	nodes.AddNotify(Notify)
+	nodes.AddNotify(NotifyNode)
 }
 
-func Notify(node *runtime.Node, real bool) {
+func NotifyNode(node *runtime.Node, real bool) {
 	msgType := MessageTypeUpdateNode
 	if real {
 		msgType = MessageTypeCurrentNode
 	}
+	SendAll(Message{Type: msgType, Node: node})
+}
+func NotifyStats(data *runtimeYanic.GlobalStats) {
+	stats = data
+	SendAll(Message{Type: MessageTypeStats, Body: data})
+}
+func SendAll(msg Message) {
 	clientsMutex.Lock()
 	for _, c := range clients {
-		c.Write(&Message{Type: msgType, Node: node})
+		c.Write(&msg)
 	}
 	clientsMutex.Unlock()
 }

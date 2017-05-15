@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 	"github.com/NYTimes/gziphandler"
 
 	configPackage "github.com/FreifunkBremen/freifunkmanager/config"
@@ -25,6 +26,7 @@ var (
 	config      *configPackage.Config
 	nodes       *runtime.Nodes
 	yanicDialer *yanic.Dialer
+	stats       *runtimeYanic.GlobalStats
 )
 
 func main() {
@@ -43,17 +45,25 @@ func main() {
 	go nodesUpdateWorker.Start()
 	go nodesSaveWorker.Start()
 
+	websocket.Start(nodes)
+
 	if config.Yanic.Enable {
 		yanicDialer := yanic.Dial(config.Yanic.Type, config.Yanic.Address)
 		yanicDialer.NodeHandler = nodes.AddNode
+		yanicDialer.GlobalsHandler = func(data *runtimeYanic.GlobalStats) {
+			stats = data
+			websocket.NotifyStats(data)
+		}
 		yanicDialer.Start()
 	}
-
-	websocket.Start(nodes)
 
 	// Startwebserver
 	http.HandleFunc("/nodes", func(w http.ResponseWriter, r *http.Request) {
 		httpLib.Write(w, nodes)
+		log.HTTP(r).Info("done")
+	})
+	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
+		httpLib.Write(w, stats)
 		log.HTTP(r).Info("done")
 	})
 	http.Handle("/", gziphandler.GzipHandler(http.FileServer(http.Dir(config.Webroot))))

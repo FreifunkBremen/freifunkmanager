@@ -16,13 +16,21 @@ var socket = {readyState:0};
 
   function onmessage(e) {
     var msg = JSON.parse(e.data);
-
-    if(msg.type === "current") {
-      store.updateReal(msg.node);
-    } else if (msg.type === "to-update") {
-      store.update(msg.node);
-    } else {
-      gui.disable(e);
+    switch (msg.type) {
+      case "current":
+        store.updateNode(msg.node,true);
+        break;
+      case "to-update":
+        store.updateNode(msg.node);
+        break;
+      case "stats":
+        if(msg.body) {
+          store.stats = msg.body;
+        }
+        break;
+      default:
+        notify.send("warn","unable to identify message: "+e);
+        break;
     }
     gui.render();
   }
@@ -35,13 +43,10 @@ var socket = {readyState:0};
   }
 
   function sendnode(node) {
-    var msg = {node:node};
+    var msg = {type:"to-update",node:node};
     var string = JSON.stringify(msg);
-    if(socket.send(string)){
-      notify.send("success","Node '"+node.node_id+"' mit neuen Werten wurde gespeichert.");
-    }else{
-      notify.send("error","Node '"+node.node_id+"' konnte nicht gespeichert werden!");
-    }
+    socket.send(string)
+    notify.send("success","Node '"+node.node_id+"' mit neuen Werten wurde übermittelt.");
   }
 
   function connect() {

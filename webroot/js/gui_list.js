@@ -1,12 +1,14 @@
 var guiList = {};
 
 (function(){
-  var container;
+  var view = guiList;
+  var container, el;
+
   var tbody;
   var sortReverse = false;
   var sortIndex;
 
-  var hostnameFilter,nodeidFilter;
+  var hostnameFilter, nodeidFilter;
 
   function sort(a,b){
     function sortNumber(a,b){
@@ -48,50 +50,50 @@ var guiList = {};
     }
   }
 
-  function renderRow(data){
+  function renderRow(node){
     var tr = document.createElement('tr');
     var startdate = new Date();
     startdate.setMinutes(startdate.getMinutes() - 1);
-    if(new Date(data.lastseen) < startdate)
+    if(new Date(node.lastseen) < startdate)
       tr.classList.add('offline')
     var td;
 
-    domlib.newAt(tr,'td').innerHTML = moment(data.lastseen).fromNow(true);
-    domlib.newAt(tr,'td').innerHTML = data.node_id;
+    domlib.newAt(tr,'td').innerHTML = moment(node.lastseen).fromNow(true);
+    domlib.newAt(tr,'td').innerHTML = node.node_id;
 
-    domlib.newAt(tr,'td').innerHTML = data.hostname;
+    domlib.newAt(tr,'td').innerHTML = node.hostname;
 
     var freq = domlib.newAt(tr,'td');
     domlib.newAt(freq,'span').innerHTML = '2.4 Ghz';
     domlib.newAt(freq,'span').innerHTML = '5 Ghz';
 
     var curchannel = domlib.newAt(tr,'td');
-    domlib.newAt(curchannel,'span').innerHTML = data._wireless.channel24||'-';
-    domlib.newAt(curchannel,'span').innerHTML = data._wireless.channel5||'-';
+    domlib.newAt(curchannel,'span').innerHTML = node._wireless.channel24||'-';
+    domlib.newAt(curchannel,'span').innerHTML = node._wireless.channel5||'-';
 
     var channel = domlib.newAt(tr,'td');
-    domlib.newAt(channel,'span').innerHTML = data.wireless.channel24||'-';
-    domlib.newAt(channel,'span').innerHTML = data.wireless.channel5||'-';
+    domlib.newAt(channel,'span').innerHTML = node.wireless.channel24||'-';
+    domlib.newAt(channel,'span').innerHTML = node.wireless.channel5||'-';
 
     var curpower = domlib.newAt(tr,'td');
-    domlib.newAt(curpower,'span').innerHTML = data._wireless.txpower24||'-';
-    domlib.newAt(curpower,'span').innerHTML = data._wireless.txpower5||'-';
+    domlib.newAt(curpower,'span').innerHTML = node._wireless.txpower24||'-';
+    domlib.newAt(curpower,'span').innerHTML = node._wireless.txpower5||'-';
 
     var power = domlib.newAt(tr,'td');
-    domlib.newAt(power,'span').innerHTML = data.wireless.txpower24||'-';
-    domlib.newAt(power,'span').innerHTML = data.wireless.txpower5||'-';
+    domlib.newAt(power,'span').innerHTML = node.wireless.txpower24||'-';
+    domlib.newAt(power,'span').innerHTML = node.wireless.txpower5||'-';
 
     var client = domlib.newAt(tr,'td');
-    domlib.newAt(client,'span').innerHTML = data.statistics.clients.wifi24;
-    domlib.newAt(client,'span').innerHTML = data.statistics.clients.wifi5;
+    domlib.newAt(client,'span').innerHTML = node.statistics.clients.wifi24;
+    domlib.newAt(client,'span').innerHTML = node.statistics.clients.wifi5;
 
     var chanUtil = domlib.newAt(tr,'td');
-    var chanUtil24 = data.statistics.wireless.filter(function(d){
+    var chanUtil24 = node.statistics.wireless.filter(function(d){
       return d.frequency < 5000;
-    })[0];
-    var chanUtil5 = data.statistics.wireless.filter(function(d){
+    })[0] || {};
+    var chanUtil5 = node.statistics.wireless.filter(function(d){
       return d.frequency > 5000;
-    })[0];
+    })[0] || {};
     domlib.newAt(chanUtil,'span').innerHTML = chanUtil24.ChanUtil||'-';
     domlib.newAt(chanUtil,'span').innerHTML = chanUtil5.ChanUtil||'-';
 
@@ -100,32 +102,32 @@ var guiList = {};
     edit.classList.add('btn');
     edit.innerHTML = 'Edit';
     edit.addEventListener('click',function(){
-      router.navigate(router.generate('node', { nodeID: data.node_id }));
+      router.navigate(router.generate('node', { nodeID: node.node_id }));
     });
 
     return tr;
   }
 
-  function updateTable(){
+  function update(){
     domlib.removeChildren(tbody);
-    var data = store.will();
+    var nodes = store.getNodes();
 
     if(hostnameFilter && hostnameFilter.value != "")
-      data = data.filter(function(d){
+      nodes = nodes.filter(function(d){
         return d.hostname.toLowerCase().indexOf(hostnameFilter.value) > -1;
       })
     if(nodeidFilter && nodeidFilter.value != "")
-      data = data.filter(function(d){
+      nodes = nodes.filter(function(d){
         return d.node_id.indexOf(nodeidFilter.value) > -1;
       })
 
-    data = data.sort(sort);
+    nodes = nodes.sort(sort);
 
     if(sortReverse)
-      data = data.reverse();
+      nodes = nodes.reverse();
 
-    for(var i=0; i<data.length; i++){
-      var row = renderRow(data[i]);
+    for(var i=0; i<nodes.length; i++){
+      var row = renderRow(nodes[i]);
       tbody.appendChild(row);
     }
   }
@@ -137,23 +139,25 @@ var guiList = {};
     sortIndex = head;
     sortIndex.classList.add(sortReverse ? 'sort-up' : 'sort-down');
 
-    updateTable();
+    update();
   }
 
-  guiList.bind = function(el) {
+  view.bind = function(el) {
     container = el;
   };
 
-  guiList.render = function render(){
+  view.render = function(){
     if (container === undefined){
       return;
-    } else if (tbody !== undefined){
-      container.appendChild(tbody.parentNode);
-      updateTable();
+    } else if (el !== undefined){
+      container.appendChild(el);
+      update();
       return;
     }
-    domlib.removeChildren(container);
-    var table = domlib.newAt(container,'table');
+    console.log("generate new view for list");
+    el = domlib.newAt(container,'div');
+
+    var table = domlib.newAt(el,'table');
     var thead = domlib.newAt(table,'thead');
     tbody = domlib.newAt(table,'tbody');
 
@@ -170,7 +174,7 @@ var guiList = {};
     nodeidFilter = domlib.newAt(cell2,'input');
     nodeidFilter.setAttribute("placeholder","NodeID");
     nodeidFilter.setAttribute("size","9");
-    nodeidFilter.addEventListener('keyup', updateTable);
+    nodeidFilter.addEventListener('keyup', update);
     cell2.addEventListener('dblclick', function(){
       sortTable(cell2);
     });
@@ -179,7 +183,7 @@ var guiList = {};
     cell3.classList.add('sortable');
     hostnameFilter = domlib.newAt(cell3,'input');
     hostnameFilter.setAttribute("placeholder","Hostname");
-    hostnameFilter.addEventListener('keyup', updateTable);
+    hostnameFilter.addEventListener('keyup', update);
     cell3.addEventListener('dblclick', function(){
       sortTable(cell3);
     });
@@ -228,6 +232,6 @@ var guiList = {};
 
     table.classList.add('nodes');
 
-    updateTable();
+    update();
   };
 })();

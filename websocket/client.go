@@ -53,6 +53,7 @@ func (c *Client) Close() {
 // Listen Write and Read request via chanel
 func (c *Client) Listen() {
 	go c.listenWrite()
+	c.Write(&Message{Type: MessageTypeStats, Body: stats})
 	c.allNodes()
 	c.listenRead()
 }
@@ -66,7 +67,7 @@ func (c *Client) allNodes() {
 	}
 }
 
-func (c *Client) handleMassage(msg *Message) {
+func (c *Client) handleMessage(msg *Message) {
 	switch msg.Type {
 	case MessageTypeUpdateNode:
 		nodes.UpdateNode(msg.Node)
@@ -113,7 +114,7 @@ func (c *Client) listenRead() {
 			} else if err != nil {
 				log.HTTP(c.ws.Request()).Error(err)
 			} else {
-				c.handleMassage(&msg)
+				c.handleMessage(&msg)
 			}
 		}
 	}

@@ -14,8 +14,8 @@ import (
 const (
 	SSHUpdateHostname = "uci set system.@system[0].hostname='%s';uci commit system;echo $(uci get system.@system[0].hostname) > /proc/sys/kernel/hostname"
 	SSHUpdateOwner    = "uci set gluon-node-info.@owner[0].contact='%s';uci commit gluon-node-info;"
-	SSHUpdateLocation = "uci set gluon-node-info.@location[0].latitude='%d';uci set gluon-node-info.@location[0].longitude='%d';uci set gluon-node-info.@location[0].share_location=1;uci commit gluon-node-info;"
-	SSHUpdateWifiFreq = "uci set gluon-node-info.@location[0].latitude='%d';uci set gluon-node-info.@location[0].longitude='%d';uci set gluon-node-info.@location[0].share_location=1;uci commit gluon-node-info;wifi"
+	SSHUpdateLocation = "uci set gluon-node-info.@location[0].latitude='%f';uci set gluon-node-info.@location[0].longitude='%f';uci set gluon-node-info.@location[0].share_location=1;uci commit gluon-node-info;"
+	SSHUpdateWifiFreq = "wifi"
 )
 
 type Node struct {

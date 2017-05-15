@@ -1,25 +1,36 @@
 var store = {
-  list:{},
-  toupdate:{}
+  _list:{},
+  _toupdate:{},
+  stats:{"Clients":0,"ClientsWifi":0,"ClientsWifi24":0,"ClientsWifi5":0,"Gateways":0,"Nodes":0,"Firmwares":{},"Models":{}}
 };
 
 (function(){
-  store.updateReal = function updateReal(node){
-    store.list[node.node_id] = node;
+
+  function getNode(nodeid){
+    var node;
+    if (store._toupdate[nodeid]) {
+      node = store._toupdate[nodeid];
+    } else if (store._list[nodeid]){
+      node = store._list[nodeid];
+    }else{
+      return;
+    }
+    node._wireless = store._list[nodeid].wireless;
+    return node;
+  }
+
+  store.updateNode = function updateReal(node, real){
+    if(real){
+      store._list[node.node_id] = node;
+    }else{
+      store._toupdate[node.node_id] = node;
+    }
   };
-  store.update = function update(node){
-    store.toupdate[node.node_id] = node;
+
+  store.getNode = getNode;
+
+  store.getNodes = function() {
+    return Object.keys(store._list).map(getNode);
   };
-  store.will = function() {
-    return Object.keys(store.list).map(function(nodeid){
-      var node;
-      if (store.toupdate[nodeid]) {
-        node = store.toupdate[nodeid];
-      } else{
-        node = store.list[nodeid];
-      }
-      node._wireless = store.list[nodeid].wireless;
-      return node;
-    });
-  };
+
 })();

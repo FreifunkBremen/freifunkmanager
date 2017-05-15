@@ -2,42 +2,13 @@ var gui = {};
 var router = new Navigo(null, true, '#');
 
 (function(){
-  function clean(){
-    domlib.removeChildren(document.querySelector('main'));
-  }
-  router.on({
-    '/list': function () {
-      clean();
-      guiList.bind(document.querySelector('main'));
-      guiList.render();
-    },
-    '/map':function(){
-      clean();
-      domlib.newAt(main,"div").innerHTML = "Map";
-    },
-    '/statistics':function(){
-      clean();
-      domlib.newAt(document.querySelector('main'),"div").innerHTML = "Stats";
-    },
-    '/n/:nodeID': {
-      as: 'node',
-      uses: function (params) {
-        clean();
-        console.log("node view");
-        var nodeid = params['nodeID'].toLowerCase();
-        domlib.newAt(document.querySelector('main'),"div").innerHTML = "Nodeid: "+nodeid;
-      }
-    },
-  });
-  router.on(function () {
-    router.navigate('/list');
-  });
+  var currentView = {bind:function(){},render:function(){}};
 
-  gui.render = function render(){
-    main = document.querySelector('main');
+  function render() {
     var status = document.getElementsByClassName('status')[0];
     if (status === undefined){
-      console.log("unable to render");
+      console.log("unable to render, render later");
+      setTimeout(render,100);
       return;
     }
     status.classList.remove('connecting','offline');
@@ -47,9 +18,55 @@ var router = new Navigo(null, true, '#');
 
     notify.bind(document.getElementsByClassName('notifications')[0]);
 
-    guiList.render();
+    currentView.render();
     router.resolve();
-  };
+  }
+
+  function setView(c){
+    currentView = c;
+    var main = document.querySelector('main')
+    domlib.removeChildren(main);
+    currentView.bind(main);
+    currentView.render();
+  }
+
+  router.on({
+    '/list': function () {
+      setView(guiList);
+    },
+    '/map':function(){
+      setView(guiMap);
+    },
+    '/statistics':function(){
+      setView(guiStats);
+    },
+    '/n/:nodeID': {
+      as: 'node',
+      uses: function (params) {
+        guiNode.current_node_id = params['nodeID'].toLowerCase();
+        setView(guiNode);
+      }
+    },
+  });
+  router.on(function () {
+    router.navigate('/list');
+  });
+
+  gui.render = function () {
+    var timeout;
+
+    function reset () {
+      timeout = null;
+    }
+
+    if (timeout){
+      console("skip rendering, because to often");
+      clearTimeout(timeout);
+    } else {
+      render();
+    }
+    timeout = setTimeout(reset, 100);
+  }
 
   gui.render();
 })();

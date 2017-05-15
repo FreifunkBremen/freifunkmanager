@@ -18,6 +18,9 @@ body {
 .status.offline {
   background: #dc0067;
 }
+h1 {
+  border-bottom: 4px solid #dc0067;
+}
 header {
   background-color: #373636;
   max-width: 100%;
@@ -119,7 +122,7 @@ table th.sortable.sort-up:after {
 table th.sortable:not(.sort-down):not(.sort-up):after {
   content: " \25B4\25BE";
 }
-table.nodes {
+table.nodes, table.stats {
   width: 100%;
 }
 
@@ -140,6 +143,13 @@ table.nodes tbody tr.offline{
 }
 table.nodes tbody tr.offline:hover{
   background: #dc0067;
+}
+
+table tr.line td,table tr.line th {
+  border-bottom: 1px solid #ffb400;
+}
+table.stats td {
+  text-align: center;
 }
 
 .btn {
