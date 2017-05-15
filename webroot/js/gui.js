@@ -43,7 +43,7 @@ var router = new Navigo(null, true, '#');
     '/n/:nodeID': {
       as: 'node',
       uses: function (params) {
-        guiNode.current_node_id = params['nodeID'].toLowerCase();
+        guiNode.setNodeID(params['nodeID'].toLowerCase());
         setView(guiNode);
       }
     },
@@ -68,5 +68,5 @@ var router = new Navigo(null, true, '#');
     timeout = setTimeout(reset, 100);
   }
 
-  gui.render();
+  window.onload = gui.render;
 })();

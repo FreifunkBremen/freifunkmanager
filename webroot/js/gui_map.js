@@ -4,9 +4,15 @@ var guiMap = {};
   var view = guiMap;
   var container, el;
 
-  var nodeLayer;
+  var nodeLayer, clientLayer24, clientLayer5;//, draggingNodeID;
 
   function addNode (node){
+    /*
+    https://github.com/Leaflet/Leaflet/issues/4484
+    if(node.node_id === draggingNodeID){
+      return
+    }
+    */
     if(node.location === undefined || node.location.latitude === undefined || node.location.longitude === undefined) {
       return;
     }
@@ -50,8 +56,13 @@ var guiMap = {};
       '</table>'+
     '</div>'
     );
-
+    /*
+    nodemarker.on('dragstart',function(){
+      draggingNodeID = node.node_id;
+    })
+    */
     nodemarker.on('dragend',function(){
+      // draggingNodeID = undefined;
       var pos = nodemarker.getLatLng();
       node.location = {
         'latitude': pos.lat,
@@ -69,6 +80,21 @@ var guiMap = {};
     for(var i=0; i<nodes.length; i++){
       addNode(nodes[i]);
     }
+
+    var clientData24 = nodes.map(function(node){
+      if(node.location === undefined || node.location.latitude === undefined || node.location.longitude === undefined) {
+        return;
+      }
+      return [node.location.latitude,node.location.longitude,node.statistics.clients.wifi24 * 2 || 0];
+    })
+    clientLayer24.setData(clientData24);
+    var clientData5 = nodes.map(function(node){
+      if(node.location === undefined || node.location.latitude === undefined || node.location.longitude === undefined) {
+        return;
+      }
+      return [node.location.latitude,node.location.longitude,node.statistics.clients.wifi5 || 0];
+    })
+    clientLayer5.setData(clientData5);
   }
 
   view.bind = function(el) {
@@ -97,8 +123,11 @@ var guiMap = {};
     layerControl = L.control.layers().addTo(map);
 
     nodeLayer = L.layerGroup();
-
+    clientLayer24 = new L.webGLHeatmap({size: 230, opacity: 0.5, alphaRange: 1});
+    clientLayer5 = new L.webGLHeatmap({size: 230, opacity: 0.5, alphaRange: 2});
     layerControl.addOverlay(nodeLayer,'Nodes');
+    layerControl.addOverlay(clientLayer24,'Clients 2.4 Ghz');
+    layerControl.addOverlay(clientLayer5,'Clients 5 Ghz');
     nodeLayer.addTo(map);
 
     window.addEventListener("resize",function(){

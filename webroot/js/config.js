@@ -5,9 +5,16 @@ var config = {
 				view: {bound: [53.07093,  8.79464], zoom: 17},
 				maxZoom: 20,
 				tileLayer: '//tiles.bremen.freifunk.net/{z}/{x}/{y}.png',
-				heatMax: {
-					wifi24: 15,
-					wifi5: 50
+				/* heatmap settings
+         size: in meters (default: 30km)
+				 opacity: in percent/100 (default: 1)
+				 gradientTexture: url-to-texture-image (default: false)
+				 alphaRange: change transparency in heatmap (default: 1)
+				 autoresize: resize heatmap when map size changes (default: false)
+				 */
+				heatmap: {
+					wifi24: {size: 230, opacity: 0.5, alphaRange: 1},
+					wifi5: {size: 230, opacity: 0.5, alphaRange: 1}
 				},
 				icon:{
 					warn:{wifi24:20,wifi5:20},

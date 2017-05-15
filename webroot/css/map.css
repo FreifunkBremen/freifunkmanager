@@ -6,7 +6,7 @@
   border-radius: 10px;
 }
 .leaflet-container .node.offline {
-  background-color rgba(255,0,0,0.5)
+  background-color: rgba(255,0,0,0.5);
 }
 .leaflet-container .node.client24 {
   border-left: 3px solid green;

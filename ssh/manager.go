@@ -45,7 +45,7 @@ func (m *Manager) ConnectTo(addr net.TCPAddr) *ssh.Client {
 	m.clientsMUX.Lock()
 	defer m.clientsMUX.Unlock()
 	if t, ok := m.clientsBlacklist[addr.IP.String()]; ok {
-		if time.Now().Add(-time.Hour * 24).After(t) {
+		if time.Now().Add(-time.Hour * 24).Before(t) {
 			return nil
 		} else {
 			delete(m.clientsBlacklist, addr.IP.String())
