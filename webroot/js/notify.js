@@ -1,51 +1,67 @@
 /* exported notify */
 
-var notify = {};
+const notify = {};
 
-(function(){
-  var container;
-  var messages = [];
+(function init () {
+	'use strict';
 
-  if ("Notification" in window) {
-    window.Notification.requestPermission();
-  }
+	const DELAY_OF_NOTIFY = 15000,
+		MAX_MESSAGE_SHOW = 10,
+		messages = [];
 
-  function removeLast (){
-    messages.splice(0, 1);
-    if(container!==undefined && container.firstElementChild)
-      container.removeChild(container.firstElementChild);
-  }
+	let container = null;
 
-  function renderMsg(msg){
-    var msgBox = document.createElement('div');
-    msgBox.classList.add("notify",msg.type);
-    msgBox.innerHTML = msg.text;
-    container.appendChild(msgBox);
-    msgBox.addEventListener('click', function(){
-      container.removeChild(msgBox);
-      if (messages.indexOf(msg) !== -1) {
-        messages.splice(messages.indexOf(msg), 1);
-      }
-    });
-  }
+	if ('Notification' in window) {
+		window.Notification.requestPermission();
+	}
 
-  window.setInterval(removeLast,15000);
+	function removeLast () {
+		messages.splice(0, 1);
+		if (container && container.firstElementChild) {
+			container.removeChild(container.firstElementChild);
+		}
+	}
 
-  notify.bind = function(el) {
-    container = el;
-  };
+	function renderMsg (msg) {
+		const msgBox = document.createElement('div');
 
-  notify.send = function(type, text){
-    if("Notification" in window && window.Notification.permission === "granted") {
-      new window.Notification(text,{body:type,icon:'/img/logo.jpg'});
-      return;
-    }
-    if(messages.length > 10){
-      removeLast();
-    }
-    var msg = {type:type,text:text};
-    messages.push(msg);
-    renderMsg(msg);
-  };
+		msgBox.classList.add('notify', msg.type);
+		msgBox.innerHTML = msg.text;
+		container.appendChild(msgBox);
+		msgBox.addEventListener('click', () => {
+			container.removeChild(msgBox);
+			if (messages.indexOf(msg) !== -1) {
+				messages.splice(messages.indexOf(msg), 1);
+			}
+		});
+	}
 
+	window.setInterval(removeLast, DELAY_OF_NOTIFY);
+
+	notify.bind = function bind (el) {
+		container = el;
+	};
+
+	notify.send = function send (type, text) {
+		if ('Notification' in window &&
+			window.Notification.permission === 'granted') {
+			// eslint-disable-next-line no-new
+			new window.Notification(text, {
+				'body': type,
+				'icon': '/img/logo.jpg'
+			});
+
+			return;
+		}
+		if (messages.length > MAX_MESSAGE_SHOW) {
+			removeLast();
+		}
+		const msg = {
+			'text': text,
+			'type': type
+		};
+
+		messages.push(msg);
+		renderMsg(msg);
+	};
 })();

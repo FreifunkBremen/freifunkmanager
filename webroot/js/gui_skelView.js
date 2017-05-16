@@ -1,28 +1,33 @@
 /* exported guiSkel */
 /* globals domlib */
-var guiSkel = {};
+const guiSkel = {};
 
-(function(){
-  var view = guiSkel;
-  var container, el;
+(function init () {
+	'use strict';
 
-  function update(){
-  }
+	const view = guiSkel;
+	let container = null,
+		el = null;
 
-  view.bind = function(el) {
-    container = el;
-  };
-  view.render = function render(){
-    if (container === undefined){
-      return;
-    } else if (el !== undefined){
-      container.appendChild(el);
-      update();
-      return;
-    }
-    console.log("generate new view for skel");
-    el = domlib.newAt(container,'div');
+	function update () {
+		console.warn('Do not run dummies');
+	}
 
-    update();
-  };
+	view.bind = function bind (bindEl) {
+		container = bindEl;
+	};
+	view.render = function render () {
+		if (!container) {
+			return;
+		} else if (el) {
+			container.appendChild(el);
+			update();
+
+			return;
+		}
+		console.log('generate new view for skel');
+		el = domlib.newAt(container, 'div');
+
+		update();
+	};
 })();

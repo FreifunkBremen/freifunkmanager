@@ -1,0 +1,35 @@
+{
+  extends: eslint:all,
+  rules: {
+    no-tabs: [off],
+    indent: [error, tab],
+    quotes: [error, single],
+    padded-blocks: [error, { blocks: never }],
+    no-console: [error, { allow: [log, warn, error] }],
+    func-style: [error, declaration],
+    object-curly-newline: off,
+    wrap-iife: [error, inside],
+    object-shorthand: ["error", "always", { "avoidQuotes": true }],
+    require-jsdoc: [off],
+    max-statements: [off],
+    no-magic-numbers: ["error", { "ignore": [0,1,-1] }],
+    sort-vars: [off],
+    max-len: [off],
+    id-length: [error, { exceptions: ["i"] }],
+    no-ternary: [off]
+
+  },
+  env: {
+    es6: true
+  },
+  globals: {
+    L: true,
+    moment: true,
+    Navigo: true,
+    document: true,
+    window: true,
+    location: true,
+    navigator: true,
+    console: true,
+  }
+}

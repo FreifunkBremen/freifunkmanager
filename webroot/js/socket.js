@@ -1,64 +1,77 @@
 /* exported socket */
-/*globals notify,gui,store,config*/
-var socket = {readyState:0};
+/* globals notify,gui,store,config*/
+let socket = {'readyState': 0};
 
-(function(){
+(function init () {
+	'use strict';
 
-  function onerror(err) {
-    console.warn(err);
-    if(socket.readyState !== 3){
-      notify.send("error","Es gibt Übertragungsprobleme!");
-      gui.render();
-    }
-  }
+	const RECONNECT_AFTER = 5000;
 
-  function onopen() {
-    gui.render();
-  }
+	function onerror (err) {
+		console.warn(err);
+		// eslint-disable-next-line no-magic-numbers
+		if (socket.readyState !== 3) {
+			notify.send('error', 'Es gibt Übertragungsprobleme!');
+			gui.render();
+		}
+	}
 
-  function onmessage(e) {
-    var msg = JSON.parse(e.data);
-    switch (msg.type) {
-      case "current":
-        store.updateNode(msg.node,true);
-        break;
-      case "to-update":
-        store.updateNode(msg.node);
-        break;
-      case "stats":
-        if(msg.body) {
-          store.stats = msg.body;
-        }
-        break;
-      default:
-        notify.send("warn","unable to identify message: "+e);
-        break;
-    }
-    gui.render();
-  }
+	function onopen () {
+		gui.render();
+	}
 
-  function onclose(){
-    console.log("socket closed by server");
-    notify.send("warn","Es besteht ein Verbindungsproblem!");
-    gui.render();
-    window.setTimeout(connect, 5000);
-  }
+	function onmessage (raw) {
+		const msg = JSON.parse(raw.data);
 
-  function sendnode(node) {
-    var msg = {type:"to-update",node:node};
-    var string = JSON.stringify(msg);
-    socket.send(string);
-    notify.send("success","Node '"+node.node_id+"' mit neuen Werten wurde übermittelt.");
-  }
+		switch (msg.type) {
+		case 'current':
+			store.updateNode(msg.node, true);
+			break;
+		case 'to-update':
+			store.updateNode(msg.node);
+			break;
+		case 'stats':
+			if (msg.body) {
+				store.stats = msg.body;
+			}
+			break;
+		default:
+			notify.send('warn', `unable to identify message: ${raw}`);
+			break;
+		}
+		gui.render();
+	}
 
-  function connect() {
-    socket = new window.WebSocket(config.backend);
-    socket.onopen = onopen;
-    socket.onerror = onerror;
-    socket.onmessage = onmessage;
-    socket.onclose = onclose;
-    socket.sendnode = sendnode;
-  }
+	function onclose () {
+		console.log('socket closed by server');
+		notify.send('warn', 'Es besteht ein Verbindungsproblem!');
+		gui.render();
+		// eslint-disable-next-line no-use-before-define
+		window.setTimeout(connect, RECONNECT_AFTER);
+	}
 
-  connect();
+	function sendnode (node) {
+		const notifyMsg = `Einstellungen für '${node.node_id}' gespeichert.`,
+			socketMsg = JSON.stringify({
+				'node': node,
+				'type': 'to-update'
+			});
+
+
+		socket.send(socketMsg);
+
+
+		notify.send('success', notifyMsg);
+	}
+
+	function connect () {
+		socket = new window.WebSocket(config.backend);
+		socket.onopen = onopen;
+		socket.onerror = onerror;
+		socket.onmessage = onmessage;
+		socket.onclose = onclose;
+		socket.sendnode = sendnode;
+	}
+
+	connect();
 })();

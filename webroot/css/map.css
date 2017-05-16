@@ -1,42 +1,42 @@
 .leaflet-container .node {
-  width: 3px;
-  height: 3px;
-  background-color: rgba(0,0,255,0.5);
-  border: 2px solid white;
-  border-radius: 10px;
+	width: 3px;
+	height: 3px;
+	background-color: rgba(0,0,255,0.5);
+	border: 2px solid white;
+	border-radius: 10px;
 }
 .leaflet-container .node.offline {
-  background-color: rgba(255,0,0,0.5);
+	background-color: rgba(255,0,0,0.5);
 }
 .leaflet-container .node.client24 {
-  border-left: 3px solid green;
+	border-left: 3px solid green;
 }
 .leaflet-container .node.client5 {
-  border-border: 3px solid green;
+	border-border: 3px solid green;
 }
 .leaflet-container .node.client24-warn {
-  border-left: 3px solid yellow;
+	border-left: 3px solid yellow;
 }
 .leaflet-container .node.client5-warn {
-  border-border: 3px solid yellow;
+	border-border: 3px solid yellow;
 }
 .leaflet-container .node.client24-crit {
-  border-left: 3px solid red;
+	border-left: 3px solid red;
 }
 .leaflet-container .node.client5-crit {
-  border-border: 3px solid red;
+	border-border: 3px solid red;
 }
 .leaflet-container .nodeicon-label {
-  font-size: 12px;
-  font-weight: lighter;
+	font-size: 12px;
+	font-weight: lighter;
 }
 .leaflet-container .nodeicon-label table {
-  width: 100%;
+	width: 100%;
 }
 .leaflet-container .nodeicon-label td {
-  border-top: 1px solid #999;
-  text-align: right;
+	border-top: 1px solid #999;
+	text-align: right;
 }
 .leaflet-container .nodeicon-label td:first-child {
-  text-align: left;
+	text-align: left;
 }

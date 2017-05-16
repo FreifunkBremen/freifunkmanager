@@ -1,38 +1,52 @@
 /* exported store */
 
-var store = {
-  _list:{},
-  _toupdate:{},
-  stats:{"Clients":0,"ClientsWifi":0,"ClientsWifi24":0,"ClientsWifi5":0,"Gateways":0,"Nodes":0,"Firmwares":{},"Models":{}}
+
+const store = {
+	'stats': {
+		'Clients': 0,
+		'ClientsWifi': 0,
+		'ClientsWifi24': 0,
+		'ClientsWifi5': 0,
+		'Firmwares': {},
+		'Gateways': 0,
+		'Models': {},
+		'Nodes': 0
+	}
 };
 
-(function(){
+(function init () {
+	'use strict';
 
-  function getNode(nodeid){
-    var node;
-    if (store._toupdate[nodeid]) {
-      node = store._toupdate[nodeid];
-    } else if (store._list[nodeid]){
-      node = store._list[nodeid];
-    }else{
-      return;
-    }
-    node._wireless = store._list[nodeid].wireless;
-    return node;
-  }
+	const list = {},
+		toupdate = {};
 
-  store.updateNode = function updateReal(node, real){
-    if(real){
-      store._list[node.node_id] = node;
-    }else{
-      store._toupdate[node.node_id] = node;
-    }
-  };
+	function getNode (nodeid) {
+		let node = {};
 
-  store.getNode = getNode;
+		if (toupdate[nodeid]) {
+			node = toupdate[nodeid];
+		} else if (list[nodeid]) {
+			node = list[nodeid];
+		} else {
+			return null;
+		}
+		// eslint-disable-next-line no-underscore-dangle
+		node._wireless = list[nodeid].wireless;
 
-  store.getNodes = function() {
-    return Object.keys(store._list).map(getNode);
-  };
+		return node;
+	}
 
+	store.updateNode = function updateNode (node, real) {
+		if (real) {
+			list[node.node_id] = node;
+		} else {
+			toupdate[node.node_id] = node;
+		}
+	};
+
+	store.getNode = getNode;
+
+	store.getNodes = function getNodes () {
+		return Object.keys(list).map(getNode);
+	};
 })();
