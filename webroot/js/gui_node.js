@@ -5,7 +5,7 @@ var guiNode = {};
   var container, el;
 
   var titleName,titleID,ago;
-  var marker,map;
+  var marker, map, geoJsonLayer;
   var btnGPS, editLocationGPS, storePosition;
   var current_node_id, editing = false;
 
@@ -22,6 +22,7 @@ var guiNode = {};
   }
 
   function update(){
+    geoJsonLayer.refresh();
     titleID.innerHTML = current_node_id;
     var node = store.getNode(current_node_id);
     if(node === undefined){
@@ -76,12 +77,13 @@ var guiNode = {};
     ago = domlib.newAt(lastseen,'span');
 
     var mapEl = domlib.newAt(el,'div');
-    mapEl.style.height = '500px';
+    mapEl.style.height = '300px';
     map = L.map(mapEl).setView(config.map.view.bound, config.map.view.zoom);
 
     L.tileLayer(config.map.tileLayer, {
         maxZoom: config.map.maxZoom,
       }).addTo(map);
+    geoJsonLayer = L.geoJson.ajax(config.map.geojson.url, config.map.geojson).addTo(map);
 
     marker = L.marker(config.map.view.bound,{draggable:true,opacity:0.5}).addTo(map);
     marker.on('dragstart', function(e){

@@ -4,7 +4,7 @@ var guiMap = {};
   var view = guiMap;
   var container, el;
 
-  var nodeLayer, clientLayer24, clientLayer5;//, draggingNodeID;
+  var geoJsonLayer, nodeLayer, clientLayer24, clientLayer5;//, draggingNodeID;
 
   function addNode (node){
     /*
@@ -74,6 +74,7 @@ var guiMap = {};
   }
 
   function update() {
+    geoJsonLayer.refresh();
     nodeLayer.clearLayers();
 
     var nodes = store.getNodes();
@@ -122,9 +123,13 @@ var guiMap = {};
 
     layerControl = L.control.layers().addTo(map);
 
+
+    geoJsonLayer = L.geoJson.ajax(config.map.geojson.url, config.map.geojson);
+
     nodeLayer = L.layerGroup();
-    clientLayer24 = new L.webGLHeatmap({size: 230, opacity: 0.5, alphaRange: 1});
-    clientLayer5 = new L.webGLHeatmap({size: 230, opacity: 0.5, alphaRange: 2});
+    clientLayer24 = new L.webGLHeatmap(config.map.heatmap.wifi24);
+    clientLayer5 = new L.webGLHeatmap(config.map.heatmap.wifi5);
+    layerControl.addOverlay(geoJsonLayer,'geojson');
     layerControl.addOverlay(nodeLayer,'Nodes');
     layerControl.addOverlay(clientLayer24,'Clients 2.4 Ghz');
     layerControl.addOverlay(clientLayer5,'Clients 5 Ghz');
