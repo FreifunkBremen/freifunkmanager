@@ -1,3 +1,5 @@
+/* exported guiSkel */
+/* globals domlib */
 var guiSkel = {};
 
 (function(){
@@ -22,5 +24,5 @@ var guiSkel = {};
     el = domlib.newAt(container,'div');
 
     update();
-  }
-})()
+  };
+})();

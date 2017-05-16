@@ -1,3 +1,6 @@
+/* exported guiMap */
+/* global config,store,domlib,socket */
+
 var guiMap = {};
 
 (function(){
@@ -87,14 +90,14 @@ var guiMap = {};
         return;
       }
       return [node.location.latitude,node.location.longitude,node.statistics.clients.wifi24 * 2 || 0];
-    })
+    });
     clientLayer24.setData(clientData24);
     var clientData5 = nodes.map(function(node){
       if(node.location === undefined || node.location.latitude === undefined || node.location.longitude === undefined) {
         return;
       }
       return [node.location.latitude,node.location.longitude,node.statistics.clients.wifi5 || 0];
-    })
+    });
     clientLayer5.setData(clientData5);
   }
 
@@ -121,7 +124,7 @@ var guiMap = {};
         maxZoom: config.map.maxZoom,
       }).addTo(map);
 
-    layerControl = L.control.layers().addTo(map);
+    var layerControl = L.control.layers().addTo(map);
 
 
     geoJsonLayer = L.geoJson.ajax(config.map.geojson.url, config.map.geojson);
@@ -141,5 +144,5 @@ var guiMap = {};
     });
 
     update();
-  }
-})()
+  };
+})();

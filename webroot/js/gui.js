@@ -1,3 +1,5 @@
+/* exported gui,router */
+/* globals socket,notify,domlib,guiList,guiMap,guiStats,guiNode */
 var gui = {};
 var router = new Navigo(null, true, '#');
 
@@ -8,7 +10,7 @@ var router = new Navigo(null, true, '#');
     var status = document.getElementsByClassName('status')[0];
     if (status === undefined){
       console.log("unable to render, render later");
-      setTimeout(render,100);
+      window.setTimeout(render,100);
       return;
     }
     status.classList.remove('connecting','offline');
@@ -24,7 +26,7 @@ var router = new Navigo(null, true, '#');
 
   function setView(c){
     currentView = c;
-    var main = document.querySelector('main')
+    var main = document.querySelector('main');
     domlib.removeChildren(main);
     currentView.bind(main);
     currentView.render();
@@ -61,12 +63,12 @@ var router = new Navigo(null, true, '#');
 
     if (timeout){
       console("skip rendering, because to often");
-      clearTimeout(timeout);
+      window.clearTimeout(timeout);
     } else {
       render();
     }
-    timeout = setTimeout(reset, 100);
-  }
+    timeout = window.setTimeout(reset, 100);
+  };
 
   window.onload = gui.render;
 })();

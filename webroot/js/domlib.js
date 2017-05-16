@@ -1,3 +1,5 @@
+/* exported domlin */
+
 var domlib = {};
 (function(){
   domlib.newAt = function(at,eltype) {
@@ -11,4 +13,4 @@ var domlib = {};
         el.removeChild(el.firstChild);
       }
   };
-})()
+})();

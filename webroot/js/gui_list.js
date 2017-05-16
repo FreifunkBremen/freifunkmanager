@@ -1,3 +1,6 @@
+/* exported guiList */
+/* global domlib,store,router */
+
 var guiList = {};
 
 (function(){
@@ -31,11 +34,11 @@ var guiList = {};
         return a.statistics.clients.wifi24 - b.statistics.clients.wifi24;
       case "ChanUtil":
         var aMax = a.statistics.wireless.map(function(d){
-          return d.ChanUtil
+          return d.ChanUtil;
         }).sort(sortNumber);
 
         var bMax = b.statistics.wireless.map(function(d){
-          return d.ChanUtil
+          return d.ChanUtil;
         }).sort(sortNumber);
 
         if(!sortReverse){
@@ -55,8 +58,7 @@ var guiList = {};
     var startdate = new Date();
     startdate.setMinutes(startdate.getMinutes() - 1);
     if(new Date(node.lastseen) < startdate)
-      tr.classList.add('offline')
-    var td;
+      tr.classList.add('offline');
 
     domlib.newAt(tr,'td').innerHTML = moment(node.lastseen).fromNow(true);
     domlib.newAt(tr,'td').innerHTML = node.node_id;
@@ -98,7 +100,7 @@ var guiList = {};
     domlib.newAt(chanUtil,'span').innerHTML = chanUtil5.ChanUtil||'-';
 
     var option = domlib.newAt(tr,'td');
-    edit = domlib.newAt(option,'div');
+    var edit = domlib.newAt(option,'div');
     edit.classList.add('btn');
     edit.innerHTML = 'Edit';
     edit.addEventListener('click',function(){
@@ -115,11 +117,11 @@ var guiList = {};
     if(hostnameFilter && hostnameFilter.value != "")
       nodes = nodes.filter(function(d){
         return d.hostname.toLowerCase().indexOf(hostnameFilter.value) > -1;
-      })
+      });
     if(nodeidFilter && nodeidFilter.value != "")
       nodes = nodes.filter(function(d){
         return d.node_id.indexOf(nodeidFilter.value) > -1;
-      })
+      });
 
     nodes = nodes.sort(sort);
 

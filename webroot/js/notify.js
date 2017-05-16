@@ -1,12 +1,13 @@
-var notify = {};
+/* exported notify */
 
+var notify = {};
 
 (function(){
   var container;
   var messages = [];
 
   if ("Notification" in window) {
-    Notification.requestPermission();
+    window.Notification.requestPermission();
   }
 
   function removeLast (){
@@ -28,15 +29,15 @@ var notify = {};
     });
   }
 
-  setInterval(removeLast,15000);
+  window.setInterval(removeLast,15000);
 
   notify.bind = function(el) {
     container = el;
   };
 
   notify.send = function(type, text){
-    if("Notification" in window && Notification.permission === "granted") {
-      new Notification(text,{body:type,icon:'/img/logo.jpg'});
+    if("Notification" in window && window.Notification.permission === "granted") {
+      new window.Notification(text,{body:type,icon:'/img/logo.jpg'});
       return;
     }
     if(messages.length > 10){
@@ -47,4 +48,4 @@ var notify = {};
     renderMsg(msg);
   };
 
-})()
+})();

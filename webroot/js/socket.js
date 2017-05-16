@@ -1,3 +1,5 @@
+/* exported socket */
+/*globals notify,gui,store,config*/
 var socket = {readyState:0};
 
 (function(){
@@ -39,18 +41,18 @@ var socket = {readyState:0};
     console.log("socket closed by server");
     notify.send("warn","Es besteht ein Verbindungsproblem!");
     gui.render();
-    setTimeout(connect, 5000);
+    window.setTimeout(connect, 5000);
   }
 
   function sendnode(node) {
     var msg = {type:"to-update",node:node};
     var string = JSON.stringify(msg);
-    socket.send(string)
+    socket.send(string);
     notify.send("success","Node '"+node.node_id+"' mit neuen Werten wurde übermittelt.");
   }
 
   function connect() {
-    socket = new WebSocket(config.backend);
+    socket = new window.WebSocket(config.backend);
     socket.onopen = onopen;
     socket.onerror = onerror;
     socket.onmessage = onmessage;

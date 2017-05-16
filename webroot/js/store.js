@@ -1,3 +1,5 @@
+/* exported store */
+
 var store = {
   _list:{},
   _toupdate:{},

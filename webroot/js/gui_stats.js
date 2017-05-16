@@ -1,3 +1,5 @@
+/* exported guiStats */
+/* globals store, domlib */
 var guiStats = {};
 
 (function(){
@@ -35,13 +37,13 @@ var guiStats = {};
     var tr,title;
 
     tr = domlib.newAt(table,'tr');
-    title = domlib.newAt(tr,'th')
+    title = domlib.newAt(tr,'th');
     title.innerHTML = "Nodes";
     title.setAttribute("colspan","2");
     nodes = domlib.newAt(tr,'td');
 
     tr = domlib.newAt(table,'tr');
-    title = domlib.newAt(tr,'th')
+    title = domlib.newAt(tr,'th');
     title.innerHTML = "Clients";
     title.setAttribute("colspan","2");
     clients = domlib.newAt(tr,'td');
@@ -58,5 +60,5 @@ var guiStats = {};
     clientsWifi5 = domlib.newAt(tr,'td');
 
     update();
-  }
-})()
+  };
+})();

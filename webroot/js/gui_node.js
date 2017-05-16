@@ -1,3 +1,5 @@
+/* exported guiNode */
+/* globals store, socket, domlib, config,notify */
 var guiNode = {};
 
 (function(){
@@ -32,10 +34,10 @@ var guiNode = {};
     var startdate = new Date();
     startdate.setMinutes(startdate.getMinutes() - 1);
     if(new Date(node.lastseen) < startdate){
-      ago.classList.add('offline')
+      ago.classList.add('offline');
       ago.classList.remove('online');
     }else{
-      ago.classList.remove('offline')
+      ago.classList.remove('offline');
       ago.classList.add('online');
     }
     ago.innerHTML = moment(node.lastseen).fromNow() + ' ('+node.lastseen+')';
@@ -51,7 +53,7 @@ var guiNode = {};
 
   view.setNodeID = function (nodeID){
     current_node_id = nodeID;
-  }
+  };
 
   view.bind = function(el) {
     container = el;
@@ -69,7 +71,7 @@ var guiNode = {};
 
     var title = domlib.newAt(el,'h1');
     titleName = domlib.newAt(title,'span');
-    title.appendChild(document.createTextNode("  -  "))
+    title.appendChild(document.createTextNode("  -  "));
     titleID = domlib.newAt(title,'i');
 
     var lastseen = domlib.newAt(el,'p');
@@ -86,10 +88,10 @@ var guiNode = {};
     geoJsonLayer = L.geoJson.ajax(config.map.geojson.url, config.map.geojson).addTo(map);
 
     marker = L.marker(config.map.view.bound,{draggable:true,opacity:0.5}).addTo(map);
-    marker.on('dragstart', function(e){
+    marker.on('dragstart', function(){
       editing = true;
     });
-    marker.on('dragend', function(e){
+    marker.on('dragend', function(){
       editing = false;
       var pos = marker.getLatLng();
       updatePosition(pos.lat,pos.lng);
@@ -109,7 +111,7 @@ var guiNode = {};
         return;
       }
       btnGPS.innerHTML = 'Following position';
-      if (!!navigator.geolocation)
+      if (navigator.geolocation !== undefined)
         editLocationGPS = navigator.geolocation.watchPosition(
           function geo_success(position) {
               btnGPS.innerHTML = "Stop following";
@@ -123,7 +125,7 @@ var guiNode = {};
               case error.TIMEOUT:
                 notify.send("error","Find Location timeout");
                 break;
-            };
+            }
           },
           {
             enableHighAccuracy: true,
@@ -131,10 +133,10 @@ var guiNode = {};
             timeout: 27000
           });
       else
-        notify.send("error","Browser did not support Location")
+        notify.send("error","Browser did not support Location");
     });
 
 
     update();
-  }
-})()
+  };
+})();

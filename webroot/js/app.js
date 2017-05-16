@@ -1,1 +1,2 @@
-document.title = config.title
+/* global config */
+document.title = config.title;
