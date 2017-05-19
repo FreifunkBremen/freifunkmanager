@@ -8,7 +8,7 @@ const config = {
 	'backend': `ws://${location.host}/websocket`,
 	'map': {
 		'view': {
-			'bound': [53.07093, 8.79464],
+			'bound': [53.07103, 8.81624],
 			'zoom': 17
 		},
 		'maxZoom': 20,
@@ -44,7 +44,7 @@ const config = {
 			}
 		},
 		'geojson': {
-			'url': 'http://events.ffhb.de/data/ground.geojson',
+			'url': 'https://events.ffhb.de/data/ground.geojson',
 			'pointToLayer': function pointToLayer (feature, latlng) {
 				'use strict';
 
