@@ -23,12 +23,12 @@ const config = {
      */
 		'heatmap': {
 			'wifi24': {
-				'size': 230,
+				'size': 30,
 				'opacity': 0.5,
 				'alphaRange': 1
 			},
 			'wifi5': {
-				'size': 230,
+				'size': 30,
 				'opacity': 0.5,
 				'alphaRange': 1
 			}

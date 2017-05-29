@@ -12,19 +12,19 @@
 	border-left: 3px solid green;
 }
 .leaflet-container .node.client5 {
-	border-border: 3px solid green;
+	border-right: 3px solid green;
 }
 .leaflet-container .node.client24-warn {
 	border-left: 3px solid yellow;
 }
 .leaflet-container .node.client5-warn {
-	border-border: 3px solid yellow;
+	border-right: 3px solid yellow;
 }
 .leaflet-container .node.client24-crit {
 	border-left: 3px solid red;
 }
 .leaflet-container .node.client5-crit {
-	border-border: 3px solid red;
+	border-right: 3px solid red;
 }
 .leaflet-container .nodeicon-label {
 	font-size: 12px;

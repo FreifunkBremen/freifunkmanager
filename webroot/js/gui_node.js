@@ -15,6 +15,8 @@ const guiNode = {};
 		titleID = null,
 		ago = null,
 
+		hostnameInput = null,
+
 		marker = null,
 		map = null,
 		geoJsonLayer = null,
@@ -66,6 +68,7 @@ const guiNode = {};
 			return;
 		}
 		titleName.innerHTML = node.hostname;
+		hostnameInput.value = node.hostname;
 		// eslint-disable-next-line one-var
 		const latlng = [node.location.latitude, node.location.longitude];
 
@@ -96,6 +99,7 @@ const guiNode = {};
 
 		const title = domlib.newAt(el, 'h1'),
 			lastseen = domlib.newAt(el, 'p'),
+			hostname = domlib.newAt(el, 'p'),
 			mapEl = domlib.newAt(el, 'div');
 
 		titleName = domlib.newAt(title, 'span');
@@ -105,6 +109,22 @@ const guiNode = {};
 
 		domlib.newAt(lastseen, 'span').innerHTML = 'Lastseen: ';
 		ago = domlib.newAt(lastseen, 'span');
+
+		domlib.newAt(hostname, 'span').innerHTML = 'Hostname: ';
+		hostnameInput = domlib.newAt(hostname, 'input');
+		hostnameInput.setAttribute('placeholder', 'Hostname');
+		hostnameInput.addEventListener('focusin', () => {
+			editing = true;
+		});
+		hostnameInput.addEventListener('focusout', () => {
+			editing = false;
+
+			const node = store.getNode(currentNodeID);
+
+			node.hostname = hostnameInput.value;
+
+			socket.sendnode(node);
+		});
 
 
 		mapEl.style.height = '300px';
