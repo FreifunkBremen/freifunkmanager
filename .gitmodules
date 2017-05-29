@@ -1,0 +1,4 @@
+[submodule "vendor/github.com/FreifunkBremen/yanic"]
+	path = vendor/github.com/FreifunkBremen/yanic
+	url = https://github.com/FreifunkBremen/yanic
+	branch = database-socket
