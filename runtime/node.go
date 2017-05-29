@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/FreifunkBremen/freifunkmanager/ssh"
 	"github.com/FreifunkBremen/yanic/data"
 	"github.com/FreifunkBremen/yanic/jsontime"
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
+
+	"github.com/FreifunkBremen/freifunkmanager/ssh"
 )
 
 const (

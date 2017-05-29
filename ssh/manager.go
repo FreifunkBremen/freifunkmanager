@@ -6,9 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/genofire/golang-lib/log"
 	"golang.org/x/crypto/ssh"
-
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 )
 
 // the SSH Connection Manager for multiple connections

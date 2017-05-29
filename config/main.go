@@ -4,8 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/BurntSushi/toml"
-
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
+	"github.com/genofire/golang-lib/log"
 )
 
 //config file of this daemon (for more the config_example.conf in git repository)

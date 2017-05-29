@@ -3,9 +3,8 @@ package websocket
 import (
 	"io"
 
+	"github.com/genofire/golang-lib/log"
 	"golang.org/x/net/websocket"
-
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 )
 
 const channelBufSize = 100

@@ -5,10 +5,10 @@ import (
 	"sync"
 
 	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
+	httpLib "github.com/genofire/golang-lib/http"
+	"github.com/genofire/golang-lib/log"
 	"golang.org/x/net/websocket"
 
-	httpLib "github.com/FreifunkBremen/freifunkmanager/lib/http"
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 )
 

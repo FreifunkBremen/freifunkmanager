@@ -7,8 +7,8 @@ import (
 
 	"github.com/FreifunkBremen/yanic/jsontime"
 	yanic "github.com/FreifunkBremen/yanic/runtime"
+	"github.com/genofire/golang-lib/log"
 
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 )
 

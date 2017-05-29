@@ -3,9 +3,8 @@ package ssh
 import (
 	"net"
 
+	"github.com/genofire/golang-lib/log"
 	"golang.org/x/crypto/ssh"
-
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 )
 
 func (m *Manager) ExecuteEverywhere(cmd string) {

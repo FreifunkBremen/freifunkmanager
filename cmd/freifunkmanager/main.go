@@ -8,17 +8,17 @@ import (
 	"syscall"
 	"time"
 
+	yanic "github.com/FreifunkBremen/yanic/database/socket/client"
 	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 	"github.com/NYTimes/gziphandler"
+	httpLib "github.com/genofire/golang-lib/http"
+	"github.com/genofire/golang-lib/log"
+	"github.com/genofire/golang-lib/worker"
 
 	configPackage "github.com/FreifunkBremen/freifunkmanager/config"
-	httpLib "github.com/FreifunkBremen/freifunkmanager/lib/http"
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
-	"github.com/FreifunkBremen/freifunkmanager/lib/worker"
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 	"github.com/FreifunkBremen/freifunkmanager/websocket"
-	yanic "github.com/FreifunkBremen/yanic/database/socket/client"
 )
 
 var (

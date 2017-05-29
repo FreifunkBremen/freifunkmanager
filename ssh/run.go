@@ -6,9 +6,8 @@ import (
 	"io"
 	"net"
 
+	"github.com/genofire/golang-lib/log"
 	"golang.org/x/crypto/ssh"
-
-	"github.com/FreifunkBremen/freifunkmanager/lib/log"
 )
 
 type SSHResultHandler func([]byte, error)
