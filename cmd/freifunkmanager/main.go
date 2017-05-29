@@ -18,7 +18,7 @@ import (
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 	"github.com/FreifunkBremen/freifunkmanager/websocket"
-	"github.com/FreifunkBremen/freifunkmanager/yanic"
+	yanic "github.com/FreifunkBremen/yanic/database/socket/client"
 )
 
 var (
@@ -54,7 +54,7 @@ func main() {
 			stats = data
 			websocket.NotifyStats(data)
 		}
-		yanicDialer.Start()
+		go yanicDialer.Start()
 	}
 
 	// Startwebserver
