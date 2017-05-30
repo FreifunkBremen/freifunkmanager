@@ -7,7 +7,7 @@ import (
 )
 
 type List struct {
-	cmd        string                 `json:"cmd"`
+	Command    string                 `json:"cmd"`
 	Clients    map[string]*ListResult `json:"clients"`
 	sshManager *Manager
 }
@@ -20,7 +20,7 @@ type ListResult struct {
 
 func (m *Manager) CreateList(cmd string) *List {
 	list := &List{
-		cmd:        cmd,
+		Command:    cmd,
 		sshManager: m,
 		Clients:    make(map[string]*ListResult),
 	}
@@ -42,7 +42,7 @@ func (l List) Run() {
 
 func (l List) runlistelement(host string, client *ListResult, wg *sync.WaitGroup) {
 	defer wg.Done()
-	result, err := l.sshManager.run(host, client.ssh, l.cmd)
+	result, err := l.sshManager.run(host, client.ssh, l.Command)
 	client.Running = false
 	if err != nil {
 		client.WithError = true

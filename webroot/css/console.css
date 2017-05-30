@@ -26,11 +26,16 @@
 	width: 15%;
 }
 .console .cmd > div {
-	clear: both;
 	background-color: #ccc;
 	margin-bottom: 3px;
 }
 .console .cmd .status {
 	width: 15%;
 	height: 20px;
+}
+.console .cmd > div > div {
+	clear: both;
+}
+.console .cmd div .status {
+	width: 20px;
 }

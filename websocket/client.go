@@ -2,8 +2,10 @@ package websocket
 
 import (
 	"io"
+	"time"
 
 	"github.com/genofire/golang-lib/log"
+	"github.com/genofire/golang-lib/worker"
 	"golang.org/x/net/websocket"
 )
 
@@ -53,16 +55,19 @@ func (c *Client) Close() {
 func (c *Client) Listen() {
 	go c.listenWrite()
 	c.Write(&Message{Type: MessageTypeStats, Body: stats})
-	c.allNodes()
+	c.publishAllData()
 	c.listenRead()
 }
 
-func (c *Client) allNodes() {
+func (c *Client) publishAllData() {
 	for _, node := range nodes.List {
 		c.Write(&Message{Type: MessageTypeSystemNode, Node: node})
 	}
 	for _, node := range nodes.Current {
 		c.Write(&Message{Type: MessageTypeCurrentNode, Node: node})
+	}
+	for _, cmd := range commands.List {
+		c.Write(&Message{Type: MessageTypeCommand, Command: cmd})
 	}
 }
 
@@ -70,6 +75,18 @@ func (c *Client) handleMessage(msg *Message) {
 	switch msg.Type {
 	case MessageTypeSystemNode:
 		nodes.UpdateNode(msg.Node)
+		break
+	case MessageTypeCommand:
+		cmd := commands.AddCommand(msg.Command)
+		w := worker.NewWorker(time.Millisecond*300, func() {
+			SendAll(Message{Type: MessageTypeCommand, Command: cmd})
+		})
+		go w.Start()
+		go cmd.Run(func() {
+			w.Close()
+			SendAll(Message{Type: MessageTypeCommand, Command: cmd})
+		})
+		break
 	}
 }
 

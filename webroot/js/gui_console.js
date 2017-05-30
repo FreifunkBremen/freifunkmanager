@@ -120,6 +120,7 @@ const guiConsole = {};
 
 		if (cmd.clients) {
 			Object.keys(cmd.clients).forEach((addr) => {
+				console.log(cmd, row, addr);
 				const clientEl = domlib.newAt(row.clientsContainer, 'div'),
 					clients = {
 						'host': domlib.newAt(clientEl, 'span'),

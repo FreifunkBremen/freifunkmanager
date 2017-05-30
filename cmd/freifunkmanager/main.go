@@ -25,6 +25,7 @@ var (
 	configFile  string
 	config      *configPackage.Config
 	nodes       *runtime.Nodes
+	commands    *runtime.Commands
 	yanicDialer *yanic.Dialer
 	stats       *runtimeYanic.GlobalStats
 )
@@ -38,14 +39,15 @@ func main() {
 	log.Log.Info("starting...")
 
 	sshmanager := ssh.NewManager(config.SSHPrivateKey)
-	nodes := runtime.NewNodes(config.StatePath, config.SSHInterface, sshmanager)
+	nodes = runtime.NewNodes(config.StatePath, config.SSHInterface, sshmanager)
+	commands = runtime.NewCommands(sshmanager)
 	nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
 	nodesSaveWorker := worker.NewWorker(time.Duration(3)*time.Second, nodes.Saver)
 
 	go nodesUpdateWorker.Start()
 	go nodesSaveWorker.Start()
 
-	websocket.Start(nodes)
+	websocket.Start(nodes, commands)
 
 	if config.Yanic.Enable {
 		yanicDialer := yanic.Dial(config.Yanic.Type, config.Yanic.Address)

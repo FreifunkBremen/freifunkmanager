@@ -16,9 +16,11 @@ var nodes *runtime.Nodes
 var clients map[string]*Client
 var clientsMutex sync.Mutex
 var stats *runtimeYanic.GlobalStats
+var commands *runtime.Commands
 
-func Start(nodeBind *runtime.Nodes) {
+func Start(nodeBind *runtime.Nodes, commandsBind *runtime.Commands) {
 	nodes = nodeBind
+	commands = commandsBind
 	clients = make(map[string]*Client)
 
 	http.Handle("/websocket", websocket.Handler(func(ws *websocket.Conn) {

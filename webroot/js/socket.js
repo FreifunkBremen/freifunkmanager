@@ -36,9 +36,7 @@ let socket = {'readyState': 0};
 			}
 			break;
 		case 'cmd':
-			if (msg.body) {
-				store.updateCMD(msg.body);
-			}
+			store.updateCMD(msg.cmd);
 			break;
 		default:
 			notify.send('warn', `unable to identify message: ${raw}`);
@@ -69,7 +67,7 @@ let socket = {'readyState': 0};
 	function sendcmd (cmd) {
 		const notifyMsg = `Befehl '${cmd.cmd}' wird überall ausgeführt.`,
 			socketMsg = JSON.stringify({
-				'body': cmd,
+				'cmd': cmd,
 				'type': 'cmd'
 			});
 
