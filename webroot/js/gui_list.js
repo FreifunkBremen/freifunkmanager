@@ -332,6 +332,13 @@ const guiList = {};
 		cell2.addEventListener('dblclick', () => {
 			sortTable(cell2);
 		});
+		nodeidFilter.addEventListener('focusin', () => {
+			editing = true;
+		});
+		nodeidFilter.addEventListener('focusout', () => {
+			editing = false;
+			update();
+		});
 
 
 		cell3.classList.add('sortable');
@@ -340,6 +347,13 @@ const guiList = {};
 		hostnameFilter.addEventListener('keyup', update);
 		cell3.addEventListener('dblclick', () => {
 			sortTable(cell3);
+		});
+		hostnameFilter.addEventListener('focusin', () => {
+			editing = true;
+		});
+		hostnameFilter.addEventListener('focusout', () => {
+			editing = false;
+			update();
 		});
 
 		cell4.innerHTML = 'Freq';

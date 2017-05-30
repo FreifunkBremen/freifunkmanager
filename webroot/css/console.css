@@ -14,28 +14,49 @@
 .console {
 	font-family: monospace;
 	white-space: pre;
+	font-size: 14px;
 }
-.console .cmd {
-	min-height: 22px;
+.console {
+	width: 100%;
+	border-spacing: 0px;
+}
+.console > tr {
 	clear: both;
-}
-.console .cmd > .time,  .console .cmd .host{
-	display: inline-block;
-	color: #009ee0;
+	border-spacing: 0px;
 
-	width: 15%;
 }
-.console .cmd > div {
+.console > tr > td {
+	width: 100%;
+	padding: 0px;
+	border-spacing: 0px;
+	height: 18px;
+}
+.console > tr.cmd > td {
+	margin-top: 3px;
+}
+.console > tr:not(.cmd) > td {
+	margin-top: 0px;
+}
+.console table,
+.console table tr,
+.console table td {
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+	border-collapse: collapse;
+}
+.console .time,  .console .host{
+	color: #009ee0;
+	width: 1%;
+}
+.console .status {
+	text-align: right;
+	height: 18px;
+}
+
+.console table {
 	background-color: #ccc;
-	margin-bottom: 3px;
 }
-.console .cmd .status {
-	width: 15%;
-	height: 20px;
-}
-.console .cmd > div > div {
-	clear: both;
-}
-.console .cmd div .status {
-	width: 20px;
+.console table .status {
+	width: 18px;
 }

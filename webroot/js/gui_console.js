@@ -11,6 +11,7 @@ const guiConsole = {};
 	let container = null,
 		el = null,
 		output = null,
+		editing = false,
 		ownfilter = false;
 
 	function createID () {
@@ -84,15 +85,22 @@ const guiConsole = {};
 
 	function createRow (cmd) {
 		const row = {
-			'clients': {},
-			'clientsContainer': document.createElement('div'),
-			'clientsEl': {},
-			'el': document.createElement('div')
-		};
+				'clients': {},
+				'clientsContainer': document.createElement('tr'),
+				'clientsEl': {},
+				'el': document.createElement('tr')
+			},
+			tab = domlib.newAt(row.clientsContainer, 'td'),
+			clientRow = domlib.newAt(tab, 'table');
+
+		tab.setAttribute('colspan', '3');
 
 
 		if (cmd.cmd === '' && cmd.timestemp === 0) {
-			row.el.innerHTML = '\n' +
+			const initRow = domlib.newAt(row.el, 'td');
+
+			initRow.setAttribute('colspan', '3');
+			initRow.innerHTML = '\n' +
 					'  _______                     ________        __\n' +
 					' |       |.-----.-----.-----.|  |  |  |.----.|  |_\n' +
 					' |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|\n' +
@@ -110,9 +118,9 @@ const guiConsole = {};
 
 			return row;
 		}
-		row.timestemp = domlib.newAt(row.el, 'span');
-		row.cmd = domlib.newAt(row.el, 'span');
-		row.status = domlib.newAt(row.el, 'span');
+		row.timestemp = domlib.newAt(row.el, 'td');
+		row.cmd = domlib.newAt(row.el, 'td');
+		row.status = domlib.newAt(row.el, 'td');
 
 		row.el.classList.add('cmd');
 		row.timestemp.classList.add('time');
@@ -120,12 +128,11 @@ const guiConsole = {};
 
 		if (cmd.clients) {
 			Object.keys(cmd.clients).forEach((addr) => {
-				console.log(cmd, row, addr);
-				const clientEl = domlib.newAt(row.clientsContainer, 'div'),
+				const clientEl = domlib.newAt(clientRow, 'tr'),
 					clients = {
-						'host': domlib.newAt(clientEl, 'span'),
-						'result': domlib.newAt(clientEl, 'span'),
-						'status': domlib.newAt(clientEl, 'span')
+						'host': domlib.newAt(clientEl, 'td'),
+						'result': domlib.newAt(clientEl, 'td'),
+						'status': domlib.newAt(clientEl, 'td')
 					};
 
 				clients.host.classList.add('host');
@@ -134,11 +141,11 @@ const guiConsole = {};
 				row.clientsEl[addr] = clientEl;
 				row.clients[addr] = clients;
 			});
-			row.cmd.addEventListener('click', () => {
+			row.el.addEventListener('click', () => {
 				if (row.clientsContainer.parentElement) {
-					row.el.removeChild(row.clientsContainer);
+					row.el.parentElement.removeChild(row.clientsContainer);
 				} else {
-					row.el.appendChild(row.clientsContainer);
+					row.el.parentElement.insertBefore(row.clientsContainer, row.el.nextSibling);
 				}
 			});
 		}
@@ -150,6 +157,9 @@ const guiConsole = {};
 	}
 
 	function update () {
+		if (editing) {
+			return;
+		}
 		let cmds = store.getCMDs();
 
 		if (ownfilter) {
@@ -185,11 +195,14 @@ const guiConsole = {};
 				return 0;
 			}
 
-			return cmds[aID].timestemp - cmds[bID].timestemp;
+			return new Date(cmds[aID].timestemp) - new Date(cmds[bID].timestemp);
 		}).
 		forEach((id) => {
 			if (cmds[id] && !cmdRow[id].el.parentElement) {
 				output.appendChild(cmdRow[id].el);
+				if (cmdRow[id].clientsContainer.parentElement) {
+					cmdRow[id].el.parentElement.insertBefore(cmdRow[id].clientsContainer, cmdRow[id].el.nextSibling);
+				}
 			}
 		});
 	}
@@ -215,7 +228,7 @@ const guiConsole = {};
 			'timestemp': 0
 		});
 
-		output = domlib.newAt(el, 'div');
+		output = domlib.newAt(el, 'table');
 		output.classList.add('console');
 
 		const prompt = domlib.newAt(el, 'div'),
@@ -238,6 +251,13 @@ const guiConsole = {};
 			ownCMDs.push(cmd.id);
 			socket.sendcmd(cmd);
 			promptInput.value = '';
+		});
+		promptInput.addEventListener('focusin', () => {
+			editing = true;
+		});
+		promptInput.addEventListener('focusout', () => {
+			editing = false;
+			update();
 		});
 
 		filterBtn.classList.add('btn');
