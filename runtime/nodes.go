@@ -58,7 +58,7 @@ func (nodes *Nodes) LearnNode(n *yanic.Node) {
 	// session := nodes.ssh.ConnectTo(node.Address)
 	result, err := nodes.ssh.RunOn(node.GetAddress(nodes.iface), "uptime")
 	if err != nil {
-		logger.Error("init ssh command not run")
+		logger.Error("init ssh command not run", err)
 		return
 	}
 	uptime := ssh.SSHResultToString(result)

@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"errors"
 	"net"
 	"strings"
 	"sync"
@@ -40,19 +41,19 @@ func NewManager(file string) *Manager {
 	}
 }
 
-func (m *Manager) ConnectTo(addr net.TCPAddr) *ssh.Client {
+func (m *Manager) ConnectTo(addr net.TCPAddr) (*ssh.Client, error) {
 	m.clientsMUX.Lock()
 	defer m.clientsMUX.Unlock()
 	if t, ok := m.clientsBlacklist[addr.IP.String()]; ok {
 		if time.Now().Add(-time.Hour * 24).Before(t) {
-			return nil
+			return nil, errors.New("node on blacklist")
 		} else {
 			delete(m.clientsBlacklist, addr.IP.String())
 		}
 	}
 
 	if client, ok := m.clients[addr.IP.String()]; ok {
-		return client
+		return client, nil
 	}
 
 	client, err := ssh.Dial("tcp", addr.String(), m.config)
@@ -60,14 +61,13 @@ func (m *Manager) ConnectTo(addr net.TCPAddr) *ssh.Client {
 		if strings.Contains(err.Error(), "no supported methods remain") {
 			m.clientsBlacklist[addr.IP.String()] = time.Now()
 			log.Log.Warnf("node was set on the blacklist: %s", err)
-		} else {
-			log.Log.Error(err)
+			return nil, errors.New("node on blacklist")
 		}
-		return nil
+		return nil, err
 	}
 
 	m.clients[addr.IP.String()] = client
-	return client
+	return client, nil
 }
 
 func (m *Manager) Close() {

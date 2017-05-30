@@ -10,14 +10,21 @@ import (
 func TestExecute(t *testing.T) {
 	assert := assert.New(t)
 
+	addr := net.TCPAddr{IP: net.ParseIP("2a06:8782:ffbb:1337::127"), Port: 22}
+
 	mgmt := NewManager("~/.ssh/id_rsa")
 	assert.NotNil(mgmt, "no new manager created")
 
-	mgmt.ConnectTo(net.TCPAddr{IP: net.ParseIP("2a06:8782:ffbb:1337::127"), Port: 22})
+	_, err := mgmt.ConnectTo(addr)
+	assert.NoError(err)
 
 	mgmt.ExecuteEverywhere("echo $HOSTNAME")
-	mgmt.ExecuteOn(net.TCPAddr{IP: net.ParseIP("2a06:8782:ffbb:1337::127"), Port: 22}, "uptime")
-	mgmt.ExecuteOn(net.TCPAddr{IP: net.ParseIP("2a06:8782:ffbb:1337::127"), Port: 22}, "echo $HOSTNAME")
+	err = mgmt.ExecuteOn(addr, "uptime")
+	assert.NoError(err)
+	err = mgmt.ExecuteOn(addr, "echo $HOSTNAME")
+	assert.NoError(err)
+	err = mgmt.ExecuteOn(addr, "exit 1")
+	assert.Error(err)
 
 	mgmt.Close()
 }
