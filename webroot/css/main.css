@@ -9,14 +9,16 @@ body {
 .status {
 	float: right;
 	background: #009ee0;
+	color: white;
 	width: 50px;
 	height: 50px;
 }
-.status.connecting {
+.status.connecting,.status.running {
 	background: #ffb400;
 }
-.status.offline {
+.status.offline, .status.failed {
 	background: #dc0067;
+	color: white;
 }
 span.online {
 	color: #009ee0;

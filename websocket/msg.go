@@ -12,4 +12,5 @@ const (
 	MessageTypeSystemNode  = "system"
 	MessageTypeCurrentNode = "current"
 	MessageTypeStats       = "stats"
+	MessageTypeCmd         = "cmd"
 )

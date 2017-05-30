@@ -7,15 +7,15 @@ import (
 )
 
 type List struct {
-	cmd        string
-	Clients    map[string]*ListResult
+	cmd        string                 `json:"cmd"`
+	Clients    map[string]*ListResult `json:"clients"`
 	sshManager *Manager
 }
 type ListResult struct {
 	ssh       *ssh.Client
-	Runned    bool
-	WithError bool
-	Result    string
+	Running   bool   `json:"running"`
+	WithError bool   `json:"with_error"`
+	Result    string `json:"result"`
 }
 
 func (m *Manager) CreateList(cmd string) *List {
@@ -25,7 +25,7 @@ func (m *Manager) CreateList(cmd string) *List {
 		Clients:    make(map[string]*ListResult),
 	}
 	for host, client := range m.clients {
-		list.Clients[host] = &ListResult{Runned: false, ssh: client}
+		list.Clients[host] = &ListResult{Running: true, ssh: client}
 	}
 	return list
 }
@@ -43,7 +43,7 @@ func (l List) Run() {
 func (l List) runlistelement(host string, client *ListResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 	result, err := l.sshManager.run(host, client.ssh, l.cmd)
-	client.Runned = true
+	client.Running = false
 	if err != nil {
 		client.WithError = true
 		return

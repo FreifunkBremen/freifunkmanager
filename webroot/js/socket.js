@@ -35,6 +35,11 @@ let socket = {'readyState': 0};
 				store.stats = msg.body;
 			}
 			break;
+		case 'cmd':
+			if (msg.body) {
+				store.updateCMD(msg.body);
+			}
+			break;
 		default:
 			notify.send('warn', `unable to identify message: ${raw}`);
 			break;
@@ -57,10 +62,18 @@ let socket = {'readyState': 0};
 				'type': 'system'
 			});
 
+		socket.send(socketMsg);
+		notify.send('success', notifyMsg);
+	}
+
+	function sendcmd (cmd) {
+		const notifyMsg = `Befehl '${cmd.cmd}' wird überall ausgeführt.`,
+			socketMsg = JSON.stringify({
+				'body': cmd,
+				'type': 'cmd'
+			});
 
 		socket.send(socketMsg);
-
-
 		notify.send('success', notifyMsg);
 	}
 
@@ -71,6 +84,7 @@ let socket = {'readyState': 0};
 		socket.onmessage = onmessage;
 		socket.onclose = onclose;
 		socket.sendnode = sendnode;
+		socket.sendcmd = sendcmd;
 	}
 
 	connect();

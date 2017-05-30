@@ -19,18 +19,18 @@ func TestList(t *testing.T) {
 	list := mgmt.CreateList("exit 1")
 	assert.Len(list.Clients, 1)
 	client := list.Clients[addr.IP.String()]
-	assert.False(client.Runned)
+	assert.True(client.Running)
 	list.Run()
-	assert.True(client.Runned)
+	assert.False(client.Running)
 	assert.True(client.WithError)
 	assert.Equal("", client.Result)
 
 	list = mgmt.CreateList("echo 15")
 	assert.Len(list.Clients, 1)
 	client = list.Clients[addr.IP.String()]
-	assert.False(client.Runned)
+	assert.True(client.Running)
 	list.Run()
-	assert.True(client.Runned)
+	assert.False(client.Running)
 	assert.False(client.WithError)
 	assert.Equal("15", client.Result)
 }

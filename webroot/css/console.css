@@ -1,0 +1,36 @@
+.prompt {
+	position: fixed;
+	bottom: 0px;
+	background-color: #ccc;
+	width: 100%;
+}
+.prompt .btn {
+	width: 10%;
+}
+.prompt input {
+	width: 85%;
+	margin-left: 2%;
+}
+.console {
+	font-family: monospace;
+	white-space: pre;
+}
+.console .cmd {
+	min-height: 22px;
+	clear: both;
+}
+.console .cmd > .time,  .console .cmd .host{
+	display: inline-block;
+	color: #009ee0;
+
+	width: 15%;
+}
+.console .cmd > div {
+	clear: both;
+	background-color: #ccc;
+	margin-bottom: 3px;
+}
+.console .cmd .status {
+	width: 15%;
+	height: 20px;
+}

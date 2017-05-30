@@ -18,7 +18,8 @@ const store = {
 	'use strict';
 
 	const current = {},
-		list = {};
+		list = {},
+		cmds = {};
 
 	function getNode (nodeid) {
 		let node = {};
@@ -51,9 +52,18 @@ const store = {
 		}
 	};
 
+
 	store.getNode = getNode;
 
 	store.getNodes = function getNodes () {
 		return Object.keys(list).map(getNode);
+	};
+
+	store.updateCMD = function updateCMD (cmd) {
+		cmds[cmd.id] = cmd;
+	};
+
+	store.getCMDs = function getCMDs () {
+		return cmds;
 	};
 })();
