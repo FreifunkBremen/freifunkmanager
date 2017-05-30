@@ -37,7 +37,7 @@ const guiMap = {};
 			tx24 = node.wireless.txpower24 || '-',
 			tx5 = node.wireless.txpower5 || '-';
 
-		startdate.setMinutes(startdate.getMinutes() - 1);
+		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
 		if (new Date(node.lastseen) < startdate) {
 			className += ' offline';
 		}

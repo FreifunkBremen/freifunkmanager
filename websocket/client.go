@@ -59,16 +59,16 @@ func (c *Client) Listen() {
 
 func (c *Client) allNodes() {
 	for _, node := range nodes.List {
-		c.Write(&Message{Type: MessageTypeCurrentNode, Node: node})
+		c.Write(&Message{Type: MessageTypeSystemNode, Node: node})
 	}
-	for _, node := range nodes.ToUpdate {
-		c.Write(&Message{Type: MessageTypeUpdateNode, Node: node})
+	for _, node := range nodes.Current {
+		c.Write(&Message{Type: MessageTypeCurrentNode, Node: node})
 	}
 }
 
 func (c *Client) handleMessage(msg *Message) {
 	switch msg.Type {
-	case MessageTypeUpdateNode:
+	case MessageTypeSystemNode:
 		nodes.UpdateNode(msg.Node)
 	}
 }

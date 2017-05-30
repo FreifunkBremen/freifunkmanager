@@ -14,7 +14,7 @@ import (
 
 type Nodes struct {
 	List       map[string]*Node `json:"nodes"`
-	ToUpdate   map[string]*Node
+	Current    map[string]*Node `json:"-"`
 	ssh        *ssh.Manager
 	statePath  string
 	iface      string
@@ -25,7 +25,7 @@ type Nodes struct {
 func NewNodes(path string, iface string, mgmt *ssh.Manager) *Nodes {
 	nodes := &Nodes{
 		List:      make(map[string]*Node),
-		ToUpdate:  make(map[string]*Node),
+		Current:   make(map[string]*Node),
 		ssh:       mgmt,
 		statePath: path,
 		iface:     iface,
@@ -34,33 +34,25 @@ func NewNodes(path string, iface string, mgmt *ssh.Manager) *Nodes {
 	return nodes
 }
 
-func (nodes *Nodes) AddNode(n *yanic.Node) {
+func (nodes *Nodes) LearnNode(n *yanic.Node) {
 	node := NewNode(n)
 	if node == nil {
 		return
 	}
 	node.Lastseen = jsontime.Now()
-	logger := log.Log.WithField("method", "AddNode").WithField("node_id", node.NodeID)
+	logger := log.Log.WithField("method", "LearnNode").WithField("node_id", node.NodeID)
 	nodes.Lock()
-	nodes.Unlock()
-	if cNode := nodes.List[node.NodeID]; cNode != nil {
-		cNode.Lastseen = jsontime.Now()
-		cNode.Stats = node.Stats
-		if uNode, ok := nodes.ToUpdate[node.NodeID]; ok {
-			uNode.Lastseen = jsontime.Now()
-			uNode.Stats = node.Stats
-			if nodes.List[node.NodeID].IsEqual(node) {
-				delete(nodes.ToUpdate, node.NodeID)
-				nodes.List[node.NodeID] = node
-				nodes.notify(node, true)
-			} else {
-				nodes.notify(uNode, false)
-			}
-		} else {
-			nodes.List[node.NodeID] = node
-			nodes.notify(node, true)
-		}
-		logger.Debugf("know already these node")
+	defer nodes.Unlock()
+	if lNode := nodes.List[node.NodeID]; lNode != nil {
+		lNode.Lastseen = jsontime.Now()
+		lNode.Stats = node.Stats
+	} else {
+		nodes.List[node.NodeID] = node
+		nodes.notify(node, true)
+	}
+	if _, ok := nodes.Current[node.NodeID]; ok {
+		nodes.Current[node.NodeID] = node
+		nodes.notify(node, false)
 		return
 	}
 	// session := nodes.ssh.ConnectTo(node.Address)
@@ -72,16 +64,16 @@ func (nodes *Nodes) AddNode(n *yanic.Node) {
 	uptime := ssh.SSHResultToString(result)
 	logger.Infof("new node with uptime: %s", uptime)
 
-	nodes.List[node.NodeID] = node
-	nodes.notify(node, true)
+	nodes.Current[node.NodeID] = node
+	nodes.notify(node, false)
 }
 
 func (nodes *Nodes) AddNotify(f func(*Node, bool)) {
 	nodes.notifyFunc = append(nodes.notifyFunc, f)
 }
-func (nodes *Nodes) notify(node *Node, real bool) {
+func (nodes *Nodes) notify(node *Node, system bool) {
 	for _, f := range nodes.notifyFunc {
-		f(node, real)
+		f(node, system)
 	}
 }
 
@@ -95,16 +87,16 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 	if n, ok := nodes.List[node.NodeID]; ok {
 		go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 	}
-	nodes.ToUpdate[node.NodeID] = node
-	nodes.notify(node, false)
+	nodes.List[node.NodeID] = node
+	nodes.notify(node, true)
 }
 
 func (nodes *Nodes) Updater() {
 	nodes.Lock()
 	defer nodes.Unlock()
-	for nodeid := range nodes.ToUpdate {
-		if node := nodes.List[nodeid]; node != nil {
-			go node.SSHSet(nodes.ssh, nodes.iface)
+	for nodeid, node := range nodes.List {
+		if n, ok := nodes.Current[nodeid]; ok {
+			go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 		}
 	}
 	log.Log.Debug("updater per ssh runs")

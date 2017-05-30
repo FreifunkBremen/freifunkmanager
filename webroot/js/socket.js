@@ -24,10 +24,10 @@ let socket = {'readyState': 0};
 		const msg = JSON.parse(raw.data);
 
 		switch (msg.type) {
-		case 'current':
+		case 'system':
 			store.updateNode(msg.node, true);
 			break;
-		case 'to-update':
+		case 'current':
 			store.updateNode(msg.node);
 			break;
 		case 'stats':
@@ -54,7 +54,7 @@ let socket = {'readyState': 0};
 		const notifyMsg = `Einstellungen für '${node.node_id}' gespeichert.`,
 			socketMsg = JSON.stringify({
 				'node': node,
-				'type': 'to-update'
+				'type': 'system'
 			});
 
 

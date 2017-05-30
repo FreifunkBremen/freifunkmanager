@@ -6,6 +6,10 @@
 const config = {
 	'title': 'FreifunkManager - Breminale',
 	'backend': `ws://${location.host}/websocket`,
+	'node': {
+		// Minuten till is shown as offline
+		'offline': 5
+	},
 	'map': {
 		'view': {
 			'bound': [53.07103, 8.81624],

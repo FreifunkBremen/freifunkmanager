@@ -46,10 +46,10 @@ func Start(nodeBind *runtime.Nodes) {
 	nodes.AddNotify(NotifyNode)
 }
 
-func NotifyNode(node *runtime.Node, real bool) {
-	msgType := MessageTypeUpdateNode
-	if real {
-		msgType = MessageTypeCurrentNode
+func NotifyNode(node *runtime.Node, system bool) {
+	msgType := MessageTypeCurrentNode
+	if system {
+		msgType = MessageTypeSystemNode
 	}
 	SendAll(Message{Type: msgType, Node: node})
 }

@@ -17,30 +17,37 @@ const store = {
 (function init () {
 	'use strict';
 
-	const list = {},
-		toupdate = {};
+	const current = {},
+		list = {};
 
 	function getNode (nodeid) {
 		let node = {};
 
-		if (toupdate[nodeid]) {
-			node = toupdate[nodeid];
-		} else if (list[nodeid]) {
+		if (list[nodeid]) {
 			node = list[nodeid];
+			if (current[nodeid]) {
+				const cNode = current[nodeid];
+
+				// eslint-disable-next-line no-underscore-dangle
+				node._wireless = cNode.wireless;
+				node.lastseen = cNode.lastseen;
+			}
 		} else {
-			return null;
+			// eslint-disable-next-line camelcase
+			node.node_id = nodeid;
+			node.wireless = {};
+			node.location = {};
+			list[nodeid] = node;
 		}
-		// eslint-disable-next-line no-underscore-dangle
-		node._wireless = list[nodeid].wireless;
 
 		return node;
 	}
 
-	store.updateNode = function updateNode (node, real) {
-		if (real) {
+	store.updateNode = function updateNode (node, system) {
+		if (system) {
 			list[node.node_id] = node;
 		} else {
-			toupdate[node.node_id] = node;
+			current[node.node_id] = node;
 		}
 	};
 

@@ -26,7 +26,7 @@ type Node struct {
 	Location data.Location `json:"location"`
 	Wireless data.Wireless `json:"wireless"`
 	Owner    string        `json:"owner"`
-	Address  net.IP        `json:"address"`
+	Address  net.IP        `json:"-"`
 	Stats    struct {
 		Wireless data.WirelessStatistics `json:"wireless"`
 		Clients  data.Clients            `json:"clients"`

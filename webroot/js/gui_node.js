@@ -55,7 +55,7 @@ const guiNode = {};
 			return;
 		}
 
-		startdate.setMinutes(startdate.getMinutes() - 1);
+		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
 		if (new Date(node.lastseen) < startdate) {
 			ago.classList.add('offline');
 			ago.classList.remove('online');

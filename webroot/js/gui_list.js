@@ -1,5 +1,6 @@
 /* exported guiList */
-/* global domlib,store,router */
+/* global config,domlib,store,router,socket */
+/* eslint max-lines: [off] */
 
 const guiList = {};
 
@@ -14,7 +15,8 @@ const guiList = {};
 		sortReverse = false,
 		sortIndex = null,
 		hostnameFilter = null,
-		nodeidFilter = null;
+		nodeidFilter = null,
+		editing = false;
 
 	// eslint-disable-next-line id-length
 	function sort (a, b) {
@@ -69,52 +71,160 @@ const guiList = {};
 			lastseen = domlib.newAt(tr, 'td'),
 			nodeID = domlib.newAt(tr, 'td'),
 			hostname = domlib.newAt(tr, 'td'),
+			hostnameInput = domlib.newAt(hostname, 'input'),
 			freq = domlib.newAt(tr, 'td'),
 			curchannel = domlib.newAt(tr, 'td'),
 			channel = domlib.newAt(tr, 'td'),
+			channel24Input = domlib.newAt(domlib.newAt(channel, 'span'), 'input'),
+			channel5Input = domlib.newAt(domlib.newAt(channel, 'span'), 'input'),
 			curpower = domlib.newAt(tr, 'td'),
 			power = domlib.newAt(tr, 'td'),
+			power24Input = domlib.newAt(domlib.newAt(power, 'span'), 'input'),
+			power5Input = domlib.newAt(domlib.newAt(power, 'span'), 'input'),
 			client = domlib.newAt(tr, 'td'),
 			chanUtil = domlib.newAt(tr, 'td'),
 			option = domlib.newAt(tr, 'td'),
 			edit = domlib.newAt(option, 'div');
 
-		startdate.setMinutes(startdate.getMinutes() - 1);
+		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
 		if (new Date(node.lastseen) < startdate) {
 			tr.classList.add('offline');
+		}
+		// eslint-disable-next-line no-underscore-dangle
+		if (!node._wireless) {
+			tr.classList.add('unseen');
 		}
 
 		lastseen.innerHTML = moment(node.lastseen).fromNow(true);
 
 		nodeID.innerHTML = node.node_id;
 
-		hostname.innerHTML = node.hostname;
+		hostnameInput.value = node.hostname;
+		hostnameInput.readOnly = true;
+		hostnameInput.setAttribute('placeholder', 'Hostname');
+		hostnameInput.addEventListener('dblclick', () => {
+			editing = true;
+			hostnameInput.readOnly = false;
+		});
+		hostnameInput.addEventListener('focusout', () => {
+			if (hostnameInput.readOnly) {
+				return;
+			}
+			editing = false;
+			hostnameInput.readOnly = true;
+			node.hostname = hostnameInput.value;
+			socket.sendnode(node);
+		});
 
 		domlib.newAt(freq, 'span').innerHTML = '2.4 Ghz';
 		domlib.newAt(freq, 'span').innerHTML = '5 Ghz';
 
 		/* eslint-disable no-underscore-dangle */
-		domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel24 || '-';
-		domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel5 || '-';
+		if (node._wireless) {
+			domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel24 || '-';
+			domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel5 || '-';
+		}
 		/* eslint-enable no-underscore-dangle */
 
-		domlib.newAt(channel, 'span').innerHTML = node.wireless.channel24 || '-';
-		domlib.newAt(channel, 'span').innerHTML = node.wireless.channel5 || '-';
+
+		channel24Input.value = node.wireless.channel24 || '';
+		channel24Input.type = 'number';
+		channel24Input.min = 1;
+		channel24Input.max = 14;
+		channel24Input.readOnly = true;
+		channel24Input.setAttribute('placeholder', '-');
+		channel24Input.addEventListener('dblclick', () => {
+			editing = true;
+			channel24Input.readOnly = false;
+		});
+		channel24Input.addEventListener('focusout', () => {
+			if (channel24Input.readOnly) {
+				return;
+			}
+			editing = false;
+			channel24Input.readOnly = true;
+			node.wireless.channel24 = parseInt(channel24Input.value, 10);
+			socket.sendnode(node);
+		});
+
+		channel5Input.value = node.wireless.channel5 || '';
+		channel5Input.type = 'number';
+		channel5Input.min = 36;
+		channel5Input.max = 165;
+		channel5Input.step = 4;
+		channel5Input.readOnly = true;
+		channel5Input.setAttribute('placeholder', '-');
+		channel5Input.addEventListener('dblclick', () => {
+			editing = true;
+			channel5Input.readOnly = false;
+		});
+		channel5Input.addEventListener('focusout', () => {
+			if (channel5Input.readOnly) {
+				return;
+			}
+			editing = false;
+			channel5Input.readOnly = true;
+			node.wireless.channel5 = parseInt(channel5Input.value, 10);
+			socket.sendnode(node);
+		});
 
 		/* eslint-disable no-underscore-dangle */
-		domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower24 || '-';
-		domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower5 || '-';
+		if (node._wireless) {
+			domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower24 || '-';
+			domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower5 || '-';
+		}
 		/* eslint-enable no-underscore-dangle */
 
-		domlib.newAt(power, 'span').innerHTML = node.wireless.txpower24 || '-';
-		domlib.newAt(power, 'span').innerHTML = node.wireless.txpower5 || '-';
+		power24Input.value = node.wireless.txpower24 || '';
+		power24Input.type = 'number';
+		power24Input.min = 1;
+		power24Input.max = 23;
+		power24Input.readOnly = true;
+		power24Input.setAttribute('placeholder', '-');
+		power24Input.addEventListener('dblclick', () => {
+			editing = true;
+			power24Input.readOnly = false;
+		});
+		power24Input.addEventListener('focusout', () => {
+			if (power24Input.readOnly) {
+				return;
+			}
+			editing = false;
+			power24Input.readOnly = true;
+			node.wireless.txpower24 = parseInt(power24Input.value, 10);
+			socket.sendnode(node);
+		});
+
+		power5Input.value = node.wireless.txpower5 || '';
+		power5Input.type = 'number';
+		power5Input.min = 1;
+		power5Input.max = 23;
+		power5Input.readOnly = true;
+		power5Input.setAttribute('placeholder', '-');
+		power5Input.addEventListener('dblclick', () => {
+			editing = true;
+			power5Input.readOnly = false;
+		});
+		power5Input.addEventListener('focusout', () => {
+			if (power5Input.readOnly) {
+				return;
+			}
+			editing = false;
+			power5Input.readOnly = true;
+			node.wireless.txpower5 = parseInt(power5Input.value, 10);
+			socket.sendnode(node);
+		});
 
 		domlib.newAt(client, 'span').innerHTML = node.statistics.clients.wifi24;
 		domlib.newAt(client, 'span').innerHTML = node.statistics.clients.wifi5;
 
 		/* eslint-disable id-length, no-magic-numbers,one-var */
-		const chanUtil24 = node.statistics.wireless.filter((d) => d.frequency < 5000)[0] || {},
-			chanUtil5 = node.statistics.wireless.filter((d) => d.frequency > 5000)[0] || {};
+		const chanUtil24 = node.statistics.wireless
+				? node.statistics.wireless.filter((d) => d.frequency < 5000)[0] || {}
+				: {},
+			chanUtil5 = node.statistics.wireless
+				? node.statistics.wireless.filter((d) => d.frequency > 5000)[0] || {}
+				: {};
 		/* eslint-enable id-length, no-magic-numbers,one-var */
 
 		domlib.newAt(chanUtil, 'span').innerHTML = chanUtil24.ChanUtil || '-';
@@ -130,6 +240,9 @@ const guiList = {};
 	}
 
 	function update () {
+		if (editing) {
+			return;
+		}
 		domlib.removeChildren(tbody);
 		let nodes = store.getNodes();
 

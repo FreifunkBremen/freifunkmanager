@@ -49,7 +49,7 @@ func main() {
 
 	if config.Yanic.Enable {
 		yanicDialer := yanic.Dial(config.Yanic.Type, config.Yanic.Address)
-		yanicDialer.NodeHandler = nodes.AddNode
+		yanicDialer.NodeHandler = nodes.LearnNode
 		yanicDialer.GlobalsHandler = func(data *runtimeYanic.GlobalStats) {
 			stats = data
 			websocket.NotifyStats(data)

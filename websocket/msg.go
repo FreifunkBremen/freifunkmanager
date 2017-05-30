@@ -9,7 +9,7 @@ type Message struct {
 }
 
 const (
-	MessageTypeUpdateNode  = "to-update"
+	MessageTypeSystemNode  = "system"
 	MessageTypeCurrentNode = "current"
 	MessageTypeStats       = "stats"
 )

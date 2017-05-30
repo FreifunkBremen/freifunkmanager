@@ -144,11 +144,12 @@ table.nodes tbody tr:nth-child(odd) {
 table.nodes tbody tr:hover {
 	background: #ccc;
 }
-table.nodes tbody tr.offline{
-	background: #ffb400;
-}
+table.nodes tbody tr.offline,
 table.nodes tbody tr.offline:hover{
 	background: #dc0067;
+}
+table.nodes tbody tr.unseen{
+	background: #009ee0;
 }
 
 table tr.line td,table tr.line th {
@@ -177,4 +178,15 @@ a.btn:hover {
 a {
 	color: #dc0067;
 	text-decoration: none;
+}
+
+
+input[readonly] {
+	border: none;
+	background: none;
+	padding: 0px;
+	font-size: 15px;
+	color: #333;
+	line-height: 1.3;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
