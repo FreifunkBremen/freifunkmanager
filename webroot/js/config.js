@@ -5,20 +5,23 @@
 
 const config = {
 	'title': 'FreifunkManager - Breminale',
-	'backend': `ws://${location.host}/websocket`,
+	'backend': `ws${location.protocol == 'https:' ? 's' : ''}://${location.host}/websocket`,
 	'node': {
 		// Minuten till is shown as offline
 		'offline': 5
 	},
 	'map': {
 		'view': {
-			'bound': [53.07103, 8.81624],
+			'bound': [
+				53.07103,
+				8.81624
+			],
 			'zoom': 17
 		},
 		'maxZoom': 20,
 		'tileLayer': 'https://tiles.bremen.freifunk.net/{z}/{x}/{y}.png',
 
-    /* Heatmap settings
+		/* Heatmap settings
      size: in meters (default: 30km)
      opacity: in percent/100 (default: 1)
      gradientTexture: url-to-texture-image (default: false)
