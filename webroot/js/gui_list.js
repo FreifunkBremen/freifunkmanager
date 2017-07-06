@@ -86,14 +86,12 @@ const guiList = {};
 			option = domlib.newAt(tr, 'td'),
 			edit = domlib.newAt(option, 'div');
 
+		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
+		if (new Date(node.lastseen) < startdate) {
+			tr.classList.add('offline');
 			// eslint-disable-next-line no-underscore-dangle
-		if (!node._wireless) {
+		} else if (!node._wireless) {
 			tr.classList.add('unseen');
-		} else {
-			startdate.setMinutes(startdate.getMinutes() - config.node.offline);
-			if (new Date(node.lastseen) < startdate) {
-				tr.classList.add('offline');
-			}
 		}
 
 
