@@ -89,6 +89,7 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 	nodes.Lock()
 	defer nodes.Unlock()
 	if n, ok := nodes.List[node.NodeID]; ok {
+		node.Address = n.Address
 		go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 	}
 	nodes.List[node.NodeID] = node
@@ -100,7 +101,7 @@ func (nodes *Nodes) Updater() {
 	defer nodes.Unlock()
 	for nodeid, node := range nodes.List {
 		if n, ok := nodes.Current[nodeid]; ok {
-			go n.SSHUpdate(nodes.ssh, nodes.iface, node)
+			go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 		}
 	}
 	log.Log.Debug("updater per ssh runs")
