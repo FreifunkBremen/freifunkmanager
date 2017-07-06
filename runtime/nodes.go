@@ -91,6 +91,7 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 	if n, ok := nodes.List[node.NodeID]; ok {
 		node.Address = n.Address
 		go node.SSHUpdate(nodes.ssh, nodes.iface, n)
+		log.Log.Info("update node", node.NodeID)
 	}
 	nodes.List[node.NodeID] = node
 	nodes.notify(node, true)
@@ -104,7 +105,7 @@ func (nodes *Nodes) Updater() {
 			go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 		}
 	}
-	log.Log.Debug("updater per ssh runs")
+	log.Log.Info("updater per ssh")
 }
 
 func (nodes *Nodes) load() {

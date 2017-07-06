@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/genofire/golang-lib/log"
+
 	"github.com/FreifunkBremen/yanic/data"
 	"github.com/FreifunkBremen/yanic/jsontime"
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
@@ -13,10 +15,11 @@ import (
 )
 
 const (
-	SSHUpdateHostname = "uci set system.@system[0].hostname='%s';uci commit system;echo $(uci get system.@system[0].hostname) > /proc/sys/kernel/hostname"
-	SSHUpdateOwner    = "uci set gluon-node-info.@owner[0].contact='%s';uci commit gluon-node-info;"
-	SSHUpdateLocation = "uci set gluon-node-info.@location[0].latitude='%f';uci set gluon-node-info.@location[0].longitude='%f';uci set gluon-node-info.@location[0].share_location=1;uci commit gluon-node-info;"
-	SSHUpdateWifiFreq = "wifi"
+	SSHUpdateHostname   = "uci set system.@system[0].hostname='%s'; uci set wireless.priv_radio0.ssid=\"offline-$(uci get system.@system[0].hostname)\"; uci set wireless.priv_radio1.ssid=\"offline-$(uci get system.@system[0].hostname)\"; uci commit; echo $(uci get system.@system[0].hostname) > /proc/sys/kernel/hostname; wifi"
+	SSHUpdateOwner      = "uci set gluon-node-info.@owner[0].contact='%s';uci commit gluon-node-info;"
+	SSHUpdateLocation   = "uci set gluon-node-info.@location[0].latitude='%f';uci set gluon-node-info.@location[0].longitude='%f';uci set gluon-node-info.@location[0].share_location=1;uci commit gluon-node-info;"
+	SSHUpdateWifiFreq24 = "if [ \"$(uci get wireless.radio0.hwmode | grep -c g)\" -ne 0 ]; then uci set wireless.radio0.channel='%d'; uci set wireless.radio0.txpower='%d'; elif [ \"$(uci get wireless.radio1.hwmode | grep -c g)\" -ne 0 ]; then uci set wireless.radio1.channel='%d'; uci set wireless.radio1.txpower='%d'; fi;"
+	SSHUpdateWifiFreq5  = "if [ \"$(uci get wireless.radio0.hwmode | grep -c a)\" -ne 0 ]; then uci set wireless.radio0.channel='%d'; uci set wireless.radio0.txpower='%d'; elif [ \"$(uci get wireless.radio1.hwmode | grep -c a)\" -ne 0 ]; then uci set wireless.radio1.channel='%d'; uci set wireless.radio1.txpower='%d'; fi;"
 )
 
 type Node struct {
@@ -68,6 +71,15 @@ func (n *Node) SSHUpdate(ssh *ssh.Manager, iface string, oldnode *Node) {
 	}
 	if oldnode == nil || !locationEqual(&n.Location, &oldnode.Location) {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateLocation, n.Location.Latitude, n.Location.Longtitude))
+	}
+	if oldnode == nil || !wirelessEqual(&n.Wireless, &oldnode.Wireless) {
+		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq24, n.Wireless.Channel24, n.Wireless.TxPower24, n.Wireless.Channel24, n.Wireless.TxPower24))
+		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq5, n.Wireless.Channel5, n.Wireless.TxPower5, n.Wireless.Channel5, n.Wireless.TxPower5))
+		ssh.ExecuteOn(addr, "wifi")
+		log.Log.Info("[cmd] wifi", n.NodeID)
+		if oldnode != nil {
+			oldnode.Wireless = n.Wireless
+		}
 	}
 }
 func (n *Node) GetAddress(iface string) net.TCPAddr {

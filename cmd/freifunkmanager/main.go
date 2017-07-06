@@ -41,10 +41,10 @@ func main() {
 	sshmanager := ssh.NewManager(config.SSHPrivateKey)
 	nodes = runtime.NewNodes(config.StatePath, config.SSHInterface, sshmanager)
 	commands = runtime.NewCommands(sshmanager)
-	nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
+	// nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
 	nodesSaveWorker := worker.NewWorker(time.Duration(3)*time.Second, nodes.Saver)
 
-	go nodesUpdateWorker.Start()
+	// go nodesUpdateWorker.Start()
 	go nodesSaveWorker.Start()
 
 	websocket.Start(nodes, commands)
@@ -94,7 +94,7 @@ func main() {
 		yanicDialer.Close()
 	}
 	nodesSaveWorker.Close()
-	nodesUpdateWorker.Close()
+	// nodesUpdateWorker.Close()
 	sshmanager.Close()
 
 	log.Log.Info("stop recieve:", sig)
