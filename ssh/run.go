@@ -47,7 +47,9 @@ func (m *Manager) run(host string, client *ssh.Client, cmd string) ([]byte, erro
 
 	if err != nil {
 		log.Log.Warnf("can not create session on %s: %s", host, err)
+		m.clientsMUX.Lock()
 		delete(m.clients, host)
+		m.clientsMUX.Unlock()
 		return nil, err
 	}
 	stdout, err := session.StdoutPipe()
