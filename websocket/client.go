@@ -54,7 +54,9 @@ func (c *Client) Close() {
 // Listen Write and Read request via chanel
 func (c *Client) Listen() {
 	go c.listenWrite()
-	c.Write(&Message{Type: MessageTypeStats, Body: stats})
+	if stats != nil {
+		c.Write(&Message{Type: MessageTypeStats, Body: stats})
+	}
 	c.publishAllData()
 	c.listenRead()
 }
@@ -66,8 +68,10 @@ func (c *Client) publishAllData() {
 	for _, node := range nodes.Current {
 		c.Write(&Message{Type: MessageTypeCurrentNode, Node: node})
 	}
-	for _, cmd := range commands.List {
-		c.Write(&Message{Type: MessageTypeCommand, Command: cmd})
+	if commands != nil {
+		for _, cmd := range commands.List {
+			c.Write(&Message{Type: MessageTypeCommand, Command: cmd})
+		}
 	}
 }
 
@@ -77,6 +81,9 @@ func (c *Client) handleMessage(msg *Message) {
 		nodes.UpdateNode(msg.Node)
 		break
 	case MessageTypeCommand:
+		if commands == nil {
+			break
+		}
 		cmd := commands.AddCommand(msg.Command)
 		w := worker.NewWorker(time.Millisecond*300, func() {
 			SendAll(Message{Type: MessageTypeCommand, Command: cmd})
@@ -98,9 +105,9 @@ func (c *Client) listenWrite() {
 			websocket.JSON.Send(c.ws, msg)
 
 		case <-c.writeQuit:
+			clientsMutex.Lock()
 			close(c.ch)
 			close(c.writeQuit)
-			clientsMutex.Lock()
 			delete(clients, c.ip)
 			clientsMutex.Unlock()
 			return
@@ -114,8 +121,8 @@ func (c *Client) listenRead() {
 		select {
 
 		case <-c.readQuit:
-			close(c.readQuit)
 			clientsMutex.Lock()
+			close(c.readQuit)
 			delete(clients, c.ip)
 			clientsMutex.Unlock()
 			return
