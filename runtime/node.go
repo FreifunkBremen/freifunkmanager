@@ -59,22 +59,16 @@ func NewNode(nodeOrigin *yanicRuntime.Node) *Node {
 }
 
 func (n *Node) SSHUpdate(ssh *ssh.Manager, iface string, oldnode *Node) {
-	if oldnode == nil {
-		return
-	}
 	addr := n.GetAddress(iface)
-	if n.Hostname != oldnode.Hostname {
+	if oldnode == nil || n.Hostname != oldnode.Hostname {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateHostname, n.Hostname))
 	}
-	if n.Owner != oldnode.Owner {
+	if oldnode == nil || n.Owner != oldnode.Owner {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateOwner, n.Owner))
 	}
-	if !locationEqual(&n.Location, &oldnode.Location) {
+	if oldnode == nil || !locationEqual(&n.Location, &oldnode.Location) {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateLocation, n.Location.Latitude, n.Location.Longtitude))
 	}
-}
-func (n *Node) SSHSet(ssh *ssh.Manager, iface string) {
-	n.SSHUpdate(ssh, iface, nil)
 }
 func (n *Node) GetAddress(iface string) net.TCPAddr {
 	return net.TCPAddr{IP: n.Address, Port: 22, Zone: iface}

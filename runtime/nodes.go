@@ -65,6 +65,10 @@ func (nodes *Nodes) LearnNode(n *yanic.Node) {
 	logger.Infof("new node with uptime: %s", uptime)
 
 	nodes.Current[node.NodeID] = node
+	if lNode := nodes.List[node.NodeID]; lNode != nil {
+		lNode.Address = node.Address
+		go lNode.SSHUpdate(nodes.ssh, nodes.iface, node)
+	}
 	nodes.notify(node, false)
 }
 
@@ -96,7 +100,7 @@ func (nodes *Nodes) Updater() {
 	defer nodes.Unlock()
 	for nodeid, node := range nodes.List {
 		if n, ok := nodes.Current[nodeid]; ok {
-			go node.SSHUpdate(nodes.ssh, nodes.iface, n)
+			go n.SSHUpdate(nodes.ssh, nodes.iface, node)
 		}
 	}
 	log.Log.Debug("updater per ssh runs")

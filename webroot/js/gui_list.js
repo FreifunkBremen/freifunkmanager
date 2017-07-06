@@ -45,9 +45,9 @@ const guiList = {};
 		case 'ChanUtil':
 			// eslint-disable-next-line id-length
 			let aMax = a.statistics.wireless.map((d) =>
-				d.ChanUtil
-			).sort(sortNumber),
-			// eslint-disable-next-line id-length
+					d.ChanUtil
+				).sort(sortNumber),
+				// eslint-disable-next-line id-length
 				bMax = b.statistics.wireless.map((d) =>
 					d.ChanUtil
 				).sort(sortNumber);
@@ -86,14 +86,16 @@ const guiList = {};
 			option = domlib.newAt(tr, 'td'),
 			edit = domlib.newAt(option, 'div');
 
-		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
-		if (new Date(node.lastseen) < startdate) {
-			tr.classList.add('offline');
-		}
-		// eslint-disable-next-line no-underscore-dangle
+			// eslint-disable-next-line no-underscore-dangle
 		if (!node._wireless) {
 			tr.classList.add('unseen');
+		} else {
+			startdate.setMinutes(startdate.getMinutes() - config.node.offline);
+			if (new Date(node.lastseen) < startdate) {
+				tr.classList.add('offline');
+			}
 		}
+
 
 		lastseen.innerHTML = moment(node.lastseen).fromNow(true);
 
