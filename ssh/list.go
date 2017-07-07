@@ -10,6 +10,7 @@ type List struct {
 	Command    string                 `json:"cmd"`
 	Clients    map[string]*ListResult `json:"clients"`
 	sshManager *Manager
+	sync.Mutex
 }
 type ListResult struct {
 	ssh       *ssh.Client
@@ -24,6 +25,8 @@ func (m *Manager) CreateList(cmd string) *List {
 		sshManager: m,
 		Clients:    make(map[string]*ListResult),
 	}
+	m.clientsMUX.Lock()
+	defer m.clientsMUX.Unlock()
 	for host, client := range m.clients {
 		list.Clients[host] = &ListResult{Running: true, ssh: client}
 	}
@@ -43,6 +46,10 @@ func (l List) Run() {
 func (l List) runlistelement(host string, client *ListResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 	result, err := l.sshManager.run(host, client.ssh, l.Command)
+
+	l.Lock()
+	defer l.Unlock()
+
 	client.Running = false
 	if err != nil {
 		client.WithError = true

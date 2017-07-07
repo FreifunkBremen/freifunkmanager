@@ -63,24 +63,24 @@ func NewNode(nodeOrigin *yanicRuntime.Node) *Node {
 
 func (n *Node) SSHUpdate(ssh *ssh.Manager, iface string, oldnode *Node) {
 	addr := n.GetAddress(iface)
+
 	if oldnode == nil || n.Hostname != oldnode.Hostname {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateHostname, n.Hostname))
 	}
 	if oldnode == nil || n.Owner != oldnode.Owner {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateOwner, n.Owner))
 	}
-	if oldnode == nil || !locationEqual(&n.Location, &oldnode.Location) {
+	if oldnode == nil || !locationEqual(n.Location, oldnode.Location) {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateLocation, n.Location.Latitude, n.Location.Longtitude))
 	}
-	if oldnode == nil || !wirelessEqual(&n.Wireless, &oldnode.Wireless) {
+	if oldnode == nil || !wirelessEqual(n.Wireless, oldnode.Wireless) {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq24, n.Wireless.Channel24, n.Wireless.TxPower24, n.Wireless.Channel24, n.Wireless.TxPower24))
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq5, n.Wireless.Channel5, n.Wireless.TxPower5, n.Wireless.Channel5, n.Wireless.TxPower5))
 		ssh.ExecuteOn(addr, "wifi")
-		log.Log.Info("[cmd] wifi", n.NodeID)
-		if oldnode != nil {
-			oldnode.Wireless = n.Wireless
-		}
+		// send warning for running wifi, because it kicks clients from node
+		log.Log.Warn("[cmd] wifi ", n.NodeID)
 	}
+	oldnode = n
 }
 func (n *Node) GetAddress(iface string) net.TCPAddr {
 	return net.TCPAddr{IP: n.Address, Port: 22, Zone: iface}
@@ -115,48 +115,16 @@ func (n *Node) IsEqual(node *Node) bool {
 	if n.Owner != node.Owner {
 		return false
 	}
-	if !locationEqual(&n.Location, &node.Location) {
+	if !locationEqual(n.Location, node.Location) {
 		return false
 	}
-	if !wirelessEqual(&n.Wireless, &node.Wireless) {
-		return false
-	}
-	return true
-}
-func (n *Node) IsEqualNode(node *yanicRuntime.Node) bool {
-	nodeinfo := node.Nodeinfo
-	if nodeinfo == nil {
-		return false
-	}
-	owner := nodeinfo.Owner
-	if owner == nil {
-		return false
-	}
-	if n.NodeID != nodeinfo.NodeID {
-		return false
-	}
-	if !bytes.Equal(n.Address, node.Address) {
-		return false
-	}
-	if n.Hostname != nodeinfo.Hostname {
-		return false
-	}
-	if n.Owner != owner.Contact {
-		return false
-	}
-	if !locationEqual(&n.Location, nodeinfo.Location) {
-		return false
-	}
-	if !wirelessEqual(&n.Wireless, nodeinfo.Wireless) {
+	if !wirelessEqual(n.Wireless, node.Wireless) {
 		return false
 	}
 	return true
 }
 
-func locationEqual(a, b *data.Location) bool {
-	if a == nil || b == nil {
-		return false
-	}
+func locationEqual(a, b data.Location) bool {
 	if a.Latitude != b.Latitude {
 		return false
 	}
@@ -169,10 +137,7 @@ func locationEqual(a, b *data.Location) bool {
 	return true
 }
 
-func wirelessEqual(a, b *data.Wireless) bool {
-	if a == nil || b == nil {
-		return false
-	}
+func wirelessEqual(a, b data.Wireless) bool {
 	if a.Channel24 != b.Channel24 {
 		return false
 	}

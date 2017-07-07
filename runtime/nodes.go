@@ -58,7 +58,7 @@ func (nodes *Nodes) LearnNode(n *yanic.Node) {
 	// session := nodes.ssh.ConnectTo(node.Address)
 	result, err := nodes.ssh.RunOn(node.GetAddress(nodes.iface), "uptime")
 	if err != nil {
-		logger.Error("init ssh command not run", err)
+		logger.Debug("init ssh command not run", err)
 		return
 	}
 	uptime := ssh.SSHResultToString(result)
@@ -109,7 +109,7 @@ func (nodes *Nodes) Updater() {
 }
 
 func (nodes *Nodes) load() {
-	if f, err := os.Open(nodes.statePath); err == nil { // transform data to legacy meshviewer
+	if f, err := os.Open(nodes.statePath); err == nil {
 		if err = json.NewDecoder(f).Decode(nodes); err == nil {
 			log.Log.Infof("loaded %d nodes", len(nodes.List))
 		} else {

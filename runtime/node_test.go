@@ -26,10 +26,8 @@ func TestNode(t *testing.T) {
 
 	n2 := NewNode(node1)
 	assert.True(n2.IsEqual(n1))
-	assert.True(n2.IsEqualNode(node1))
 
 	node1.Nodeinfo.Owner.Contact = "blub2"
-	assert.False(n2.IsEqualNode(node1))
 	n2.Update(node1)
 	assert.False(n2.IsEqual(n1))
 }

@@ -86,7 +86,9 @@ func (c *Client) handleMessage(msg *Message) {
 		}
 		cmd := commands.AddCommand(msg.Command)
 		w := worker.NewWorker(time.Millisecond*300, func() {
+			cmd.Lock()
 			SendAll(Message{Type: MessageTypeCommand, Command: cmd})
+			cmd.Unlock()
 		})
 		go w.Start()
 		go cmd.Run(func() {
