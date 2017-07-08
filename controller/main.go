@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	maxDB = 80
+	maxDB = -75
 )
 
 type Controller struct {
@@ -49,7 +49,7 @@ func (c *Controller) Close() {
 }
 
 func (c *Controller) tick() {
-	c.sshMgmt.RunEverywhere("if [ \"$(uci get wireless.radio0.hwmode | grep -c a)\" -ne 0 ]; then echo \"radio0\"; elif [ \"$(uci get wireless.radio1.hwmode | grep -c a)\" -ne 0 ]; then echo \"radio1\"; fi", ssh.SSHResultToStringHandler(func(ip string, iface string, err error) {
+	c.sshMgmt.RunEverywhere("if [ \"$(uci get wireless.radio0.hwmode | grep -c a)\" -ne 0 ]; then echo \"client0\"; elif [ \"$(uci get wireless.radio1.hwmode | grep -c a)\" -ne 0 ]; then echo \"client1\"; fi", ssh.SSHResultToStringHandler(func(ip string, iface string, err error) {
 		if err != nil {
 			return
 		}
@@ -68,7 +68,7 @@ func (c *Controller) tick() {
 
 			c.no24Ghz[mac] = true
 
-			if db > maxDB {
+			if db < maxDB {
 
 				node, ok := c.node[ip]
 				if !ok {
@@ -91,7 +91,7 @@ func (c *Controller) tick() {
 
 	}))
 
-	c.sshMgmt.RunEverywhere("if [ \"$(uci get wireless.radio0.hwmode | grep -c g)\" -ne 0 ]; then echo \"radio0\"; elif [ \"$(uci get wireless.radio1.hwmode | grep -c g)\" -ne 0 ]; then echo \"radio1\"; fi", ssh.SSHResultToStringHandler(func(ip string, iface string, err error) {
+	c.sshMgmt.RunEverywhere("if [ \"$(uci get wireless.radio0.hwmode | grep -c g)\" -ne 0 ]; then echo \"client0\"; elif [ \"$(uci get wireless.radio1.hwmode | grep -c g)\" -ne 0 ]; then echo \"client1\"; fi", ssh.SSHResultToStringHandler(func(ip string, iface string, err error) {
 		if err != nil {
 			return
 		}
@@ -115,7 +115,7 @@ func (c *Controller) tick() {
 				c.sshMgmt.ExecuteOn(addr, cmd)
 			}
 
-			if db > maxDB {
+			if db < maxDB {
 
 				node, ok := c.node[ip]
 				if !ok {
