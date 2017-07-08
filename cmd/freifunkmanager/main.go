@@ -16,6 +16,7 @@ import (
 	"github.com/genofire/golang-lib/worker"
 
 	configPackage "github.com/FreifunkBremen/freifunkmanager/config"
+	wifiController "github.com/FreifunkBremen/freifunkmanager/controller"
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 	"github.com/FreifunkBremen/freifunkmanager/websocket"
@@ -43,14 +44,16 @@ func main() {
 	commands = runtime.NewCommands(sshmanager)
 	// nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
 	nodesSaveWorker := worker.NewWorker(time.Duration(3)*time.Second, nodes.Saver)
+	controller := wifiController.NewController(sshmanager)
 
 	// go nodesUpdateWorker.Start()
 	go nodesSaveWorker.Start()
+	go controller.Start()
 
 	websocket.Start(nodes, commands)
 
 	if config.Yanic.Enable {
-		yanicDialer := yanic.Dial(config.Yanic.Type, config.Yanic.Address)
+		yanicDialer = yanic.Dial(config.Yanic.Type, config.Yanic.Address)
 		yanicDialer.NodeHandler = nodes.LearnNode
 		yanicDialer.GlobalsHandler = func(data *runtimeYanic.GlobalStats) {
 			stats = data
@@ -90,6 +93,7 @@ func main() {
 	// Stop services
 	websocket.Close()
 	srv.Close()
+	controller.Close()
 	if config.Yanic.Enable {
 		yanicDialer.Close()
 	}

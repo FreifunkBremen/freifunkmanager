@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type SSHResultHandler func(string, error)
+type SSHResultHandler func(string, string, error)
 
 func SSHResultToString(result string) string {
 	if len(result) > 0 {
@@ -18,15 +18,15 @@ func SSHResultToString(result string) string {
 }
 
 func SSHResultToStringHandler(handler SSHResultHandler) SSHResultHandler {
-	return func(result string, err error) {
-		handler(SSHResultToString(result), err)
+	return func(addr string, result string, err error) {
+		handler(addr, SSHResultToString(result), err)
 	}
 }
 
 func (m *Manager) RunEverywhere(cmd string, handler SSHResultHandler) {
 	for host, client := range m.clients {
 		result, err := m.run(host, client, cmd)
-		handler(result, err)
+		handler(host, result, err)
 	}
 }
 
