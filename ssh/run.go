@@ -58,7 +58,7 @@ func (m *Manager) run(host string, client *ssh.Client, cmd string) (string, erro
 	}
 	err = session.Run(cmd)
 	if err != nil {
-		log.Log.Warnf("could not run %s on %s: %s", cmd, host, err)
+		log.Log.Debugf("could not run %s on %s: %s", cmd, host, err)
 		return "", err
 	}
 	return buffer.String(), nil
