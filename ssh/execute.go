@@ -8,6 +8,8 @@ import (
 )
 
 func (m *Manager) ExecuteEverywhere(cmd string) {
+	m.clientsMUX.Lock()
+	defer m.clientsMUX.Unlock()
 	for host, client := range m.clients {
 		m.execute(host, client, cmd)
 	}

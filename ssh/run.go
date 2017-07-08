@@ -24,9 +24,13 @@ func SSHResultToStringHandler(handler SSHResultHandler) SSHResultHandler {
 }
 
 func (m *Manager) RunEverywhere(cmd string, handler SSHResultHandler) {
+	m.clientsMUX.Lock()
+	defer m.clientsMUX.Unlock()
 	for host, client := range m.clients {
-		result, err := m.run(host, client, cmd)
-		handler(host, result, err)
+		go func() {
+			result, err := m.run(host, client, cmd)
+			handler(host, result, err)
+		}()
 	}
 }
 
