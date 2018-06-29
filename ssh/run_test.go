@@ -14,14 +14,10 @@ func TestRun(t *testing.T) {
 	mgmt := NewManager("~/.ssh/id_rsa")
 	assert.NotNil(mgmt, "no new manager created")
 
-	_, err := mgmt.ConnectTo(addr)
+	client, err := mgmt.ConnectTo(addr)
 	assert.NoError(err)
+	client.Close()
 
-	mgmt.RunEverywhere("echo 13", SSHResultToStringHandler(func(result string, err error) {
-		assert.NoError(err)
-
-		assert.Equal("13", result)
-	}))
 	result, err := mgmt.RunOn(addr, "echo 16")
 	assert.NoError(err)
 
@@ -29,6 +25,4 @@ func TestRun(t *testing.T) {
 	resultInt, _ := strconv.Atoi(str)
 
 	assert.Equal(16, resultInt)
-
-	mgmt.Close()
 }

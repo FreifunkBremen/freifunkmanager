@@ -8,68 +8,70 @@ import (
 	"syscall"
 	"time"
 
-	yanic "github.com/FreifunkBremen/yanic/database/socket/client"
-	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 	"github.com/NYTimes/gziphandler"
+	"github.com/genofire/golang-lib/file"
 	httpLib "github.com/genofire/golang-lib/http"
-	"github.com/genofire/golang-lib/log"
 	"github.com/genofire/golang-lib/worker"
+	log "github.com/sirupsen/logrus"
 
-	configPackage "github.com/FreifunkBremen/freifunkmanager/config"
-	wifiController "github.com/FreifunkBremen/freifunkmanager/controller"
+	respondYanic "github.com/FreifunkBremen/yanic/respond"
+	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
+
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 	"github.com/FreifunkBremen/freifunkmanager/websocket"
 )
 
 var (
-	configFile  string
-	config      *configPackage.Config
-	nodes       *runtime.Nodes
-	commands    *runtime.Commands
-	yanicDialer *yanic.Dialer
-	stats       *runtimeYanic.GlobalStats
+	configFile string
+	config     = &runtime.Config{}
+	nodes      *runtime.Nodes
+	collector  *respondYanic.Collector
+	verbose    bool
 )
 
 func main() {
 	flag.StringVar(&configFile, "config", "config.conf", "path of configuration file (default:config.conf)")
+	flag.BoolVar(&verbose, "v", false, "verbose logging")
 	flag.Parse()
+	if verbose {
+		log.SetLevel(log.DebugLevel)
+	}
 
-	config = configPackage.ReadConfigFile(configFile)
+	if err := file.ReadTOML(configFile, config); err != nil {
+		log.Panicf("Error during read config: %s", err)
+	}
 
-	log.Log.Info("starting...")
+	log.Info("starting...")
 
 	sshmanager := ssh.NewManager(config.SSHPrivateKey)
 	nodes = runtime.NewNodes(config.StatePath, config.SSHInterface, sshmanager)
-	commands = runtime.NewCommands(sshmanager)
-	// nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
 	nodesSaveWorker := worker.NewWorker(time.Duration(3)*time.Second, nodes.Saver)
-	controller := wifiController.NewController(sshmanager)
+	nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
+	nodesYanic := runtimeYanic.NewNodes(&runtimeYanic.NodesConfig{})
 
-	// go nodesUpdateWorker.Start()
+	db := runtime.NewYanicDB(nodes)
 	go nodesSaveWorker.Start()
-	go controller.Start()
+	go nodesUpdateWorker.Start()
 
-	websocket.Start(nodes, commands)
+	websocket.Start(nodes)
+	db.NotifyStats = websocket.NotifyStats
 
 	if config.Yanic.Enable {
-		yanicDialer = yanic.Dial(config.Yanic.Type, config.Yanic.Address)
-		yanicDialer.NodeHandler = nodes.LearnNode
-		yanicDialer.GlobalsHandler = func(data *runtimeYanic.GlobalStats) {
-			stats = data
-			websocket.NotifyStats(data)
-		}
-		go yanicDialer.Start()
+		collector = respondYanic.NewCollector(db, nodesYanic, make(map[string][]string), []respondYanic.InterfaceConfig{respondYanic.InterfaceConfig{
+			InterfaceName: config.Yanic.InterfaceName,
+			IPAddress:     config.Yanic.Address,
+			Port:          config.Yanic.Port,
+		}})
+		defer collector.Close()
 	}
 
 	// Startwebserver
 	http.HandleFunc("/nodes", func(w http.ResponseWriter, r *http.Request) {
 		httpLib.Write(w, nodes)
-		log.HTTP(r).Info("done")
 	})
 	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
-		httpLib.Write(w, stats)
-		log.HTTP(r).Info("done")
+		httpLib.Write(w, db.Statistics)
 	})
 	http.Handle("/", gziphandler.GzipHandler(http.FileServer(http.Dir(config.Webroot))))
 
@@ -79,27 +81,26 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			log.Log.Panic(err)
+			log.Panic(err)
 		}
 	}()
 
-	log.Log.Info("started")
+	log.Info("started")
 
 	// Wait for system signal
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-sigs
 
-	// Stop services
 	websocket.Close()
+
+	// Stop services
 	srv.Close()
-	controller.Close()
 	if config.Yanic.Enable {
-		yanicDialer.Close()
+		collector.Close()
 	}
 	nodesSaveWorker.Close()
-	// nodesUpdateWorker.Close()
-	sshmanager.Close()
+	nodesUpdateWorker.Close()
 
-	log.Log.Info("stop recieve:", sig)
+	log.Info("stop recieve:", sig)
 }

@@ -1,24 +1,27 @@
 package runtime
 
 import (
+	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/FreifunkBremen/yanic/data"
+	yanicData "github.com/FreifunkBremen/yanic/data"
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
 )
 
 func TestNode(t *testing.T) {
 	assert := assert.New(t)
-	node1 := &yanicRuntime.Node{}
+	node1 := &yanicRuntime.Node{
+		Address: &net.UDPAddr{IP: net.ParseIP("ff02::1")},
+	}
 	n1 := NewNode(node1)
 	assert.Nil(n1)
 
-	node1.Nodeinfo = &data.NodeInfo{
-		Owner:    &data.Owner{Contact: "blub"},
-		Wireless: &data.Wireless{},
-		Location: &data.Location{Altitude: 13},
+	node1.Nodeinfo = &yanicData.NodeInfo{
+		Owner:    &yanicData.Owner{Contact: "blub"},
+		Wireless: &yanicData.Wireless{},
+		Location: &yanicData.Location{Altitude: 13},
 	}
 	n1 = NewNode(node1)
 	assert.NotNil(n1)

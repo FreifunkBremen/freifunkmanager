@@ -1,13 +1,13 @@
 package runtime
 
 import (
-	"encoding/json"
-	"os"
 	"sync"
 
-	"github.com/FreifunkBremen/yanic/jsontime"
-	yanic "github.com/FreifunkBremen/yanic/runtime"
-	"github.com/genofire/golang-lib/log"
+	"github.com/FreifunkBremen/yanic/lib/jsontime"
+	log "github.com/sirupsen/logrus"
+
+	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
+	"github.com/genofire/golang-lib/file"
 
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 )
@@ -30,17 +30,17 @@ func NewNodes(path string, iface string, mgmt *ssh.Manager) *Nodes {
 		statePath: path,
 		iface:     iface,
 	}
-	nodes.load()
+	file.ReadJSON(path, nodes)
 	return nodes
 }
 
-func (nodes *Nodes) LearnNode(n *yanic.Node) {
+func (nodes *Nodes) LearnNode(n *yanicRuntime.Node) {
 	node := NewNode(n)
 	if node == nil {
 		return
 	}
 	node.Lastseen = jsontime.Now()
-	logger := log.Log.WithField("method", "LearnNode").WithField("node_id", node.NodeID)
+	logger := log.WithField("method", "LearnNode").WithField("node_id", node.NodeID)
 	nodes.Lock()
 	defer nodes.Unlock()
 	if lNode := nodes.List[node.NodeID]; lNode != nil {
@@ -83,7 +83,7 @@ func (nodes *Nodes) notify(node *Node, system bool) {
 
 func (nodes *Nodes) UpdateNode(node *Node) {
 	if node == nil {
-		log.Log.Warn("no new node to update")
+		log.Warn("no new node to update")
 		return
 	}
 	nodes.Lock()
@@ -91,7 +91,7 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 	if n, ok := nodes.List[node.NodeID]; ok {
 		node.Address = n.Address
 		go node.SSHUpdate(nodes.ssh, nodes.iface, n)
-		log.Log.Info("update node", node.NodeID)
+		log.Info("update node", node.NodeID)
 	}
 	nodes.List[node.NodeID] = node
 	nodes.notify(node, true)
@@ -105,24 +105,12 @@ func (nodes *Nodes) Updater() {
 			go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 		}
 	}
-	log.Log.Info("updater per ssh")
-}
-
-func (nodes *Nodes) load() {
-	if f, err := os.Open(nodes.statePath); err == nil {
-		if err = json.NewDecoder(f).Decode(nodes); err == nil {
-			log.Log.Infof("loaded %d nodes", len(nodes.List))
-		} else {
-			log.Log.Error("failed to unmarshal nodes:", err)
-		}
-	} else {
-		log.Log.Error("failed to load cached nodes:", err)
-	}
+	log.Info("updater per ssh")
 }
 
 func (nodes *Nodes) Saver() {
 	nodes.Lock()
-	yanic.SaveJSON(nodes, nodes.statePath)
+	file.SaveJSON(nodes.statePath, nodes)
 	nodes.Unlock()
-	log.Log.Debug("saved state file")
+	log.Debug("saved state file")
 }

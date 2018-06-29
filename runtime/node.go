@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/genofire/golang-lib/log"
+	log "github.com/sirupsen/logrus"
 
-	"github.com/FreifunkBremen/yanic/data"
-	"github.com/FreifunkBremen/yanic/jsontime"
+	yanicData "github.com/FreifunkBremen/yanic/data"
+	"github.com/FreifunkBremen/yanic/lib/jsontime"
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
 
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
@@ -23,16 +23,16 @@ const (
 )
 
 type Node struct {
-	Lastseen jsontime.Time `json:"lastseen"`
-	NodeID   string        `json:"node_id"`
-	Hostname string        `json:"hostname"`
-	Location data.Location `json:"location"`
-	Wireless data.Wireless `json:"wireless"`
-	Owner    string        `json:"owner"`
-	Address  net.IP        `json:"-"`
+	Lastseen jsontime.Time      `json:"lastseen"`
+	NodeID   string             `json:"node_id"`
+	Hostname string             `json:"hostname"`
+	Location yanicData.Location `json:"location"`
+	Wireless yanicData.Wireless `json:"wireless"`
+	Owner    string             `json:"owner"`
+	Address  net.IP             `json:"-"`
 	Stats    struct {
-		Wireless data.WirelessStatistics `json:"wireless"`
-		Clients  data.Clients            `json:"clients"`
+		Wireless yanicData.WirelessStatistics `json:"wireless"`
+		Clients  yanicData.Clients            `json:"clients"`
 	} `json:"statistics"`
 }
 
@@ -41,7 +41,12 @@ func NewNode(nodeOrigin *yanicRuntime.Node) *Node {
 		node := &Node{
 			Hostname: nodeinfo.Hostname,
 			NodeID:   nodeinfo.NodeID,
-			Address:  nodeOrigin.Address,
+		}
+		for _, ip := range nodeinfo.Network.Addresses {
+			ipAddr := net.ParseIP(ip)
+			if node.Address == nil || ipAddr.IsGlobalUnicast() {
+				node.Address = ipAddr
+			}
 		}
 		if owner := nodeinfo.Owner; owner != nil {
 			node.Owner = owner.Contact
@@ -71,14 +76,14 @@ func (n *Node) SSHUpdate(ssh *ssh.Manager, iface string, oldnode *Node) {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateOwner, n.Owner))
 	}
 	if oldnode == nil || !locationEqual(n.Location, oldnode.Location) {
-		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateLocation, n.Location.Latitude, n.Location.Longtitude))
+		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateLocation, n.Location.Latitude, n.Location.Longitude))
 	}
 	if oldnode == nil || !wirelessEqual(n.Wireless, oldnode.Wireless) {
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq24, n.Wireless.Channel24, n.Wireless.TxPower24, n.Wireless.Channel24, n.Wireless.TxPower24))
 		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq5, n.Wireless.Channel5, n.Wireless.TxPower5, n.Wireless.Channel5, n.Wireless.TxPower5))
 		ssh.ExecuteOn(addr, "wifi")
 		// send warning for running wifi, because it kicks clients from node
-		log.Log.Warn("[cmd] wifi ", n.NodeID)
+		log.Warn("[cmd] wifi ", n.NodeID)
 	}
 	oldnode = n
 }
@@ -89,7 +94,7 @@ func (n *Node) Update(node *yanicRuntime.Node) {
 	if nodeinfo := node.Nodeinfo; nodeinfo != nil {
 		n.Hostname = nodeinfo.Hostname
 		n.NodeID = nodeinfo.NodeID
-		n.Address = node.Address
+		n.Address = node.Address.IP
 
 		if owner := nodeinfo.Owner; owner != nil {
 			n.Owner = owner.Contact
@@ -124,11 +129,11 @@ func (n *Node) IsEqual(node *Node) bool {
 	return true
 }
 
-func locationEqual(a, b data.Location) bool {
+func locationEqual(a, b yanicData.Location) bool {
 	if a.Latitude != b.Latitude {
 		return false
 	}
-	if a.Longtitude != b.Longtitude {
+	if a.Longitude != b.Longitude {
 		return false
 	}
 	if a.Altitude != b.Altitude {
@@ -137,7 +142,7 @@ func locationEqual(a, b data.Location) bool {
 	return true
 }
 
-func wirelessEqual(a, b data.Wireless) bool {
+func wirelessEqual(a, b yanicData.Wireless) bool {
 	if a.Channel24 != b.Channel24 {
 		return false
 	}

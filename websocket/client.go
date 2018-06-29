@@ -2,10 +2,8 @@ package websocket
 
 import (
 	"io"
-	"time"
 
-	"github.com/genofire/golang-lib/log"
-	"github.com/genofire/golang-lib/worker"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 )
 
@@ -22,7 +20,7 @@ type Client struct {
 func NewClient(ip string, ws *websocket.Conn) *Client {
 
 	if ws == nil {
-		log.Log.Panic("ws cannot be nil")
+		log.Panic("ws cannot be nil")
 	}
 
 	return &Client{
@@ -41,14 +39,14 @@ func (c *Client) Write(msg *Message) {
 		clientsMutex.Lock()
 		delete(clients, c.ip)
 		clientsMutex.Unlock()
-		log.HTTP(c.ws.Request()).Error("client disconnected")
+		log.Error("client disconnected")
 	}
 }
 
 func (c *Client) Close() {
 	c.writeQuit <- true
 	c.readQuit <- true
-	log.HTTP(c.ws.Request()).Info("client disconnecting...")
+	log.Info("client disconnecting...")
 }
 
 // Listen Write and Read request via chanel
@@ -68,33 +66,12 @@ func (c *Client) publishAllData() {
 	for _, node := range nodes.Current {
 		c.Write(&Message{Type: MessageTypeCurrentNode, Node: node})
 	}
-	if commands != nil {
-		for _, cmd := range commands.List {
-			c.Write(&Message{Type: MessageTypeCommand, Command: cmd})
-		}
-	}
 }
 
 func (c *Client) handleMessage(msg *Message) {
 	switch msg.Type {
 	case MessageTypeSystemNode:
 		nodes.UpdateNode(msg.Node)
-		break
-	case MessageTypeCommand:
-		if commands == nil {
-			break
-		}
-		cmd := commands.AddCommand(msg.Command)
-		w := worker.NewWorker(time.Millisecond*300, func() {
-			cmd.Lock()
-			SendAll(Message{Type: MessageTypeCommand, Command: cmd})
-			cmd.Unlock()
-		})
-		go w.Start()
-		go cmd.Run(func() {
-			w.Close()
-			SendAll(Message{Type: MessageTypeCommand, Command: cmd})
-		})
 		break
 	}
 }
@@ -137,7 +114,7 @@ func (c *Client) listenRead() {
 				c.writeQuit <- true
 				return
 			} else if err != nil {
-				log.HTTP(c.ws.Request()).Error(err)
+				log.Error(err)
 			} else {
 				c.handleMessage(&msg)
 			}

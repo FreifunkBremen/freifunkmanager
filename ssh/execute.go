@@ -3,23 +3,17 @@ package ssh
 import (
 	"net"
 
-	"github.com/genofire/golang-lib/log"
+	log "github.com/sirupsen/logrus"
+
 	"golang.org/x/crypto/ssh"
 )
-
-func (m *Manager) ExecuteEverywhere(cmd string) {
-	m.clientsMUX.Lock()
-	defer m.clientsMUX.Unlock()
-	for host, client := range m.clients {
-		m.execute(host, client, cmd)
-	}
-}
 
 func (m *Manager) ExecuteOn(addr net.TCPAddr, cmd string) error {
 	client, err := m.ConnectTo(addr)
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 	return m.execute(addr.IP.String(), client, cmd)
 }
 
@@ -27,14 +21,9 @@ func (m *Manager) execute(host string, client *ssh.Client, cmd string) error {
 	session, err := client.NewSession()
 	defer session.Close()
 
-	if err != nil {
-		log.Log.Warnf("can not create session on %s: %s", host, err)
-		delete(m.clients, host)
-		return err
-	}
 	err = session.Run(cmd)
 	if err != nil {
-		log.Log.Warnf("could not run %s on %s: %s", cmd, host, err)
+		log.Warnf("could not run %s on %s: %s", cmd, host, err)
 		return err
 	}
 	return nil

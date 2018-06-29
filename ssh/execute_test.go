@@ -15,10 +15,9 @@ func TestExecute(t *testing.T) {
 	mgmt := NewManager("~/.ssh/id_rsa")
 	assert.NotNil(mgmt, "no new manager created")
 
-	_, err := mgmt.ConnectTo(addr)
+	client, err := mgmt.ConnectTo(addr)
 	assert.NoError(err)
 
-	mgmt.ExecuteEverywhere("echo $HOSTNAME")
 	err = mgmt.ExecuteOn(addr, "uptime")
 	assert.NoError(err)
 	err = mgmt.ExecuteOn(addr, "echo $HOSTNAME")
@@ -26,5 +25,5 @@ func TestExecute(t *testing.T) {
 	err = mgmt.ExecuteOn(addr, "exit 1")
 	assert.Error(err)
 
-	mgmt.Close()
+	client.Close()
 }

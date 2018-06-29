@@ -6,7 +6,7 @@ import (
 
 	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 	httpLib "github.com/genofire/golang-lib/http"
-	"github.com/genofire/golang-lib/log"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
@@ -16,11 +16,9 @@ var nodes *runtime.Nodes
 var clients map[string]*Client
 var clientsMutex sync.Mutex
 var stats *runtimeYanic.GlobalStats
-var commands *runtime.Commands
 
-func Start(nodeBind *runtime.Nodes, commandsBind *runtime.Commands) {
+func Start(nodeBind *runtime.Nodes) {
 	nodes = nodeBind
-	commands = commandsBind
 	clients = make(map[string]*Client)
 
 	http.Handle("/websocket", websocket.Handler(func(ws *websocket.Conn) {
@@ -32,10 +30,10 @@ func Start(nodeBind *runtime.Nodes, commandsBind *runtime.Commands) {
 			clientsMutex.Lock()
 			delete(clients, ip)
 			clientsMutex.Unlock()
-			log.HTTP(r).Info("client disconnected")
+			log.Info("client disconnected")
 		}()
 
-		log.HTTP(r).Infof("new client")
+		log.Infof("new client")
 
 		client := NewClient(ip, ws)
 		clientsMutex.Lock()
@@ -68,5 +66,5 @@ func SendAll(msg Message) {
 }
 
 func Close() {
-	log.Log.Infof("websocket stopped with %d clients", len(clients))
+	log.Infof("websocket stopped with %d clients", len(clients))
 }

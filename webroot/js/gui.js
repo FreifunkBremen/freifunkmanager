@@ -1,5 +1,5 @@
 /* exported gui,router */
-/* globals socket,notify,domlib,guiList,guiMap,guiStats,guiNode,guiConsole */
+/* globals socket,notify,domlib,guiList,guiMap,guiStats,guiNode */
 
 const gui = {},
 	router = new Navigo(null, true, '#');
@@ -58,9 +58,6 @@ const gui = {},
 	}
 
 	router.on({
-		'/console': function routerConsole () {
-			setView(guiConsole);
-		},
 		'/list': function routerList () {
 			setView(guiList);
 		},

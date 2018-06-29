@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"net"
 
-	"github.com/genofire/golang-lib/log"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -23,22 +23,12 @@ func SSHResultToStringHandler(handler SSHResultHandler) SSHResultHandler {
 	}
 }
 
-func (m *Manager) RunEverywhere(cmd string, handler SSHResultHandler) {
-	m.clientsMUX.Lock()
-	defer m.clientsMUX.Unlock()
-	for host, client := range m.clients {
-		go func() {
-			result, err := m.run(host, client, cmd)
-			handler(host, result, err)
-		}()
-	}
-}
-
 func (m *Manager) RunOn(addr net.TCPAddr, cmd string) (string, error) {
 	client, err := m.ConnectTo(addr)
 	if err != nil {
 		return "", err
 	}
+	defer client.Close()
 	return m.run(addr.IP.String(), client, cmd)
 }
 
@@ -47,22 +37,18 @@ func (m *Manager) run(host string, client *ssh.Client, cmd string) (string, erro
 	defer session.Close()
 
 	if err != nil {
-		log.Log.Warnf("can not create session on %s: %s", host, err)
-		m.clientsMUX.Lock()
-		delete(m.clients, host)
-		m.clientsMUX.Unlock()
+		log.Warnf("can not create session on %s: %s", host, err)
 		return "", err
 	}
 	buffer := &bytes.Buffer{}
 	session.Stdout = buffer
 	if err != nil {
-		log.Log.Warnf("can not create pipe for run on %s: %s", host, err)
-		delete(m.clients, host)
+		log.Warnf("can not create pipe for run on %s: %s", host, err)
 		return "", err
 	}
 	err = session.Run(cmd)
 	if err != nil {
-		log.Log.Debugf("could not run %s on %s: %s", cmd, host, err)
+		log.Debugf("could not run %s on %s: %s", cmd, host, err)
 		return "", err
 	}
 	return buffer.String(), nil

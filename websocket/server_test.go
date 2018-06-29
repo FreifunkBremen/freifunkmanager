@@ -10,9 +10,8 @@ import (
 func TestStart(t *testing.T) {
 	assert := assert.New(t)
 	nodes := &runtime.Nodes{}
-	commands := &runtime.Commands{}
 	assert.Nil(clients)
-	Start(nodes, commands)
+	Start(nodes)
 	assert.NotNil(clients)
 	Close()
 }
