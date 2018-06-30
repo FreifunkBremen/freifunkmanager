@@ -29,10 +29,10 @@ func (m *Manager) RunOn(addr net.TCPAddr, cmd string) (string, error) {
 		return "", err
 	}
 	defer client.Close()
-	return m.run(addr.IP.String(), client, cmd)
+	return Run(addr.IP.String(), client, cmd)
 }
 
-func (m *Manager) run(host string, client *ssh.Client, cmd string) (string, error) {
+func Run(host string, client *ssh.Client, cmd string) (string, error) {
 	session, err := client.NewSession()
 	defer session.Close()
 

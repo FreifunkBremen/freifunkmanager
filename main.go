@@ -54,8 +54,9 @@ func main() {
 	go nodesSaveWorker.Start()
 	go nodesUpdateWorker.Start()
 
-	websocket.Start(nodes)
-	db.NotifyStats = websocket.NotifyStats
+	ws := websocket.NewWebsocketServer(config.Secret, nodes)
+	nodes.AddNotifyStats(ws.SendStats)
+	nodes.AddNotifyNode(ws.SendNode)
 
 	if config.Yanic.Enable {
 		collector = respondYanic.NewCollector(db, nodesYanic, make(map[string][]string), []respondYanic.InterfaceConfig{respondYanic.InterfaceConfig{
@@ -71,7 +72,7 @@ func main() {
 		httpLib.Write(w, nodes)
 	})
 	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
-		httpLib.Write(w, db.Statistics)
+		httpLib.Write(w, nodes.Statistics)
 	})
 	http.Handle("/", gziphandler.GzipHandler(http.FileServer(http.Dir(config.Webroot))))
 
@@ -80,7 +81,7 @@ func main() {
 	}
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			log.Panic(err)
 		}
 	}()
@@ -92,7 +93,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-sigs
 
-	websocket.Close()
+	ws.Close()
 
 	// Stop services
 	srv.Close()

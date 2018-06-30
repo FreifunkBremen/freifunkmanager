@@ -1,0 +1,29 @@
+.notifications {
+	position: absolute;
+	right: 1em;
+}
+
+.notify {
+	position: relative;
+	min-height: 1em;
+	margin: 1em 0;
+	padding: 1em 1.5em;
+	color: rgba(0,0,0,.87);
+	-webkit-transition: opacity .1s ease,color .1s ease,background .1s ease,box-shadow .1s ease;
+	transition: opacity .1s ease,color .1s ease,background .1s ease,box-shadow .1s ease;
+	box-shadow: 0 0 0 1px rgba(34,36,38,.22) inset, 0 0 0 0 transparent;
+	background: #ccc;
+	color: #000;
+}
+.notify.success {
+	background: #009ee0;
+	color: #fff;
+}
+.notify.warn {
+	background: #ffb400;
+	color: #000;
+}
+.notify.error {
+	background: #dc0067;
+	color: #fff;
+}

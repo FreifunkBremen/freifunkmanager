@@ -124,12 +124,6 @@ __pycache__
 # IDE's go
 .idea/
 
-# webroot
-webroot/node_modules
-webroot/data
-webroot/app.js
-webroot/app.js.map
-
 # go project
 profile.cov
 config.conf

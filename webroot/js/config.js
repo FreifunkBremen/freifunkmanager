@@ -1,11 +1,9 @@
-/* exported config */
-
 /* eslint no-magic-numbers: "off"*/
 /* eslint sort-keys: "off"*/
 
-const config = {
+export default {
 	'title': 'FreifunkManager - Breminale',
-	'backend': `ws${location.protocol == 'https:' ? 's' : ''}://${location.host}/websocket`,
+	'backend': `ws${location.protocol == 'https:' ? 's' : ''}://${location.host}/ws`,
 	'node': {
 		// Minuten till is shown as offline
 		'offline': 5
@@ -20,22 +18,16 @@ const config = {
 		},
 		'maxZoom': 20,
 		'tileLayer': 'https://tiles.bremen.freifunk.net/{z}/{x}/{y}.png',
-
-		/* Heatmap settings
-     size: in meters (default: 30km)
-     opacity: in percent/100 (default: 1)
-     gradientTexture: url-to-texture-image (default: false)
-     alphaRange: change transparency in heatmap (default: 1)
-     autoresize: resize heatmap when map size changes (default: false)
-     */
 		'heatmap': {
 			'wifi24': {
-				'size': 30,
+				'size': 10,
+				'units': 'm',
 				'opacity': 0.5,
 				'alphaRange': 1
 			},
 			'wifi5': {
-				'size': 30,
+				'size': 10,
+				'units': 'm',
 				'opacity': 0.5,
 				'alphaRange': 1
 			}
@@ -51,7 +43,7 @@ const config = {
 			}
 		},
 		'geojson': {
-			'url': 'https://events.ffhb.de/data/ground.geojson',
+			'url': 'https://raw.githubusercontent.com/FreifunkBremen/internal-maps/master/breminale.geojson',
 			'pointToLayer': function pointToLayer (feature, latlng) {
 				'use strict';
 

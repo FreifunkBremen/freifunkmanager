@@ -1,3 +1,10 @@
+@import "_notify.less";
+@import "_menu.less";
+@import "_status.less";
+@import "_login.less";
+@import "../node_modules/leaflet/dist/leaflet.css";
+@import "_map.less";
+
 body {
 	position: relative;
 	margin: 0px;
@@ -5,20 +12,6 @@ body {
 	color: #333;
 	line-height: 1.3;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-}
-.status {
-	float: right;
-	background: #009ee0;
-	color: white;
-	width: 50px;
-	height: 50px;
-}
-.status.connecting,.status.running {
-	background: #ffb400;
-}
-.status.offline, .status.failed {
-	background: #dc0067;
-	color: white;
 }
 span.online {
 	color: #009ee0;
@@ -28,85 +21,6 @@ span.offline {
 }
 h1 {
 	border-bottom: 4px solid #dc0067;
-}
-header {
-	width: 100%;
-	height: 50px;
-}
-header > div {
-	display: inline-block;
-}
-nav {
-	background-color: #373636;
-	position: fixed;
-	display: inline-block;
-	font-weight: 700;
-	width: 100%;
-	height: 50px;
-}
-nav ul {
-	padding: 0;
-	margin: 0;
-	list-style-type: none;
-}
-nav li {
-	float:left;
-	display: inline-block;
-}
-nav li:hover, nav.active {
-	background: rgba(255, 255, 255, 0.2);
-}
-nav li a, nav li span {
-	display: inline-block;
-	cursor: pointer;
-	text-decoration: none !important;
-	text-align: center;
-	text-transform: uppercase;
-	color: inherit;
-	box-sizing: border-box;
-	padding: 1.1em .5em;
-	height: 50px;
-}
-nav > ul > .item-1 {
-	background: #ffb400;
-	color: #000;
-}
-nav > ul > .item-2 {
-	background: #dc0067;
-	color: #fff;
-}
-nav > ul > .item-3 {
-	background: #ccc;
-	color: #000;
-}
-.notifications {
-	position: absolute;
-	right: 1em;
-}
-
-.notify {
-	position: relative;
-	min-height: 1em;
-	margin: 1em 0;
-	padding: 1em 1.5em;
-	color: rgba(0,0,0,.87);
-	-webkit-transition: opacity .1s ease,color .1s ease,background .1s ease,box-shadow .1s ease;
-	transition: opacity .1s ease,color .1s ease,background .1s ease,box-shadow .1s ease;
-	box-shadow: 0 0 0 1px rgba(34,36,38,.22) inset, 0 0 0 0 transparent;
-	background: #ccc;
-	color: #000;
-}
-.notify.success {
-	background: #009ee0;
-	color: #fff;
-}
-.notify.warn {
-	background: #ffb400;
-	color: #000;
-}
-.notify.error {
-	background: #dc0067;
-	color: #fff;
 }
 
 thead {

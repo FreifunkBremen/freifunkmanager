@@ -1,24 +1,52 @@
-/* exported guiMap */
-/* global config,store,domlib,socket */
 
-const guiMap = {};
+import * as domlib from '../domlib';
+import * as gui from '../gui';
+import * as socket from '../socket';
+import * as store from '../store';
+import config from '../config';
+import View from '../view';
+import {WINDOW_HEIGHT_MENU}  from '../element/menu';
+//import '../../node_modules/leaflet/dist/leaflet.js';
+//import '../../node_modules/leaflet-webgl-heatmap/dist/leaflet-webgl-heatmap.min.js';
+//import '../../node_modules/leaflet-ajax/dist/leaflet.ajax.min.js';
 
-(function init () {
-	'use strict';
 
-	const view = guiMap,
-		WINDOW_HEIGHT_MENU = 50;
+export class MapView extends View {
 
-	let container = null,
-		el = null,
+	constructor () {
+		super();
 
-		geoJsonLayer = null,
-		nodeLayer = null,
-		clientLayer24 = null,
-		clientLayer5 = null;
-	// , draggingNodeID=null;
 
-	function addNode (node) {
+		this.el.style.height = `${window.innerHeight - WINDOW_HEIGHT_MENU}px`;
+		this.map = L.map(this.el).setView(config.map.view.bound, config.map.view.zoom);
+
+		const layerControl = L.control.layers().addTo(this.map);
+
+		L.tileLayer(config.map.tileLayer, {
+			'maxZoom': config.map.maxZoom
+		}).addTo(this.map);
+
+
+		this.geoJsonLayer = L.geoJson.ajax(config.map.geojson.url, config.map.geojson);
+
+		this.nodeLayer = L.layerGroup();
+		/* eslint-disable new-cap */
+		this.clientLayer24 = L.webGLHeatmap(config.map.heatmap.wifi24);
+		this.clientLayer5 = L.webGLHeatmap(config.map.heatmap.wifi5);
+		/* eslint-enable new-cap */
+		layerControl.addOverlay(this.geoJsonLayer, 'geojson');
+		layerControl.addOverlay(this.nodeLayer, 'Nodes');
+		layerControl.addOverlay(this.clientLayer24, 'Clients 2.4 Ghz');
+		layerControl.addOverlay(this.clientLayer5, 'Clients 5 Ghz');
+		this.nodeLayer.addTo(this.map);
+
+		window.addEventListener('resize', () => {
+			this.el.style.height = `${window.innerHeight - WINDOW_HEIGHT_MENU}px`;
+			this.map.invalidateSize();
+		});
+	}
+
+	addNode (node) {
 		/* eslint-disable-line https://github.com/Leaflet/Leaflet/issues/4484
 			if(node.node_id === draggingNodeID){
 				return
@@ -88,29 +116,32 @@ const guiMap = {};
 		*/
 		nodemarker.on('dragend', () => {
 			// DraggingNodeID = undefined;
-			const pos = nodemarker.getLatLng();
+			const pos = nodemarker.getLatLng(),
+				old = node.location;
 
 			node.location = {
 				'latitude': pos.lat,
 				'longitude': pos.lng
 			};
-			socket.sendnode(node);
+			socket.sendnode(node, (msg)=>{
+				if (!msg.body) {
+					node.location = old;
+				}
+			});
 		});
-		nodeLayer.addLayer(nodemarker);
+		this.nodeLayer.addLayer(nodemarker);
 	}
 
-	function update () {
-		geoJsonLayer.refresh();
-		nodeLayer.clearLayers();
+	render () {
+		this.geoJsonLayer.refresh();
+		this.nodeLayer.clearLayers();
 
 		const nodes = store.getNodes();
 
 		for (let i = 0; i < nodes.length; i += 1) {
-			addNode(nodes[i]);
+			this.addNode(nodes[i]);
 		}
-
-
-		clientLayer24.setData(nodes.map((node) => {
+		this.clientLayer24.setData(nodes.map((node) => {
 			if (!node.location || !node.location.latitude || !node.location.longitude) {
 				return null;
 			}
@@ -118,59 +149,13 @@ const guiMap = {};
 			return [node.location.latitude, node.location.longitude, node.statistics.clients.wifi24 || 0];
 		}));
 
-		clientLayer5.setData(nodes.map((node) => {
+		this.clientLayer5.setData(nodes.map((node) => {
 			if (!node.location || !node.location.latitude || !node.location.longitude) {
 				return null;
 			}
 
 			return [node.location.latitude, node.location.longitude, node.statistics.clients.wifi5 || 0];
 		}));
+		this.map.invalidateSize();
 	}
-
-	view.bind = function bind (bindEl) {
-		container = bindEl;
-	};
-
-	view.render = function render () {
-		if (!container) {
-			return;
-		} else if (el) {
-			container.appendChild(el);
-			update();
-
-			return;
-		}
-		console.log('generate new view for map');
-		el = domlib.newAt(container, 'div');
-
-		el.style.height = `${window.innerHeight - WINDOW_HEIGHT_MENU}px`;
-
-		const map = L.map(el).setView(config.map.view.bound, config.map.view.zoom),
-			layerControl = L.control.layers().addTo(map);
-
-		L.tileLayer(config.map.tileLayer, {
-			'maxZoom': config.map.maxZoom
-		}).addTo(map);
-
-
-		geoJsonLayer = L.geoJson.ajax(config.map.geojson.url, config.map.geojson);
-
-		nodeLayer = L.layerGroup();
-		/* eslint-disable new-cap */
-		clientLayer24 = new L.webGLHeatmap(config.map.heatmap.wifi24);
-		clientLayer5 = new L.webGLHeatmap(config.map.heatmap.wifi5);
-		/* eslint-enable new-cap */
-		layerControl.addOverlay(geoJsonLayer, 'geojson');
-		layerControl.addOverlay(nodeLayer, 'Nodes');
-		layerControl.addOverlay(clientLayer24, 'Clients 2.4 Ghz');
-		layerControl.addOverlay(clientLayer5, 'Clients 5 Ghz');
-		nodeLayer.addTo(map);
-
-		window.addEventListener('resize', () => {
-			el.style.height = `${window.innerHeight - WINDOW_HEIGHT_MENU}px`;
-			map.invalidateSize();
-		});
-
-		update();
-	};
-})();
+}

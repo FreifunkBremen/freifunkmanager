@@ -2,38 +2,25 @@ package runtime
 
 import (
 	"bytes"
-	"fmt"
 	"net"
-
-	log "github.com/sirupsen/logrus"
 
 	yanicData "github.com/FreifunkBremen/yanic/data"
 	"github.com/FreifunkBremen/yanic/lib/jsontime"
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
-
-	"github.com/FreifunkBremen/freifunkmanager/ssh"
-)
-
-const (
-	SSHUpdateHostname   = "uci set system.@system[0].hostname='%s'; uci set wireless.priv_radio0.ssid=\"offline-$(uci get system.@system[0].hostname)\"; uci set wireless.priv_radio1.ssid=\"offline-$(uci get system.@system[0].hostname)\"; uci commit; echo $(uci get system.@system[0].hostname) > /proc/sys/kernel/hostname; wifi"
-	SSHUpdateOwner      = "uci set gluon-node-info.@owner[0].contact='%s';uci commit gluon-node-info;"
-	SSHUpdateLocation   = "uci set gluon-node-info.@location[0].latitude='%f';uci set gluon-node-info.@location[0].longitude='%f';uci set gluon-node-info.@location[0].share_location=1;uci commit gluon-node-info;"
-	SSHUpdateWifiFreq24 = "if [ \"$(uci get wireless.radio0.hwmode | grep -c g)\" -ne 0 ]; then uci set wireless.radio0.channel='%d'; uci set wireless.radio0.txpower='%d'; elif [ \"$(uci get wireless.radio1.hwmode | grep -c g)\" -ne 0 ]; then uci set wireless.radio1.channel='%d'; uci set wireless.radio1.txpower='%d'; fi;"
-	SSHUpdateWifiFreq5  = "if [ \"$(uci get wireless.radio0.hwmode | grep -c a)\" -ne 0 ]; then uci set wireless.radio0.channel='%d'; uci set wireless.radio0.txpower='%d'; elif [ \"$(uci get wireless.radio1.hwmode | grep -c a)\" -ne 0 ]; then uci set wireless.radio1.channel='%d'; uci set wireless.radio1.txpower='%d'; fi;"
 )
 
 type Node struct {
-	Lastseen jsontime.Time      `json:"lastseen"`
-	NodeID   string             `json:"node_id"`
+	Lastseen jsontime.Time      `json:"lastseen" mapstructure:"-"`
+	NodeID   string             `json:"node_id" mapstructure:"node_id"`
 	Hostname string             `json:"hostname"`
 	Location yanicData.Location `json:"location"`
 	Wireless yanicData.Wireless `json:"wireless"`
 	Owner    string             `json:"owner"`
-	Address  net.IP             `json:"-"`
+	Address  net.IP             `json:"ip" mapstructure:"-"`
 	Stats    struct {
 		Wireless yanicData.WirelessStatistics `json:"wireless"`
 		Clients  yanicData.Clients            `json:"clients"`
-	} `json:"statistics"`
+	} `json:"statistics" mapstructure:"-"`
 }
 
 func NewNode(nodeOrigin *yanicRuntime.Node) *Node {
@@ -64,28 +51,6 @@ func NewNode(nodeOrigin *yanicRuntime.Node) *Node {
 		return node
 	}
 	return nil
-}
-
-func (n *Node) SSHUpdate(ssh *ssh.Manager, iface string, oldnode *Node) {
-	addr := n.GetAddress(iface)
-
-	if oldnode == nil || n.Hostname != oldnode.Hostname {
-		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateHostname, n.Hostname))
-	}
-	if oldnode == nil || n.Owner != oldnode.Owner {
-		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateOwner, n.Owner))
-	}
-	if oldnode == nil || !locationEqual(n.Location, oldnode.Location) {
-		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateLocation, n.Location.Latitude, n.Location.Longitude))
-	}
-	if oldnode == nil || !wirelessEqual(n.Wireless, oldnode.Wireless) {
-		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq24, n.Wireless.Channel24, n.Wireless.TxPower24, n.Wireless.Channel24, n.Wireless.TxPower24))
-		ssh.ExecuteOn(addr, fmt.Sprintf(SSHUpdateWifiFreq5, n.Wireless.Channel5, n.Wireless.TxPower5, n.Wireless.Channel5, n.Wireless.TxPower5))
-		ssh.ExecuteOn(addr, "wifi")
-		// send warning for running wifi, because it kicks clients from node
-		log.Warn("[cmd] wifi ", n.NodeID)
-	}
-	oldnode = n
 }
 func (n *Node) GetAddress(iface string) net.TCPAddr {
 	return net.TCPAddr{IP: n.Address, Port: 22, Zone: iface}

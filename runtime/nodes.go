@@ -3,22 +3,23 @@ package runtime
 import (
 	"sync"
 
-	"github.com/FreifunkBremen/yanic/lib/jsontime"
 	log "github.com/sirupsen/logrus"
 
-	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
+	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 	"github.com/genofire/golang-lib/file"
 
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 )
 
 type Nodes struct {
-	List       map[string]*Node `json:"nodes"`
-	Current    map[string]*Node `json:"-"`
-	ssh        *ssh.Manager
-	statePath  string
-	iface      string
-	notifyFunc []func(*Node, bool)
+	List            map[string]*Node          `json:"nodes"`
+	Current         map[string]*Node          `json:"-"`
+	Statistics      *runtimeYanic.GlobalStats `json:"-"`
+	ssh             *ssh.Manager
+	statePath       string
+	iface           string
+	notifyNodeFunc  []func(*Node, bool)
+	notifyStatsFunc []func(*runtimeYanic.GlobalStats)
 	sync.Mutex
 }
 
@@ -34,50 +35,22 @@ func NewNodes(path string, iface string, mgmt *ssh.Manager) *Nodes {
 	return nodes
 }
 
-func (nodes *Nodes) LearnNode(n *yanicRuntime.Node) {
-	node := NewNode(n)
-	if node == nil {
-		return
-	}
-	node.Lastseen = jsontime.Now()
-	logger := log.WithField("method", "LearnNode").WithField("node_id", node.NodeID)
-	nodes.Lock()
-	defer nodes.Unlock()
-	if lNode := nodes.List[node.NodeID]; lNode != nil {
-		lNode.Lastseen = jsontime.Now()
-		lNode.Stats = node.Stats
-	} else {
-		nodes.List[node.NodeID] = node
-		nodes.notify(node, true)
-	}
-	if _, ok := nodes.Current[node.NodeID]; ok {
-		nodes.Current[node.NodeID] = node
-		nodes.notify(node, false)
-		return
-	}
-	// session := nodes.ssh.ConnectTo(node.Address)
-	result, err := nodes.ssh.RunOn(node.GetAddress(nodes.iface), "uptime")
-	if err != nil {
-		logger.Debug("init ssh command not run", err)
-		return
-	}
-	uptime := ssh.SSHResultToString(result)
-	logger.Infof("new node with uptime: %s", uptime)
-
-	nodes.Current[node.NodeID] = node
-	if lNode := nodes.List[node.NodeID]; lNode != nil {
-		lNode.Address = node.Address
-		go lNode.SSHUpdate(nodes.ssh, nodes.iface, node)
-	}
-	nodes.notify(node, false)
+func (nodes *Nodes) AddNotifyNode(f func(*Node, bool)) {
+	nodes.notifyNodeFunc = append(nodes.notifyNodeFunc, f)
 }
-
-func (nodes *Nodes) AddNotify(f func(*Node, bool)) {
-	nodes.notifyFunc = append(nodes.notifyFunc, f)
-}
-func (nodes *Nodes) notify(node *Node, system bool) {
-	for _, f := range nodes.notifyFunc {
+func (nodes *Nodes) notifyNode(node *Node, system bool) {
+	for _, f := range nodes.notifyNodeFunc {
 		f(node, system)
+	}
+}
+
+func (nodes *Nodes) AddNotifyStats(f func(stats *runtimeYanic.GlobalStats)) {
+	nodes.notifyStatsFunc = append(nodes.notifyStatsFunc, f)
+}
+func (nodes *Nodes) notifyStats(stats *runtimeYanic.GlobalStats) {
+	nodes.Statistics = stats
+	for _, f := range nodes.notifyStatsFunc {
+		f(stats)
 	}
 }
 
@@ -94,7 +67,7 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 		log.Info("update node", node.NodeID)
 	}
 	nodes.List[node.NodeID] = node
-	nodes.notify(node, true)
+	nodes.notifyNode(node, true)
 }
 
 func (nodes *Nodes) Updater() {

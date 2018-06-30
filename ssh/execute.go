@@ -14,10 +14,10 @@ func (m *Manager) ExecuteOn(addr net.TCPAddr, cmd string) error {
 		return err
 	}
 	defer client.Close()
-	return m.execute(addr.IP.String(), client, cmd)
+	return Execute(addr.IP.String(), client, cmd)
 }
 
-func (m *Manager) execute(host string, client *ssh.Client, cmd string) error {
+func Execute(host string, client *ssh.Client, cmd string) error {
 	session, err := client.NewSession()
 	defer session.Close()
 

@@ -1,0 +1,25 @@
+nav .status {
+	float: right;
+	background-color: #009ee0;
+	color: white;
+	width: 50px;
+	height: 50px;
+
+	&.connecting,
+	&.running {
+		background-color: #ffb400;
+		animation: blinkDot 2s infinite;
+	}
+	&.offline,
+	&.failed {
+		background-color: #dc0067;
+		animation: blinkDot 1s infinite;
+	}
+
+
+	@keyframes blinkDot {
+		50% {
+			background-color: rgba(255, 255, 255, 0.25);
+		}
+	}
+}

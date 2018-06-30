@@ -10,6 +10,9 @@ type Config struct {
 	// path to deliver static content
 	Webroot string `toml:"webroot"`
 
+	// auth secret
+	Secret string `toml:"secret"`
+
 	// SSH private key
 	SSHPrivateKey string `toml:"ssh_key"`
 	SSHInterface  string `toml:"ssh_interface"`

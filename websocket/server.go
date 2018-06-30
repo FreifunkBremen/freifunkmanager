@@ -2,69 +2,47 @@ package websocket
 
 import (
 	"net/http"
-	"sync"
 
-	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
-	httpLib "github.com/genofire/golang-lib/http"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/net/websocket"
+	wsLib "github.com/genofire/golang-lib/websocket"
+	"github.com/google/uuid"
 
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 )
 
-var nodes *runtime.Nodes
-var clients map[string]*Client
-var clientsMutex sync.Mutex
-var stats *runtimeYanic.GlobalStats
+type WebsocketServer struct {
+	nodes    *runtime.Nodes
+	secret   string
+	loggedIn map[uuid.UUID]bool
 
-func Start(nodeBind *runtime.Nodes) {
-	nodes = nodeBind
-	clients = make(map[string]*Client)
-
-	http.Handle("/websocket", websocket.Handler(func(ws *websocket.Conn) {
-		r := ws.Request()
-		ip := httpLib.GetRemoteIP(r)
-
-		defer func() {
-			ws.Close()
-			clientsMutex.Lock()
-			delete(clients, ip)
-			clientsMutex.Unlock()
-			log.Info("client disconnected")
-		}()
-
-		log.Infof("new client")
-
-		client := NewClient(ip, ws)
-		clientsMutex.Lock()
-		clients[ip] = client
-		clientsMutex.Unlock()
-		client.Listen()
-
-	}))
-
-	nodes.AddNotify(NotifyNode)
+	inputMSG chan *wsLib.Message
+	ws       *wsLib.Server
+	handlers map[string]WebsocketHandlerFunc
 }
 
-func NotifyNode(node *runtime.Node, system bool) {
-	msgType := MessageTypeCurrentNode
-	if system {
-		msgType = MessageTypeSystemNode
+func NewWebsocketServer(secret string, nodes *runtime.Nodes) *WebsocketServer {
+	ownWS := WebsocketServer{
+		nodes:    nodes,
+		handlers: make(map[string]WebsocketHandlerFunc),
+		loggedIn: make(map[uuid.UUID]bool),
+		inputMSG: make(chan *wsLib.Message),
+		secret:   secret,
 	}
-	SendAll(Message{Type: msgType, Node: node})
-}
-func NotifyStats(data *runtimeYanic.GlobalStats) {
-	stats = data
-	SendAll(Message{Type: MessageTypeStats, Body: data})
-}
-func SendAll(msg Message) {
-	clientsMutex.Lock()
-	for _, c := range clients {
-		c.Write(&msg)
-	}
-	clientsMutex.Unlock()
+	ownWS.ws = wsLib.NewServer(ownWS.inputMSG, wsLib.NewSessionManager())
+
+	// Register Handlers
+	ownWS.handlers[MessageTypeConnect] = ownWS.connectHandler
+
+	ownWS.handlers[MessageTypeLogin] = ownWS.loginHandler
+	ownWS.handlers[MessageTypeAuthStatus] = ownWS.authStatusHandler
+	ownWS.handlers[MessageTypeLogout] = ownWS.logoutHandler
+
+	ownWS.handlers[MessageTypeSystemNode] = ownWS.nodeHandler
+
+	http.HandleFunc("/ws", ownWS.ws.Handler)
+	go ownWS.MessageHandler()
+	return &ownWS
 }
 
-func Close() {
-	log.Infof("websocket stopped with %d clients", len(clients))
+func (ws *WebsocketServer) Close() {
+	close(ws.inputMSG)
 }
