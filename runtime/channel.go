@@ -13,7 +13,8 @@ type Channel struct {
 }
 
 var (
-	ChannelEU   = true
+	ChannelEU = true
+
 	ChannelList = map[uint32]*Channel{
 		1:   &Channel{Frequenz: 2412, AllowedInEU: true, DFS: false, Indoor: false, SDR: false},
 		2:   &Channel{Frequenz: 2417, AllowedInEU: true, DFS: false, Indoor: false, SDR: false},
@@ -84,16 +85,13 @@ var (
 )
 
 func ChannelIs5GHz(channel uint32) bool {
-	fre, ok := ChannelList[channel]
-	return ok && fre.Frequenz < FREQ_THREASHOLD
+	ch, ok := ChannelList[channel]
+	return ok && (!ChannelEU || ch.AllowedInEU) && ch.Frequenz > FREQ_THREASHOLD
 }
 
 func GetChannel(channel uint32) *Channel {
 	if ch, ok := ChannelList[channel]; ok {
-		if !ChannelEU {
-			return ch
-		}
-		if ch.AllowedInEU {
+		if !ChannelEU || ch.AllowedInEU {
 			return ch
 		}
 	}

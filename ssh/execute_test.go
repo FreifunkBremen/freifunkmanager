@@ -10,7 +10,7 @@ import (
 func TestExecute(t *testing.T) {
 	assert := assert.New(t)
 
-	addr := net.TCPAddr{IP: net.ParseIP("2a06:8782:ffbb:1337::127"), Port: 22}
+	addr := net.TCPAddr{IP: net.ParseIP("fd2f:5119:f2c::127"), Port: 22}
 
 	mgmt := NewManager("~/.ssh/id_rsa")
 	assert.NotNil(mgmt, "no new manager created")
