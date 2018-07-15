@@ -95,20 +95,21 @@ export class NodeView extends View {
 		this.btnGPS.innerHTML = 'Start follow position';
 		this.btnGPS.addEventListener('click', () => {
 			if (this.editLocationGPS != null) {
-				if (this.btnGPS.innerHTML === 'Stop following') {
-					updatePosition();
+				if (this.gpsPosition) {
+					this.updatePosition(this.gpsPosition.latitude, this.gpsPosition.longitude);
 				}
 				this.btnGPS.innerHTML = 'Start follow position';
 				navigator.geolocation.clearWatch(this.editLocationGPS);
 				this.editLocationGPS = null;
-
 				return;
 			}
+
+			this.gpsPosition = null;
 			this.btnGPS.innerHTML = 'Following position';
 			if (navigator.geolocation) {
 				this.editLocationGPS = navigator.geolocation.watchPosition((position) => {
 					this.btnGPS.innerHTML = 'Stop following';
-					this.this.storePosition = position.coords;
+					this.gpsPosition = position.coords;
 					const latlng = [position.coords.latitude, position.coords.longitude];
 
 					this.marker.setLatLng(latlng);
@@ -136,8 +137,8 @@ export class NodeView extends View {
 	updatePosition (lat, lng) {
 		const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
 			localNodeCopy = Object.assign({}, node),
-			newLat = lat || this.storePosition.latitude || false,
-			newlng = lng || this.storePosition.longitude || false;
+			newLat = lat || this.gpsPosition.latitude || false,
+			newlng = lng || this.gpsPosition.longitude || false;
 
 		if (!newLat || !newlng) {
 			return;
