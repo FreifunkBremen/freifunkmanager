@@ -39,16 +39,11 @@ export class NodeView extends View {
 		this.hostnameInput.addEventListener('focusout', () => {
 			this.editing = false;
 
-			const node = store.getNode(this.currentNodeID),
-				old = node.hostname;
+			const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
+				localNodeCopy = Object.assign({}, node);
 
-			node.hostname = this.hostnameInput.value;
-
-			socket.sendnode(node, (msg)=>{
-				if (!msg.body) {
-					node.hostname = old;
-				}
-			});
+			localNodeCopy.hostname = this.hostnameInput.value;
+			socket.sendnode(localNodeCopy);
 		});
 
 		domlib.newAt(owner, 'span').innerHTML = 'Owner: ';
@@ -60,16 +55,11 @@ export class NodeView extends View {
 		this.ownerInput.addEventListener('focusout', () => {
 			this.editing = false;
 
-			const node = store.getNode(this.currentNodeID),
-				old = node.owner;
+			const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
+				localNodeCopy = Object.assign({}, node);
 
-			node.owner = this.ownerInput.value;
-
-			socket.sendnode(node, (msg)=>{
-				if (!msg.body) {
-					node.owner = old;
-				}
-			});
+			localNodeCopy.owner = this.ownerInput.value;
+			socket.sendnode(localNodeCopy);
 		});
 
 
@@ -144,7 +134,8 @@ export class NodeView extends View {
 	}
 
 	updatePosition (lat, lng) {
-		const node = store.getNode(this.currentNodeID),
+		const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
+			localNodeCopy = Object.assign({}, node),
 			newLat = lat || this.storePosition.latitude || false,
 			newlng = lng || this.storePosition.longitude || false;
 
@@ -152,21 +143,21 @@ export class NodeView extends View {
 			return;
 		}
 
-		node.location = {
+		localNodeCopy.location = {
 			'latitude': newLat,
 			'longitude': newlng
 		};
-		socket.sendnode(node);
+		socket.sendnode(localNodeCopy);
 	}
 
 	render () {
 		this.geoJsonLayer.refresh();
 		this.titleID.innerHTML = this.currentNodeID;
-		const node = store.getNode(this.currentNodeID),
+		const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
 			startdate = new Date();
 
 		if (!node) {
-			console.log(`node not found: ${this.currentNodeID}`);
+			console.log(`internal error: node not found: ${this.currentNodeID}`);
 
 			return;
 		}
