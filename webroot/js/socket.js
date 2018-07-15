@@ -190,11 +190,17 @@ setEvent('auth_status', (msg) => {
 	render();
 });
 
-setEvent('node-system', (msg) => {
+addEvent('node-system', (msg) => {
 	store.updateNode(msg.body, true);
 });
-setEvent('node-current', (msg) => {
+addEvent('node-current', (msg) => {
 	store.updateNode(msg.body);
+});
+addEvent('channels_wifi24', (msg) => {
+	store.channelsWifi24 = msg.body.sort((a, b) => a - b);
+});
+addEvent('channels_wifi5', (msg) => {
+	store.channelsWifi5 = msg.body.sort((a, b) => a - b);
 });
 
 connect();

@@ -50,35 +50,50 @@ export class StatisticsView extends View {
 				this.clientsWifi.innerHTML = msg.body.ClientsWifi;
 				this.clientsWifi24.innerHTML = msg.body.ClientsWifi24;
 				this.clientsWifi5.innerHTML = msg.body.ClientsWifi5;
-
-				while(this.channelTabelle.hasChildNodes()) {
-					this.channelTabelle.removeChild(this.channelTabelle.firstElementChild);
-				}
-
-				let tr = domlib.newAt(this.channelTabelle, 'tr');
-
-				let title = domlib.newAt(tr, 'th');
-				title.innerHTML = '2.4 Ghz';
-				title.setAttribute('colspan', '2');
-
-				title = domlib.newAt(tr, 'th');
-				title.innerHTML = '5 Ghz';
-				title.setAttribute('colspan', '2');
-				const storeNodes = store.getNodes();
-				for (let ch = 1; ch <= 33; ch++) {
-					tr = domlib.newAt(this.channelTabelle, 'tr');
-					if (ch < 14) {
-						domlib.newAt(tr, 'td').innerHTML = ch;
-						domlib.newAt(tr, 'td').innerHTML = storeNodes.reduce((c, node) => node.wireless.channel24 === ch ? c + 1 : c, 0);
-					} else {
-						domlib.newAt(tr, 'td');
-						domlib.newAt(tr, 'td');
-					}
-					const ch5 = 32 + ch * 4;
-					domlib.newAt(tr, 'td').innerHTML = ch5;
-					domlib.newAt(tr, 'td').innerHTML = storeNodes.reduce((c, node) => node.wireless.channel5 === ch5 ? c + 1 : c, 0);
-				}
 			}
 		});
+		socket.addEvent('node-current', this.updateChannelTable.bind(this));
+		socket.addEvent('channels_wifi24', this.updateChannelTable.bind(this));
+		socket.addEvent('channels_wifi5', this.updateChannelTable.bind(this));
+	}
+	updateChannelTable (){
+		while(this.channelTabelle.hasChildNodes()) {
+			this.channelTabelle.removeChild(this.channelTabelle.firstElementChild);
+		}
+		if(!store.channelsWifi24 || !store.channelsWifi5) {
+			return
+		}
+		const storeNodes = store.getNodes(),
+		 end = Math.max(store.channelsWifi24.length||0,store.channelsWifi5.length||0);
+
+		let tr = domlib.newAt(this.channelTabelle, 'tr');
+
+		let title = domlib.newAt(tr, 'th');
+		title.innerHTML = '2.4 Ghz';
+		title.setAttribute('colspan', '2');
+
+		title = domlib.newAt(tr, 'th');
+		title.innerHTML = '5 Ghz';
+		title.setAttribute('colspan', '2');
+
+		for (let i = 0; i <= end; i++) {
+			tr = domlib.newAt(this.channelTabelle, 'tr');
+			const wifi24Channel = store.channelsWifi24[i],
+			 wifi5Channel = store.channelsWifi5[i];
+			if (wifi24Channel) {
+				domlib.newAt(tr, 'td').innerHTML = wifi24Channel;
+				domlib.newAt(tr, 'td').innerHTML = storeNodes.reduce((c, node) => node.wireless.channel24 === wifi24Channel ? c + 1 : c, 0);
+			} else {
+				domlib.newAt(tr, 'td');
+				domlib.newAt(tr, 'td');
+			}
+			if (wifi5Channel) {
+				domlib.newAt(tr, 'td').innerHTML = wifi5Channel;
+				domlib.newAt(tr, 'td').innerHTML = storeNodes.reduce((c, node) => node.wireless.channel5 === wifi5Channel ? c + 1 : c, 0);
+			} else {
+				domlib.newAt(tr, 'td');
+				domlib.newAt(tr, 'td');
+			}
+		}
 	}
 }
