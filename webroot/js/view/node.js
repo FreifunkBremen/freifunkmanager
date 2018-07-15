@@ -158,7 +158,6 @@ export class NodeView extends View {
 
 		if (!node) {
 			console.log(`internal error: node not found: ${this.currentNodeID}`);
-
 			return;
 		}
 
@@ -171,20 +170,23 @@ export class NodeView extends View {
 			this.ago.classList.add('online');
 		}
 		this.ago.innerHTML = `${FromNowAgo(node.lastseen)} (${node.lastseen})`;
-		if (this.editLocationGPS || this.editing || !node.location || !node.location.latitude || !node.location.longitude) {
-			return;
-		}
+
 		this.titleName.innerHTML = node.hostname;
-		this.hostnameInput.value = node.hostname;
-		this.ownerInput.value = node.owner;
 
-		// eslint-disable-next-line one-var
-		const latlng = [node.location.latitude, node.location.longitude];
+		if (!this.editing) { // don't change input fields while user is editing
+			this.hostnameInput.value = node.hostname;
+			this.ownerInput.value = node.owner;
 
-		this.map.setView(latlng);
-		this.marker.setLatLng(latlng);
-		this.marker.setOpacity(1);
-		this.map.invalidateSize();
+			if (!this.editLocationGPS && node.location && node.location.latitude && node.location.longitude) {
+				// eslint-disable-next-line one-var
+				const latlng = [node.location.latitude, node.location.longitude];
+
+				this.map.setView(latlng);
+				this.marker.setLatLng(latlng);
+				this.marker.setOpacity(1);
+				this.map.invalidateSize();
+			}
+		}
 	}
 
 	setNodeID (nodeID) {
