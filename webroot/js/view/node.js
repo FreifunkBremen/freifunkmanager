@@ -94,13 +94,13 @@ export class NodeView extends View {
 		this.btnGPS.classList.add('btn');
 		this.btnGPS.innerHTML = 'Start follow position';
 		this.btnGPS.addEventListener('click', () => {
-			if (this.editLocationGPS) {
+			if (this.editLocationGPS != null) {
 				if (this.btnGPS.innerHTML === 'Stop following') {
 					updatePosition();
 				}
 				this.btnGPS.innerHTML = 'Start follow position';
 				navigator.geolocation.clearWatch(this.editLocationGPS);
-				this.editLocationGPS = false;
+				this.editLocationGPS = null;
 
 				return;
 			}
@@ -177,7 +177,7 @@ export class NodeView extends View {
 			this.hostnameInput.value = node.hostname;
 			this.ownerInput.value = node.owner;
 
-			if (!this.editLocationGPS && node.location && node.location.latitude && node.location.longitude) {
+			if (this.editLocationGPS == null && node.location && node.location.latitude && node.location.longitude) {
 				// eslint-disable-next-line one-var
 				const latlng = [node.location.latitude, node.location.longitude];
 
