@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -58,7 +59,8 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager, iface string, oldnode *Node) {
 		return
 	}
 	radio := ssh.SSHResultToString(result)
-	if radio != "" {
+	ch := GetChannel(n.Wireless.Channel24)
+	if radio != "" || ch == nil {
 		if oldnode == nil || n.Wireless.TxPower24 != oldnode.Wireless.TxPower24 {
 			ssh.Execute(n.Address.String(), client, fmt.Sprintf(`
 				uci set wireless.%s.txpower='%d';
@@ -68,10 +70,12 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager, iface string, oldnode *Node) {
 		}
 		if oldnode == nil || n.Wireless.Channel24 != oldnode.Wireless.Channel24 {
 			ssh.Execute(n.Address.String(), client, fmt.Sprintf(`
+				ubus call hostapd.%s switch_chan '{"freq":%d}'
 				uci set wireless.%s.channel='%d';
 				uci commit wireless;`,
+				strings.Replace(radio, "radio", "client", 1), ch.Frequenz,
 				radio, n.Wireless.Channel24))
-			runWifi = true
+
 		}
 	}
 	result, err = ssh.Run(n.Address.String(), client, `
@@ -84,7 +88,8 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager, iface string, oldnode *Node) {
 		return
 	}
 	radio = ssh.SSHResultToString(result)
-	if radio != "" {
+	ch = GetChannel(n.Wireless.Channel5)
+	if radio != "" || ch == nil {
 		if oldnode == nil || n.Wireless.TxPower5 != oldnode.Wireless.TxPower5 {
 			ssh.Execute(n.Address.String(), client, fmt.Sprintf(`
 				uci set wireless.%s.txpower='%d';
@@ -94,10 +99,11 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager, iface string, oldnode *Node) {
 		}
 		if oldnode == nil || n.Wireless.Channel5 != oldnode.Wireless.Channel5 {
 			ssh.Execute(n.Address.String(), client, fmt.Sprintf(`
+				ubus call hostapd.%s switch_chan '{"freq":%d}'
 				uci set wireless.%s.channel='%d';
 				uci commit wireless;`,
+				strings.Replace(radio, "radio", "client", 1), ch.Frequenz,
 				radio, n.Wireless.Channel5))
-			runWifi = true
 		}
 	}
 

@@ -54,10 +54,18 @@ func (nodes *Nodes) notifyStats(stats *runtimeYanic.GlobalStats) {
 	}
 }
 
-func (nodes *Nodes) UpdateNode(node *Node) {
+func (nodes *Nodes) UpdateNode(node *Node) bool {
 	if node == nil {
 		log.Warn("no new node to update")
-		return
+		return false
+	}
+	if GetChannel(node.Wireless.Channel24) == nil {
+		log.Warnf("wrong wifi24 channel for '%s'", node.NodeID)
+		return false
+	}
+	if GetChannel(node.Wireless.Channel5) == nil {
+		log.Warnf("wrong wifi5 channel for '%s'", node.NodeID)
+		return false
 	}
 	nodes.Lock()
 	defer nodes.Unlock()
@@ -68,6 +76,7 @@ func (nodes *Nodes) UpdateNode(node *Node) {
 	}
 	nodes.List[node.NodeID] = node
 	nodes.notifyNode(node, true)
+	return true
 }
 
 func (nodes *Nodes) Updater() {
