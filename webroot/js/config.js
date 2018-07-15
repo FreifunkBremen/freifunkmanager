@@ -5,6 +5,8 @@ export default {
 	'title': 'FreifunkManager - Breminale',
 	'backend': `ws${location.protocol == 'https:' ? 's' : ''}://${location.host}/ws`,
 	'node': {
+		'channel24': 6,
+		'channel5': 44,
 		// Minuten till is shown as offline
 		'offline': 5
 	},

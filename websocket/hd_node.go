@@ -27,8 +27,7 @@ func (ws *WebsocketServer) nodeHandler(logger *log.Entry, msg *wsLib.Message) er
 		logger.Debugf("%v", node)
 		return nil
 	}
-	ws.nodes.UpdateNode(&node)
-	msg.Answer(msg.Subject, true)
+	msg.Answer(msg.Subject, ws.nodes.UpdateNode(&node))
 	logger.Infof("change %s", node.NodeID)
 	return nil
 }

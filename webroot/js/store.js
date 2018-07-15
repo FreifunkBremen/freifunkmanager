@@ -1,3 +1,5 @@
+import config from './config';
+
 const current = {},
 	list = {};
 
@@ -22,7 +24,10 @@ export function getNode (nodeid) {
 export function createNode (nodeid) {
 	return {
 		'node_id': nodeid,
-		'wireless': {},
+		'wireless': {
+			'channel24': config.node.channel24,
+			'channel5': config.node.channel5,
+		},
 		'location': {}
 	};
 };
