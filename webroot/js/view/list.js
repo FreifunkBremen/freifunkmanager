@@ -12,6 +12,10 @@ export class ListView extends View {
 	constructor () {
 		super();
 		this.debouncer = new lib.Debouncer(1000, "list render");
+		this.maxDisplayedNodes = localStorage.getItem("maxDisplayedNodes");
+		if (this.maxDisplayedNodes == null) {
+			this.maxDisplayedNodes = 20;
+		}
 		const table = domlib.newAt(this.el, 'table'),
 			thead = domlib.newAt(table, 'thead');
 
@@ -116,6 +120,20 @@ export class ListView extends View {
 		cell11.innerHTML = 'Option';
 
 		table.classList.add('nodes');
+
+		this.footerNote = domlib.newAt(this.el, 'span');
+
+		var footerLinkContents = [["5", 5], ["10", 10], ["20", 20], ["50", 50], ["All", -1]];
+		for (var i = 0; i < footerLinkContents.length; i++) {
+			var link = domlib.newAt(this.el, 'a', null, footerLinkContents[i][0]);
+			link.classList.add('btn');
+			const newValue = footerLinkContents[i][1];
+			link.addEventListener('click', () => {
+				this.maxDisplayedNodes = newValue;
+				localStorage.setItem("maxDisplayedNodes", this.maxDisplayedNodes);
+				this.render();
+			});
+		}
 	}
 
 	// eslint-disable-next-line id-length
@@ -416,11 +434,18 @@ export class ListView extends View {
 			nodes = nodes.reverse();
 		}
 
+		var numDisplayedNodes = nodes.length;
+		if (this.maxDisplayedNodes != -1) {
+			numDisplayedNodes = Math.min(this.maxDisplayedNodes, numDisplayedNodes);
+		}
+
 		var fragment = document.createDocumentFragment();
-		for (let i = 0; i < nodes.length; i += 1) {
+		for (let i = 0; i < numDisplayedNodes; i += 1) {
 			const row = this.renderRow(nodes[i]);
 			fragment.appendChild(row);
 		}
 		this.tbody.appendChild(fragment);
+
+		this.footerNote.innerHTML = numDisplayedNodes + " of " + nodes.length + " nodes. Show: ";
 	}
 }
