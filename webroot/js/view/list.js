@@ -194,9 +194,9 @@ export class ListView extends View {
 		}
 
 
-		lastseen.innerHTML = FromNowAgo(node.lastseen);
+		lastseen.textContent = FromNowAgo(node.lastseen);
 
-		nodeID.innerHTML = node.node_id;
+		nodeID.textContent = node.node_id;
 
 		hostnameInput.value = node.hostname;
 		hostnameInput.readOnly = true;
@@ -221,13 +221,13 @@ export class ListView extends View {
 			});
 		});
 
-		domlib.newAt(freq, 'span').innerHTML = '2.4 Ghz';
-		domlib.newAt(freq, 'span').innerHTML = '5 Ghz';
+		domlib.newAt(freq, 'span').textContent = '2.4 Ghz';
+		domlib.newAt(freq, 'span').textContent = '5 Ghz';
 
 		/* eslint-disable no-underscore-dangle */
 		if (node._wireless) {
-			domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel24 || '-';
-			domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel5 || '-';
+			domlib.newAt(curchannel, 'span').textContent = node._wireless.channel24 || '-';
+			domlib.newAt(curchannel, 'span').textContent = node._wireless.channel5 || '-';
 		}
 		/* eslint-enable no-underscore-dangle */
 
@@ -287,8 +287,8 @@ export class ListView extends View {
 
 		/* eslint-disable no-underscore-dangle */
 		if (node._wireless) {
-			domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower24 || '-';
-			domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower5 || '-';
+			domlib.newAt(curpower, 'span').textContent = node._wireless.txpower24 || '-';
+			domlib.newAt(curpower, 'span').textContent = node._wireless.txpower5 || '-';
 		}
 		/* eslint-enable no-underscore-dangle */
 
@@ -344,8 +344,8 @@ export class ListView extends View {
 			});
 		});
 
-		domlib.newAt(client, 'span').innerHTML = node.statistics.clients.wifi24;
-		domlib.newAt(client, 'span').innerHTML = node.statistics.clients.wifi5;
+		domlib.newAt(client, 'span').textContent = node.statistics.clients.wifi24;
+		domlib.newAt(client, 'span').textContent = node.statistics.clients.wifi5;
 
 		/* eslint-disable id-length, no-magic-numbers,one-var */
 		const chanUtil24 = node.statistics.wireless
@@ -356,11 +356,11 @@ export class ListView extends View {
 				: {};
 		/* eslint-enable id-length, no-magic-numbers,one-var */
 
-		domlib.newAt(chanUtil, 'span').innerHTML = chanUtil24.ChanUtil || '-';
-		domlib.newAt(chanUtil, 'span').innerHTML = chanUtil5.ChanUtil || '-';
+		domlib.newAt(chanUtil, 'span').textContent = chanUtil24.ChanUtil || '-';
+		domlib.newAt(chanUtil, 'span').textContent = chanUtil5.ChanUtil || '-';
 
 		edit.classList.add('btn');
-		edit.innerHTML = 'Edit';
+		edit.textContent = 'Edit';
 		edit.addEventListener('click', () => {
 			gui.router.navigate(gui.router.generate('node', {'nodeID': node.node_id}));
 		});
