@@ -25,7 +25,7 @@ export class MenuView extends View {
 		domlib.newAt(aMap, 'a', {'href':'#/map'}, 'Map');
 
 		const aStatistics= domlib.newAt(this.menuList, 'li', {'class':'item-3'});
-		domlib.newAt(aStatistics, 'a', {'href':'#/statistics'}, 'Statistics');
+		domlib.newAt(aStatistics, 'a', {'href':'#/statistics'}, 'Stats');
 
 	}
 	loginTyping(e) {
