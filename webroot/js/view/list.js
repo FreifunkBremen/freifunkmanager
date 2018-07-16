@@ -38,7 +38,9 @@ export class ListView extends View {
 		this.nodeidFilter = domlib.newAt(cell2, 'input');
 		this.nodeidFilter.setAttribute('placeholder', 'NodeID');
 		this.nodeidFilter.setAttribute('size', '9');
-		this.nodeidFilter.addEventListener('keyup', this.render);
+		this.nodeidFilter.addEventListener('keyup', () => {
+			this.render();
+		});
 		cell2.addEventListener('dblclick', () => {
 			this.sortTable(cell2);
 		});
@@ -55,7 +57,9 @@ export class ListView extends View {
 		cell3.classList.add('hostname');
 		this.hostnameFilter = domlib.newAt(cell3, 'input');
 		this.hostnameFilter.setAttribute('placeholder', 'Hostname');
-		this.hostnameFilter.addEventListener('keyup', this.render);
+		this.hostnameFilter.addEventListener('keyup', () => {
+			this.render();
+		});
 		cell3.addEventListener('dblclick', () => {
 			this.sortTable(cell3);
 		});
