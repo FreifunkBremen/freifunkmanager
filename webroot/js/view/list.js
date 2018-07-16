@@ -430,10 +430,11 @@ export class ListView extends View {
 			nodes = nodes.reverse();
 		}
 
+		var fragment = document.createDocumentFragment();
 		for (let i = 0; i < nodes.length; i += 1) {
 			const row = this.renderRow(nodes[i]);
-
-			this.tbody.appendChild(row);
+			fragment.appendChild(row);
 		}
+		this.tbody.appendChild(fragment);
 	}
 }
