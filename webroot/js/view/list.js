@@ -116,6 +116,8 @@ export class ListView extends View {
 		cell11.innerHTML = 'Option';
 
 		table.classList.add('nodes');
+
+		this.footerNote = domlib.newAt(this.el, 'span');
 	}
 
 	// eslint-disable-next-line id-length
@@ -434,11 +436,20 @@ export class ListView extends View {
 			nodes = nodes.reverse();
 		}
 
+		const numDisplayedNodes = Math.min(10, nodes.length);
+
 		var fragment = document.createDocumentFragment();
-		for (let i = 0; i < nodes.length; i += 1) {
+		for (let i = 0; i < numDisplayedNodes; i += 1) {
 			const row = this.renderRow(nodes[i]);
 			fragment.appendChild(row);
 		}
 		this.tbody.appendChild(fragment);
+
+		if (numDisplayedNodes < nodes.length) {
+			this.footerNote.textContent = "" + (nodes.length - numDisplayedNodes) + " further nodes hidden.";
+		}
+		else {
+			this.footerNote.textContent = "";
+		}
 	}
 }
