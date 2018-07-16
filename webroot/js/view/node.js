@@ -142,6 +142,34 @@ export class NodeView extends View {
 		});
 		this.gpsStatusText = domlib.newAt(this.el, 'span');
 		this.gpsStatusText.classList.add('withTextMargins');
+
+		this.createLoadBtn = domlib.newAt(this.el, 'span');
+		this.createLoadBtn.classList.add('btn');
+		this.createLoadBtn.innerHTML = 'Create Heavy Load';
+		this.loadIntervalId = null;
+		this.createLoadBtn.addEventListener('click', () => {
+			console.log("starting to create load for " + this.currentNodeID);
+			if (this.loadIntervalId == null) {
+				this.createLoadBtn.innerHTML = 'Creating Load...';
+				this.loadIntervalId = setInterval(() => {
+					console.log("sending dummy data for node " + this.currentNodeID);
+
+					const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
+						localNodeCopy = Object.assign({}, node),
+						nowTime = new Date(),
+						dummyData = "test_" + nowTime.toLocaleTimeString() + "." + nowTime.getMilliseconds();
+					//localNodeCopy.owner = dummyData;
+					localNodeCopy.hostname = dummyData;
+					socket.sendnode(localNodeCopy);
+
+				}, 200);
+			}
+			else {
+				clearInterval(this.loadIntervalId);
+				this.loadIntervalId = null;
+				this.createLoadBtn.innerHTML = 'Create Heavy Load';
+			}
+		});
 	}
 
 	updatePosition (lat, lng) {
