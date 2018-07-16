@@ -98,6 +98,9 @@ export class NodeView extends View {
 				if (this.gpsPosition) {
 					this.updatePosition(this.gpsPosition.latitude, this.gpsPosition.longitude);
 				}
+				else {
+					this.gpsStatusText.innerHTML = "";
+				}
 				this.btnGPS.innerHTML = 'Start follow position';
 				navigator.geolocation.clearWatch(this.editLocationGPS);
 				this.editLocationGPS = null;
@@ -105,10 +108,15 @@ export class NodeView extends View {
 			}
 
 			this.gpsPosition = null;
-			this.btnGPS.innerHTML = 'Following position';
+			this.btnGPS.innerHTML = 'Stop following';
+			this.gpsStatusText.innerHTML = "waiting for location...";
 			if (navigator.geolocation) {
 				this.editLocationGPS = navigator.geolocation.watchPosition((position) => {
-					this.btnGPS.innerHTML = 'Stop following';
+					this.gpsStatusText.innerHTML = "GPS location at " +
+						new Date(position.timestamp).toLocaleTimeString() + ": " +
+						position.coords.latitude.toFixed(5) + " / " +
+						position.coords.longitude.toFixed(5);
+
 					this.gpsPosition = position.coords;
 					const latlng = [position.coords.latitude, position.coords.longitude];
 
@@ -132,6 +140,8 @@ export class NodeView extends View {
 				notify.send('error', 'Browser did not support Location');
 			}
 		});
+		this.gpsStatusText = domlib.newAt(this.el, 'span');
+		this.gpsStatusText.classList.add('withTextMargins');
 	}
 
 	updatePosition (lat, lng) {
