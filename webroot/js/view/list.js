@@ -10,6 +10,8 @@ export class ListView extends View {
 
 	constructor () {
 		super();
+		this.lastRenderTime = null;
+		this.deferredRenderTimer = null;
 		const table = domlib.newAt(this.el, 'table'),
 			thead = domlib.newAt(table, 'thead');
 
@@ -386,6 +388,28 @@ export class ListView extends View {
 		if (this.editing && this.tbody) {
 			return;
 		}
+
+		// render at most once every 1000 msec
+		const nowTime = Date.now();
+		if (this.lastRenderTime != null) {
+			const timeSinceLastRender = nowTime - this.lastRenderTime,
+				maxRenderDelay = 1000;
+
+			if (timeSinceLastRender < maxRenderDelay) {
+				console.log("deferring render() impl");
+				if (this.deferredRenderTimer == null) {
+					this.deferredRenderTimer = setTimeout(() => {
+						console.log("doing deferred render() impl now");
+						this.render();
+						this.deferredRenderTimer = null;
+					}, maxRenderDelay - timeSinceLastRender);
+				}
+				return;
+			}
+		}
+		this.lastRenderTime = nowTime;
+		console.log("immediate render()");
+
 		while(this.tbody.hasChildNodes()) {
 			this.tbody.removeChild(this.tbody.firstElementChild);
 		}
