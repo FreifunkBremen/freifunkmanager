@@ -6,15 +6,17 @@ import {singelton as notify} from './element/notify';
 
 const router = new Navigo(null, true, '#'),
 	elMain = domlib.newEl('main'),
-	elMenu = new MenuView();
+	elMenu = new MenuView(),
+	GUI_RENDER_DEBOUNCER_TIME = 100;
 
 export {router};
 
 let init = false,
 	currentView = new View();
 
-export function render () {
+function renderView () {
 	if (!document.body) {
+		window.setTimeout(renderView, GUI_RENDER_DEBOUNCER_TIME);
 		return;
 	}
 
@@ -26,13 +28,27 @@ export function render () {
 
 		init = true;
 	}
-
 	currentView.render();
 
 	notify.render();
 	elMenu.render();
 
 	router.resolve();
+}
+
+export function render () {
+	let timeout = false;
+
+	function reset () {
+		timeout = null;
+	}
+	if (timeout) {
+			console('skip rendering to often');
+			window.clearTimeout(timeout);
+	}else{
+		renderView();
+	}
+	timeout = window.setTimeout(reset, GUI_RENDER_DEBOUNCER_TIME);
 }
 
 export function setView (toView) {
