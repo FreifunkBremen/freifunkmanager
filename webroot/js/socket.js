@@ -159,10 +159,10 @@ export function delEvent (to, func) {
 export function sendnode(node, callback) {
 	sendjson({'subject':'node-system','body': node}, (msg) => {
 		if(msg.body){
-			notify.send({
+			/*notify.send({
 				'header': 'Speichern',
 				'type': 'success',
-			}, `Einstellungen für '${node.node_id}' gespeichert.`);
+			}, `Einstellungen für '${node.node_id}' gespeichert.`);*/
 		}else{
 			notify.send({
 				'header': 'Speichern',

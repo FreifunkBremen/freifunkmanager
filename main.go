@@ -65,6 +65,7 @@ func main() {
 			Port:          config.Yanic.Port,
 		}})
 		defer collector.Close()
+		log.Info("started Yanic collector")
 	}
 
 	// Startwebserver

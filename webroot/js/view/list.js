@@ -10,6 +10,8 @@ export class ListView extends View {
 
 	constructor () {
 		super();
+		this.lastRenderTime = null;
+		this.deferredRenderTimer = null;
 		const table = domlib.newAt(this.el, 'table'),
 			thead = domlib.newAt(table, 'thead');
 
@@ -38,7 +40,9 @@ export class ListView extends View {
 		this.nodeidFilter = domlib.newAt(cell2, 'input');
 		this.nodeidFilter.setAttribute('placeholder', 'NodeID');
 		this.nodeidFilter.setAttribute('size', '9');
-		this.nodeidFilter.addEventListener('keyup', this.render);
+		this.nodeidFilter.addEventListener('keyup', () => {
+			this.render();
+		});
 		cell2.addEventListener('dblclick', () => {
 			this.sortTable(cell2);
 		});
@@ -55,7 +59,9 @@ export class ListView extends View {
 		cell3.classList.add('hostname');
 		this.hostnameFilter = domlib.newAt(cell3, 'input');
 		this.hostnameFilter.setAttribute('placeholder', 'Hostname');
-		this.hostnameFilter.addEventListener('keyup', this.render);
+		this.hostnameFilter.addEventListener('keyup', () => {
+			this.render();
+		});
 		cell3.addEventListener('dblclick', () => {
 			this.sortTable(cell3);
 		});
@@ -110,6 +116,8 @@ export class ListView extends View {
 		cell11.innerHTML = 'Option';
 
 		table.classList.add('nodes');
+
+		this.footerNote = domlib.newAt(this.el, 'span');
 	}
 
 	// eslint-disable-next-line id-length
@@ -190,9 +198,9 @@ export class ListView extends View {
 		}
 
 
-		lastseen.innerHTML = FromNowAgo(node.lastseen);
+		lastseen.textContent = FromNowAgo(node.lastseen);
 
-		nodeID.innerHTML = node.node_id;
+		nodeID.textContent = node.node_id;
 
 		hostnameInput.value = node.hostname;
 		hostnameInput.readOnly = true;
@@ -217,13 +225,13 @@ export class ListView extends View {
 			});
 		});
 
-		domlib.newAt(freq, 'span').innerHTML = '2.4 Ghz';
-		domlib.newAt(freq, 'span').innerHTML = '5 Ghz';
+		domlib.newAt(freq, 'span').textContent = '2.4 Ghz';
+		domlib.newAt(freq, 'span').textContent = '5 Ghz';
 
 		/* eslint-disable no-underscore-dangle */
 		if (node._wireless) {
-			domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel24 || '-';
-			domlib.newAt(curchannel, 'span').innerHTML = node._wireless.channel5 || '-';
+			domlib.newAt(curchannel, 'span').textContent = node._wireless.channel24 || '-';
+			domlib.newAt(curchannel, 'span').textContent = node._wireless.channel5 || '-';
 		}
 		/* eslint-enable no-underscore-dangle */
 
@@ -283,8 +291,8 @@ export class ListView extends View {
 
 		/* eslint-disable no-underscore-dangle */
 		if (node._wireless) {
-			domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower24 || '-';
-			domlib.newAt(curpower, 'span').innerHTML = node._wireless.txpower5 || '-';
+			domlib.newAt(curpower, 'span').textContent = node._wireless.txpower24 || '-';
+			domlib.newAt(curpower, 'span').textContent = node._wireless.txpower5 || '-';
 		}
 		/* eslint-enable no-underscore-dangle */
 
@@ -340,8 +348,8 @@ export class ListView extends View {
 			});
 		});
 
-		domlib.newAt(client, 'span').innerHTML = node.statistics.clients.wifi24;
-		domlib.newAt(client, 'span').innerHTML = node.statistics.clients.wifi5;
+		domlib.newAt(client, 'span').textContent = node.statistics.clients.wifi24;
+		domlib.newAt(client, 'span').textContent = node.statistics.clients.wifi5;
 
 		/* eslint-disable id-length, no-magic-numbers,one-var */
 		const chanUtil24 = node.statistics.wireless
@@ -352,11 +360,11 @@ export class ListView extends View {
 				: {};
 		/* eslint-enable id-length, no-magic-numbers,one-var */
 
-		domlib.newAt(chanUtil, 'span').innerHTML = chanUtil24.ChanUtil || '-';
-		domlib.newAt(chanUtil, 'span').innerHTML = chanUtil5.ChanUtil || '-';
+		domlib.newAt(chanUtil, 'span').textContent = chanUtil24.ChanUtil || '-';
+		domlib.newAt(chanUtil, 'span').textContent = chanUtil5.ChanUtil || '-';
 
 		edit.classList.add('btn');
-		edit.innerHTML = 'Edit';
+		edit.textContent = 'Edit';
 		edit.addEventListener('click', () => {
 			gui.router.navigate(gui.router.generate('node', {'nodeID': node.node_id}));
 		});
@@ -386,6 +394,28 @@ export class ListView extends View {
 		if (this.editing && this.tbody) {
 			return;
 		}
+
+		// render at most once every 1000 msec
+		const nowTime = Date.now();
+		if (this.lastRenderTime != null) {
+			const timeSinceLastRender = nowTime - this.lastRenderTime,
+				maxRenderDelay = 1000;
+
+			if (timeSinceLastRender < maxRenderDelay) {
+				console.log("deferring render() impl");
+				if (this.deferredRenderTimer == null) {
+					this.deferredRenderTimer = setTimeout(() => {
+						console.log("doing deferred render() impl now");
+						this.render();
+						this.deferredRenderTimer = null;
+					}, maxRenderDelay - timeSinceLastRender);
+				}
+				return;
+			}
+		}
+		this.lastRenderTime = nowTime;
+		console.log("immediate render()");
+
 		while(this.tbody.hasChildNodes()) {
 			this.tbody.removeChild(this.tbody.firstElementChild);
 		}
@@ -406,10 +436,20 @@ export class ListView extends View {
 			nodes = nodes.reverse();
 		}
 
-		for (let i = 0; i < nodes.length; i += 1) {
-			const row = this.renderRow(nodes[i]);
+		const numDisplayedNodes = Math.min(10, nodes.length);
 
-			this.tbody.appendChild(row);
+		var fragment = document.createDocumentFragment();
+		for (let i = 0; i < numDisplayedNodes; i += 1) {
+			const row = this.renderRow(nodes[i]);
+			fragment.appendChild(row);
+		}
+		this.tbody.appendChild(fragment);
+
+		if (numDisplayedNodes < nodes.length) {
+			this.footerNote.textContent = "" + (nodes.length - numDisplayedNodes) + " further nodes hidden.";
+		}
+		else {
+			this.footerNote.textContent = "";
 		}
 	}
 }

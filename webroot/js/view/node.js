@@ -94,21 +94,30 @@ export class NodeView extends View {
 		this.btnGPS.classList.add('btn');
 		this.btnGPS.innerHTML = 'Start follow position';
 		this.btnGPS.addEventListener('click', () => {
-			if (this.editLocationGPS) {
-				if (this.btnGPS.innerHTML === 'Stop following') {
-					updatePosition();
+			if (this.editLocationGPS != null) {
+				if (this.gpsPosition) {
+					this.updatePosition(this.gpsPosition.latitude, this.gpsPosition.longitude);
+				}
+				else {
+					this.gpsStatusText.innerHTML = "";
 				}
 				this.btnGPS.innerHTML = 'Start follow position';
 				navigator.geolocation.clearWatch(this.editLocationGPS);
-				this.editLocationGPS = false;
-
+				this.editLocationGPS = null;
 				return;
 			}
-			this.btnGPS.innerHTML = 'Following position';
+
+			this.gpsPosition = null;
+			this.btnGPS.innerHTML = 'Stop following';
+			this.gpsStatusText.innerHTML = "waiting for location...";
 			if (navigator.geolocation) {
 				this.editLocationGPS = navigator.geolocation.watchPosition((position) => {
-					this.btnGPS.innerHTML = 'Stop following';
-					this.this.storePosition = position.coords;
+					this.gpsStatusText.innerHTML = "GPS location at " +
+						new Date(position.timestamp).toLocaleTimeString() + ": " +
+						position.coords.latitude.toFixed(5) + " / " +
+						position.coords.longitude.toFixed(5);
+
+					this.gpsPosition = position.coords;
 					const latlng = [position.coords.latitude, position.coords.longitude];
 
 					this.marker.setLatLng(latlng);
@@ -131,13 +140,43 @@ export class NodeView extends View {
 				notify.send('error', 'Browser did not support Location');
 			}
 		});
+		this.gpsStatusText = domlib.newAt(this.el, 'span');
+		this.gpsStatusText.classList.add('withTextMargins');
+
+		this.createLoadBtn = domlib.newAt(this.el, 'span');
+		this.createLoadBtn.classList.add('btn');
+		this.createLoadBtn.innerHTML = 'Create Heavy Load';
+		this.loadIntervalId = null;
+		this.createLoadBtn.addEventListener('click', () => {
+			console.log("starting to create load for " + this.currentNodeID);
+			if (this.loadIntervalId == null) {
+				this.createLoadBtn.innerHTML = 'Creating Load...';
+				this.loadIntervalId = setInterval(() => {
+					console.log("sending dummy data for node " + this.currentNodeID);
+
+					const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
+						localNodeCopy = Object.assign({}, node),
+						nowTime = new Date(),
+						dummyData = "test_" + nowTime.toLocaleTimeString() + "." + nowTime.getMilliseconds();
+					//localNodeCopy.owner = dummyData;
+					localNodeCopy.hostname = dummyData;
+					socket.sendnode(localNodeCopy);
+
+				}, 200);
+			}
+			else {
+				clearInterval(this.loadIntervalId);
+				this.loadIntervalId = null;
+				this.createLoadBtn.innerHTML = 'Create Heavy Load';
+			}
+		});
 	}
 
 	updatePosition (lat, lng) {
 		const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
 			localNodeCopy = Object.assign({}, node),
-			newLat = lat || this.storePosition.latitude || false,
-			newlng = lng || this.storePosition.longitude || false;
+			newLat = lat || this.gpsPosition.latitude || false,
+			newlng = lng || this.gpsPosition.longitude || false;
 
 		if (!newLat || !newlng) {
 			return;
@@ -158,7 +197,6 @@ export class NodeView extends View {
 
 		if (!node) {
 			console.log(`internal error: node not found: ${this.currentNodeID}`);
-
 			return;
 		}
 
@@ -171,20 +209,23 @@ export class NodeView extends View {
 			this.ago.classList.add('online');
 		}
 		this.ago.innerHTML = `${FromNowAgo(node.lastseen)} (${node.lastseen})`;
-		if (this.editLocationGPS || this.editing || !node.location || !node.location.latitude || !node.location.longitude) {
-			return;
-		}
+
 		this.titleName.innerHTML = node.hostname;
-		this.hostnameInput.value = node.hostname;
-		this.ownerInput.value = node.owner;
 
-		// eslint-disable-next-line one-var
-		const latlng = [node.location.latitude, node.location.longitude];
+		if (!this.editing) { // don't change input fields while user is editing
+			this.hostnameInput.value = node.hostname;
+			this.ownerInput.value = node.owner;
 
-		this.map.setView(latlng);
-		this.marker.setLatLng(latlng);
-		this.marker.setOpacity(1);
-		this.map.invalidateSize();
+			if (this.editLocationGPS == null && node.location && node.location.latitude && node.location.longitude) {
+				// eslint-disable-next-line one-var
+				const latlng = [node.location.latitude, node.location.longitude];
+
+				this.map.setView(latlng);
+				this.marker.setLatLng(latlng);
+				this.marker.setOpacity(1);
+				this.map.invalidateSize();
+			}
+		}
 	}
 
 	setNodeID (nodeID) {

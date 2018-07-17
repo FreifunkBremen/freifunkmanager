@@ -22,7 +22,7 @@ func (ws *WebsocketServer) loginHandler(logger *log.Entry, msg *websocket.Messag
 	ok = (ws.secret == secret)
 	if ok {
 		ws.loggedIn[msg.Session] = true
-		logger.Debug("done")
+		logger.Debug("login done")
 	} else {
 		logger.Warn("wrong secret")
 	}
@@ -32,7 +32,7 @@ func (ws *WebsocketServer) loginHandler(logger *log.Entry, msg *websocket.Messag
 
 func (ws *WebsocketServer) authStatusHandler(logger *log.Entry, msg *websocket.Message) error {
 	login, ok := ws.loggedIn[msg.Session]
-	defer logger.Debug("done")
+	defer logger.Debug("auth status done")
 	if !ok {
 		msg.Answer(msg.Subject, false)
 		return nil
@@ -49,7 +49,7 @@ func (ws *WebsocketServer) logoutHandler(logger *log.Entry, msg *websocket.Messa
 	}
 	ws.loggedIn[msg.Session] = false
 	delete(ws.loggedIn, msg.Session)
-	logger.Debug("done")
+	logger.Debug("logout done")
 	msg.Answer(msg.Subject, true)
 	return nil
 }
