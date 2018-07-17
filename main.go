@@ -58,13 +58,19 @@ func main() {
 	nodes.AddNotifyStats(ws.SendStats)
 	nodes.AddNotifyNode(ws.SendNode)
 
-	if config.Yanic.Enable {
-		collector = respondYanic.NewCollector(db, nodesYanic, make(map[string][]string), []respondYanic.InterfaceConfig{respondYanic.InterfaceConfig{
-			InterfaceName: config.Yanic.InterfaceName,
-			IPAddress:     config.Yanic.Address,
-			Port:          config.Yanic.Port,
-		}})
+	if config.YanicEnable {
+		if duration := config.YanicSynchronize.Duration; duration > 0 {
+			now := time.Now()
+			delay := duration - now.Sub(now.Truncate(duration))
+			log.Printf("delaying %0.1f seconds", delay.Seconds())
+			time.Sleep(delay)
+		}
+		collector = respondYanic.NewCollector(db, nodesYanic, make(map[string][]string), []respondYanic.InterfaceConfig{config.Yanic})
+		if duration := config.YanicCollectInterval.Duration; duration > 0 {
+			collector.Start(config.YanicCollectInterval.Duration)
+		}
 		defer collector.Close()
+		log.Info("started Yanic collector")
 	}
 
 	// Startwebserver
@@ -97,9 +103,6 @@ func main() {
 
 	// Stop services
 	srv.Close()
-	if config.Yanic.Enable {
-		collector.Close()
-	}
 	nodesSaveWorker.Close()
 	nodesUpdateWorker.Close()
 

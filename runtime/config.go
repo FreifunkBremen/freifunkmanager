@@ -1,5 +1,11 @@
 package runtime
 
+import (
+	"github.com/FreifunkBremen/yanic/lib/duration"
+
+	respondYanic "github.com/FreifunkBremen/yanic/respond"
+)
+
 //config file of this daemon (for more the config_example.conf in git repository)
 type Config struct {
 	// prevent crashes
@@ -18,10 +24,8 @@ type Config struct {
 	SSHInterface  string `toml:"ssh_interface"`
 
 	// yanic socket
-	Yanic struct {
-		Enable        bool   `toml:"enable"`
-		InterfaceName string `toml:"ifname"`
-		Address       string `toml:"address"`
-		Port          int    `toml:"port"`
-	} `toml:"yanic"`
+	YanicEnable          bool                         `toml:"yanic_enable"`
+	YanicSynchronize     duration.Duration            `toml:"yanic_synchronize"`
+	YanicCollectInterval duration.Duration            `toml:"yanic_collect_interval"`
+	Yanic                respondYanic.InterfaceConfig `toml:"yanic"`
 }
