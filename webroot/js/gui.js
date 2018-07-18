@@ -1,4 +1,5 @@
 import * as domlib from './domlib';
+import * as lib from './lib';
 import {MenuView} from './element/menu';
 import Navigo from '../node_modules/navigo/lib/navigo';
 import View from './view';
@@ -11,8 +12,14 @@ const router = new Navigo(null, true, '#'),
 
 export {router};
 
+
 let init = false,
-	currentView = new View();
+	currentView = new View(),
+	debouncer = new lib.Debouncer(GUI_RENDER_DEBOUNCER_TIME, "gui render");
+
+export function render () {
+	debouncer.run(renderView);
+}
 
 function renderView () {
 	if (!document.body) {
@@ -35,26 +42,6 @@ function renderView () {
 	router.resolve();
 }
 
-
-let renderDebounceTimer = null,
-	numRenderCallsSkipped = 0;
-
-export function render () {
-	if (renderDebounceTimer == null) {
-		renderView();
-		renderDebounceTimer = window.setTimeout(() => {
-			renderDebounceTimer = null;
-			if (numRenderCallsSkipped > 0) {
-				console.log("skipped " + numRenderCallsSkipped + " render calls; calling render() now");
-				numRenderCallsSkipped = 0;
-				render();
-			}
-		}, GUI_RENDER_DEBOUNCER_TIME);
-	} else {
-		console.log("skip rendering");
-		numRenderCallsSkipped++;
-	}
-}
 
 export function setView (toView) {
 	currentView.unbind();

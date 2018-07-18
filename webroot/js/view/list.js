@@ -1,5 +1,6 @@
 import * as domlib from '../domlib';
 import * as gui from '../gui';
+import * as lib from '../lib';
 import * as socket from '../socket';
 import * as store from '../store';
 import config from '../config';
@@ -10,6 +11,7 @@ export class ListView extends View {
 
 	constructor () {
 		super();
+		this.debouncer = new lib.Debouncer(1000, "list render");
 		const table = domlib.newAt(this.el, 'table'),
 			thead = domlib.newAt(table, 'thead');
 
@@ -387,6 +389,10 @@ export class ListView extends View {
 	}
 
 	render () {
+		this.debouncer.run(this.renderView);
+	}
+
+	renderView () {
 		if (this.editing && this.tbody) {
 			return;
 		}
