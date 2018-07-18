@@ -16,7 +16,6 @@ let init = false,
 
 function renderView () {
 	if (!document.body) {
-		window.setTimeout(renderView, GUI_RENDER_DEBOUNCER_TIME);
 		return;
 	}
 
@@ -36,19 +35,25 @@ function renderView () {
 	router.resolve();
 }
 
-export function render () {
-	let timeout = false;
 
-	function reset () {
-		timeout = null;
-	}
-	if (timeout) {
-			console('skip rendering to often');
-			window.clearTimeout(timeout);
-	}else{
+let renderDebounceTimer = null,
+	numRenderCallsSkipped = 0;
+
+export function render () {
+	if (renderDebounceTimer == null) {
 		renderView();
+		renderDebounceTimer = window.setTimeout(() => {
+			renderDebounceTimer = null;
+			if (numRenderCallsSkipped > 0) {
+				console.log("skipped " + numRenderCallsSkipped + " render calls; calling render() now");
+				numRenderCallsSkipped = 0;
+				render();
+			}
+		}, GUI_RENDER_DEBOUNCER_TIME);
+	} else {
+		console.log("skip rendering");
+		numRenderCallsSkipped++;
 	}
-	timeout = window.setTimeout(reset, GUI_RENDER_DEBOUNCER_TIME);
 }
 
 export function setView (toView) {
