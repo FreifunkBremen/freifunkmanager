@@ -10,7 +10,8 @@ const RECONNECT_AFTER = 5000,
 	eventTo = {};
 
 let connectionID = localStorage.getItem('session'),
-	socket = null;
+	socket = null,
+	connectionEstablished = false;
 
 function newUUID () {
 	/* eslint-disable */
@@ -42,6 +43,7 @@ function onerror (err) {
 }
 
 function onopen () {
+	connectionEstablished = true;
 	render();
 }
 
@@ -103,11 +105,14 @@ function onmessage (raw) {
 
 function onclose () {
 	console.log('socket closed by server');
-	notify.send({
-		'header': 'Verbindung',
-		'type': 'warning'
-	}, 'Verbindung zum Server beendet!');
+	if (connectionEstablished) {
+		notify.send({
+			'header': 'Verbindung',
+			'type': 'warning'
+		}, 'Verbindung zum Server beendet!');
+	}
 	render();
+	connectionEstablished = false;
 	// eslint-disable-next-line no-use-before-define
 	window.setTimeout(connect, RECONNECT_AFTER);
 }
