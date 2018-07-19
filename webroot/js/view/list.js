@@ -407,7 +407,7 @@ export class ListView extends View {
 	}
 
 	render () {
-		this.debouncer.run(this.renderView);
+		this.debouncer.run(() => { this.renderView(); });
 	}
 
 	renderView () {
