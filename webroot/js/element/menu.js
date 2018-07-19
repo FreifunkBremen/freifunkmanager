@@ -15,9 +15,6 @@ export class MenuView extends View {
 		const menuContainer = domlib.newAt(this.el, 'nav');
 		this.menuList = domlib.newAt(menuContainer, 'ul');
 
-		const logo = domlib.newAt(this.menuList, 'li', {'class':'logo'});
-		domlib.newAt(logo, 'img', {'src':'/img/logo.svg'});
-
 		const aList = domlib.newAt(this.menuList, 'li', {'class':'item-1'});
 		domlib.newAt(aList, 'a', {'href':'#/list'}, 'List');
 
