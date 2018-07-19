@@ -91,26 +91,26 @@ export class NodeView extends View {
 
 
 		this.btnGPS = domlib.newAt(this.el, 'span');
-		this.btnGPS.classList.add('btn');
-		this.btnGPS.innerHTML = 'Start follow position';
-		this.btnGPS.addEventListener('click', () => {
-			if (this.editLocationGPS != null) {
-				if (this.gpsPosition) {
-					this.updatePosition(this.gpsPosition.latitude, this.gpsPosition.longitude);
+		if (navigator.geolocation) {
+			this.btnGPS.classList.add('btn');
+			this.btnGPS.innerHTML = 'Start follow position';
+			this.btnGPS.addEventListener('click', () => {
+				if (this.editLocationGPS != null) {
+					if (this.gpsPosition) {
+						this.updatePosition(this.gpsPosition.latitude, this.gpsPosition.longitude);
+					}
+					else {
+						this.gpsStatusText.innerHTML = "";
+					}
+					this.btnGPS.innerHTML = 'Start follow position';
+					navigator.geolocation.clearWatch(this.editLocationGPS);
+					this.editLocationGPS = null;
+					return;
 				}
-				else {
-					this.gpsStatusText.innerHTML = "";
-				}
-				this.btnGPS.innerHTML = 'Start follow position';
-				navigator.geolocation.clearWatch(this.editLocationGPS);
-				this.editLocationGPS = null;
-				return;
-			}
 
-			this.gpsPosition = null;
-			this.btnGPS.innerHTML = 'Stop following';
-			this.gpsStatusText.innerHTML = "waiting for location...";
-			if (navigator.geolocation) {
+				this.gpsPosition = null;
+				this.btnGPS.innerHTML = 'Stop following';
+				this.gpsStatusText.innerHTML = "waiting for location...";
 				this.editLocationGPS = navigator.geolocation.watchPosition((position) => {
 					this.gpsStatusText.innerHTML = "GPS location at " +
 						new Date(position.timestamp).toLocaleTimeString() + ": " +
@@ -131,15 +131,15 @@ export class NodeView extends View {
 						console.error('a navigator geolocation error: ', error);
 					}
 				},
-					{
-						'enableHighAccuracy': true,
-						'maximumAge': 30000,
-						'timeout': 27000
-					});
-			} else {
-				notify.send('error', 'Browser did not support Location');
-			}
-		});
+				{
+					'enableHighAccuracy': true,
+					'maximumAge': 30000,
+					'timeout': 27000
+				});
+			});
+		} else {
+			this.btnGPS.innerHTML = '(Browser does not support geo-location)';
+		}
 		this.gpsStatusText = domlib.newAt(this.el, 'span');
 		this.gpsStatusText.classList.add('withTextMargins');
 	}
