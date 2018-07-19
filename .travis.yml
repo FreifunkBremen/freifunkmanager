@@ -7,4 +7,4 @@ install:
   - go get "golang.org/x/tools/cmd/cover"
 script:
   - ./.test-coverage
-  - go install github.com/FreifunkBremen/freifunkmanager/cmd/freifunkmanager
+  - go install github.com/FreifunkBremen/freifunkmanager
