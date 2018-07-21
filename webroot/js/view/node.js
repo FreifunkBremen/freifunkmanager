@@ -144,6 +144,18 @@ export class NodeView extends View {
 		}
 		this.gpsStatusText = domlib.newAt(this.el, 'span');
 		this.gpsStatusText.classList.add('withTextMargins');
+
+		this.resetLocationBtn = domlib.newAt(this.el, 'span');
+		this.resetLocationBtn.classList.add('btn');
+		this.resetLocationBtn.innerHTML = 'Reset Location';
+		this.resetLocationBtn.addEventListener('click', () => {
+			const node = store.getNode(this.currentNodeID) || store.createNode(this.currentNodeID),
+				localNodeCopy = Object.assign({}, node);
+
+			localNodeCopy.location = null;
+			this.currentNodeIsRendered = false;
+			socket.sendnode(localNodeCopy);
+		});
 	}
 
 	updatePosition (lat, lng) {
