@@ -22,6 +22,8 @@ export class NodeView extends View {
 			owner = domlib.newAt(this.el, 'p'),
 			mapEl = domlib.newAt(this.el, 'div');
 
+		this.currentNodeIsRendered = false;
+
 		this.titleName = domlib.newAt(title, 'span');
 		title.appendChild(document.createTextNode('  -  '));
 		this.titleID = domlib.newAt(title, 'i');
@@ -196,12 +198,22 @@ export class NodeView extends View {
 				this.marker.setLatLng(latlng);
 				this.marker.setOpacity(1);
 				this.map.invalidateSize();
+				this.currentNodeIsRendered = true;
 			}
+		}
+
+		if (!this.currentNodeIsRendered) {
+			this.map.setView(config.map.view.bound);
+			this.marker.setLatLng(config.map.view.bound);
+			this.marker.setOpacity(0.5);
+			this.map.invalidateSize();
+			this.currentNodeIsRendered = true;
 		}
 	}
 
 	setNodeID (nodeID) {
 		this.currentNodeID = nodeID;
+		this.currentNodeIsRendered = false;
 	}
 
 }
