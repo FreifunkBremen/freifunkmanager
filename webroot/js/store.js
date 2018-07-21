@@ -24,6 +24,9 @@ export function getNode (nodeid) {
 export function createNode (nodeid) {
 	return {
 		'node_id': nodeid,
+		'hostname': '',
+		'owner': '',
+		'lastseen': null,
 		'wireless': {
 			'channel24': config.node.channel24,
 			'channel5': config.node.channel5,
