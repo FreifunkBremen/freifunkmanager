@@ -28,22 +28,61 @@ export class MapView extends View {
 
 
 		this.geoJsonLayer = L.geoJson.ajax(config.map.geojson.url, config.map.geojson);
+		this.geoJsonLayer.name = "geojson";
 
 		this.nodeLayer = L.layerGroup();
+		this.nodeLayer.name = "nodes";
 		/* eslint-disable new-cap */
 		this.clientLayer24 = L.webGLHeatmap(config.map.heatmap.wifi24);
+		this.clientLayer24.name = "clientLayer24";
 		this.clientLayer5 = L.webGLHeatmap(config.map.heatmap.wifi5);
+		this.clientLayer5.name = "clientLayer5";
 		/* eslint-enable new-cap */
 		layerControl.addOverlay(this.geoJsonLayer, 'geojson');
 		layerControl.addOverlay(this.nodeLayer, 'Nodes');
 		layerControl.addOverlay(this.clientLayer24, 'Clients 2.4 Ghz');
 		layerControl.addOverlay(this.clientLayer5, 'Clients 5 Ghz');
-		this.nodeLayer.addTo(this.map);
+
+		var enabledLayersStr = localStorage.getItem("mapLayers");
+		if (enabledLayersStr == null) {
+			// fall back to default list of enabled layers:
+			enabledLayersStr = [this.nodeLayer.name].join();
+		}
+
+		const enabledLayers = enabledLayersStr.split(",");
+		for (var i = 0; i < enabledLayers.length; i++) {
+			const layerName = enabledLayers[i];
+			for (var j = 0; j < layerControl._layers.length; j++) {
+				if (layerControl._layers[j].layer.name == layerName) {
+					layerControl._layers[j].layer.addTo(this.map);
+					break;
+				}
+			}
+		}
+
+		this.map.on({
+			overlayadd: (e) => {
+				this.saveMapSelection();
+			},
+			overlayremove: (e) => {
+				this.saveMapSelection();
+			}
+		});
 
 		window.addEventListener('resize', () => {
 			this.el.style.height = `${window.innerHeight - WINDOW_HEIGHT_MENU}px`;
 			this.map.invalidateSize();
 		});
+	}
+
+	saveMapSelection () {
+		var enabledLayers = [];
+		this.map.eachLayer((layer) => {
+			if (layer.name) {
+				enabledLayers.push(layer.name);
+			}
+		});
+		localStorage.setItem("mapLayers", enabledLayers.join());
 	}
 
 	addNode (node) {
