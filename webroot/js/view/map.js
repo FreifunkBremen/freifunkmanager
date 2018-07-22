@@ -141,19 +141,16 @@ export class MapView extends View {
 		for (let i = 0; i < nodes.length; i += 1) {
 			this.addNode(nodes[i]);
 		}
-		this.clientLayer24.setData(nodes.map((node) => {
-			if (!node.location || !node.location.latitude || !node.location.longitude) {
-				return null;
-			}
 
+		this.clientLayer24.setData(nodes.filter((node) => {
+			return (node.location && node.location.latitude && node.location.longitude);
+		}).map((node) => {
 			return [node.location.latitude, node.location.longitude, node.statistics.clients.wifi24 || 0];
 		}));
 
-		this.clientLayer5.setData(nodes.map((node) => {
-			if (!node.location || !node.location.latitude || !node.location.longitude) {
-				return null;
-			}
-
+		this.clientLayer5.setData(nodes.filter((node) => {
+			return (node.location && node.location.latitude && node.location.longitude);
+		}).map((node) => {
 			return [node.location.latitude, node.location.longitude, node.statistics.clients.wifi5 || 0];
 		}));
 		this.map.invalidateSize();
