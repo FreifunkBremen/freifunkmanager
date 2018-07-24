@@ -14,17 +14,19 @@ import (
 
 type YanicDB struct {
 	databaseYanic.Connection
-	nodes *Nodes
+	nodes  *Nodes
+	prefix string
 }
 
-func NewYanicDB(nodes *Nodes) *YanicDB {
+func NewYanicDB(nodes *Nodes, prefix string) *YanicDB {
 	return &YanicDB{
-		nodes: nodes,
+		nodes:  nodes,
+		prefix: prefix,
 	}
 }
 
 func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
-	node := NewNode(n)
+	node := NewNode(n, conn.prefix)
 	if node == nil {
 		return
 	}

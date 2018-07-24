@@ -20,8 +20,10 @@ type Config struct {
 	Secret string `toml:"secret"`
 
 	// SSH private key
-	SSHPrivateKey string `toml:"ssh_key"`
-	SSHInterface  string `toml:"ssh_interface"`
+	SSHPrivateKey      string            `toml:"ssh_key"`
+	SSHInterface       string            `toml:"ssh_interface"`
+	SSHIPAddressSuffix string            `toml:"ssh_ipaddress_suffix"`
+	SSHTimeout         duration.Duration `toml:"ssh_timeout"`
 
 	// yanic socket
 	YanicEnable          bool                         `toml:"yanic_enable"`

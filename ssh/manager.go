@@ -16,10 +16,11 @@ type Manager struct {
 	config           *ssh.ClientConfig
 	clientsBlacklist map[string]time.Time
 	clientsMUX       sync.Mutex
+	timeout          time.Duration
 }
 
 // create a new SSH Connection Manager by ssh file
-func NewManager(file string) *Manager {
+func NewManager(file string, timeout time.Duration) *Manager {
 	var auths []ssh.AuthMethod
 	if auth := SSHAgent(); auth != nil {
 		auths = append(auths, auth)
@@ -36,7 +37,32 @@ func NewManager(file string) *Manager {
 	return &Manager{
 		config:           sshConfig,
 		clientsBlacklist: make(map[string]time.Time),
+		timeout:          timeout,
 	}
+}
+
+// Conn wraps a net.Conn, and sets a deadline for every read
+// and write operation.
+type Conn struct {
+	net.Conn
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+}
+
+func (c *Conn) Read(b []byte) (int, error) {
+	err := c.Conn.SetReadDeadline(time.Now().Add(c.ReadTimeout))
+	if err != nil {
+		return 0, err
+	}
+	return c.Conn.Read(b)
+}
+
+func (c *Conn) Write(b []byte) (int, error) {
+	err := c.Conn.SetWriteDeadline(time.Now().Add(c.WriteTimeout))
+	if err != nil {
+		return 0, err
+	}
+	return c.Conn.Write(b)
 }
 
 func (m *Manager) ConnectTo(addr net.TCPAddr) (*ssh.Client, error) {
@@ -50,7 +76,20 @@ func (m *Manager) ConnectTo(addr net.TCPAddr) (*ssh.Client, error) {
 		}
 	}
 
-	client, err := ssh.Dial("tcp", addr.String(), m.config)
+	addrString := addr.String()
+
+	conn, err := net.DialTimeout("tcp", addrString, m.timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	timeoutConn := &Conn{conn, m.timeout, m.timeout}
+	c, chans, reqs, err := ssh.NewClientConn(timeoutConn, addrString, m.config)
+	if err != nil {
+		return nil, err
+	}
+
+	client := ssh.NewClient(c, chans, reqs)
 	if err != nil {
 		if strings.Contains(err.Error(), "no supported methods remain") {
 			m.clientsBlacklist[addr.IP.String()] = time.Now()

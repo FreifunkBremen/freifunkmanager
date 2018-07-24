@@ -44,13 +44,13 @@ func main() {
 
 	log.Info("starting...")
 
-	sshmanager := ssh.NewManager(config.SSHPrivateKey)
+	sshmanager := ssh.NewManager(config.SSHPrivateKey, config.SSHTimeout.Duration)
 	nodes = runtime.NewNodes(config.StatePath, config.SSHInterface, sshmanager)
 	nodesSaveWorker := worker.NewWorker(time.Duration(3)*time.Second, nodes.Saver)
 	nodesUpdateWorker := worker.NewWorker(time.Duration(3)*time.Minute, nodes.Updater)
 	nodesYanic := runtimeYanic.NewNodes(&runtimeYanic.NodesConfig{})
 
-	db := runtime.NewYanicDB(nodes)
+	db := runtime.NewYanicDB(nodes, config.SSHIPAddressSuffix)
 	go nodesSaveWorker.Start()
 	go nodesUpdateWorker.Start()
 

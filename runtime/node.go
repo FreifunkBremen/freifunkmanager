@@ -3,6 +3,7 @@ package runtime
 import (
 	"bytes"
 	"net"
+	"strings"
 
 	yanicData "github.com/FreifunkBremen/yanic/data"
 	"github.com/FreifunkBremen/yanic/lib/jsontime"
@@ -23,13 +24,16 @@ type Node struct {
 	} `json:"statistics" mapstructure:"-"`
 }
 
-func NewNode(nodeOrigin *yanicRuntime.Node) *Node {
+func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 	if nodeinfo := nodeOrigin.Nodeinfo; nodeinfo != nil {
 		node := &Node{
 			Hostname: nodeinfo.Hostname,
 			NodeID:   nodeinfo.NodeID,
 		}
 		for _, ip := range nodeinfo.Network.Addresses {
+			if !strings.HasPrefix(ip, ipPrefix) {
+				continue
+			}
 			ipAddr := net.ParseIP(ip)
 			if node.Address == nil || ipAddr.IsGlobalUnicast() {
 				node.Address = ipAddr

@@ -3,6 +3,7 @@ package ssh
 import (
 	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +13,7 @@ func TestExecute(t *testing.T) {
 
 	addr := net.TCPAddr{IP: net.ParseIP("fd2f:5119:f2c::127"), Port: 22}
 
-	mgmt := NewManager("~/.ssh/id_rsa")
+	mgmt := NewManager("~/.ssh/id_rsa", time.Second)
 	assert.NotNil(mgmt, "no new manager created")
 
 	client, err := mgmt.ConnectTo(addr)
