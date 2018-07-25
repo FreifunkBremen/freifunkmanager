@@ -20,7 +20,8 @@ type Nodes struct {
 	iface           string
 	notifyNodeFunc  []func(*Node, bool)
 	notifyStatsFunc []func(*runtimeYanic.GlobalStats)
-	sync.Mutex
+	ListMux         sync.RWMutex
+	CurrentMux      sync.RWMutex
 }
 
 func NewNodes(path string, iface string, mgmt *ssh.Manager) *Nodes {
@@ -67,32 +68,34 @@ func (nodes *Nodes) UpdateNode(node *Node) bool {
 		log.Warnf("wrong wifi5 channel for '%s'", node.NodeID)
 		return false
 	}
-	nodes.Lock()
-	defer nodes.Unlock()
+	nodes.ListMux.Lock()
 	if n, ok := nodes.List[node.NodeID]; ok {
 		node.Address = n.Address
 		go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 		log.Info("update node", node.NodeID)
 	}
 	nodes.List[node.NodeID] = node
+	nodes.ListMux.Unlock()
 	nodes.notifyNode(node, true)
 	return true
 }
 
 func (nodes *Nodes) Updater() {
-	nodes.Lock()
-	defer nodes.Unlock()
+	nodes.ListMux.RLock()
+	nodes.CurrentMux.RLock()
 	for nodeid, node := range nodes.List {
 		if n, ok := nodes.Current[nodeid]; ok {
 			go node.SSHUpdate(nodes.ssh, nodes.iface, n)
 		}
 	}
+	nodes.ListMux.RUnlock()
+	nodes.CurrentMux.RUnlock()
 	log.Info("updater per ssh")
 }
 
 func (nodes *Nodes) Saver() {
-	nodes.Lock()
+	nodes.ListMux.RLock()
 	file.SaveJSON(nodes.statePath, nodes)
-	nodes.Unlock()
+	nodes.ListMux.RUnlock()
 	log.Debug("saved state file")
 }

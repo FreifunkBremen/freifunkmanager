@@ -32,8 +32,7 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 	}
 	node.Lastseen = jsontime.Now()
 	logger := log.WithField("method", "LearnNode").WithField("node_id", node.NodeID)
-	conn.nodes.Lock()
-	defer conn.nodes.Unlock()
+	conn.nodes.ListMux.Lock()
 	if lNode := conn.nodes.List[node.NodeID]; lNode != nil {
 		lNode.Lastseen = jsontime.Now()
 		lNode.Stats = node.Stats
@@ -41,9 +40,12 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 		conn.nodes.List[node.NodeID] = node
 		conn.nodes.notifyNode(node, true)
 	}
+	conn.nodes.ListMux.Unlock()
+	conn.nodes.CurrentMux.Lock()
 	if _, ok := conn.nodes.Current[node.NodeID]; ok {
 		conn.nodes.Current[node.NodeID] = node
 		conn.nodes.notifyNode(node, false)
+		conn.nodes.CurrentMux.Unlock()
 		return
 	}
 	// session := nodes.ssh.ConnectTo(node.Address)
@@ -56,10 +58,13 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 	logger.Infof("new node with uptime: %s", uptime)
 
 	conn.nodes.Current[node.NodeID] = node
+	conn.nodes.CurrentMux.Unlock()
+	conn.nodes.ListMux.Lock()
 	if lNode := conn.nodes.List[node.NodeID]; lNode != nil {
 		lNode.Address = node.Address
 		go lNode.SSHUpdate(conn.nodes.ssh, conn.nodes.iface, node)
 	}
+	conn.nodes.ListMux.Unlock()
 	conn.nodes.notifyNode(node, false)
 }
 
