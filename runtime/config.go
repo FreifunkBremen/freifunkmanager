@@ -9,7 +9,8 @@ import (
 //config file of this daemon (for more the config_example.conf in git repository)
 type Config struct {
 	// prevent crashes
-	StatePath string `toml:"state_path"`
+	DatabaseType       string `toml:"db_type"`
+	DatabaseConnection string `toml:"db_connection"`
 
 	// address on which the api and static content webserver runs
 	WebserverBind string `toml:"webserver_bind"`
@@ -21,7 +22,6 @@ type Config struct {
 
 	// SSH private key
 	SSHPrivateKey      string            `toml:"ssh_key"`
-	SSHInterface       string            `toml:"ssh_interface"`
 	SSHIPAddressSuffix string            `toml:"ssh_ipaddress_suffix"`
 	SSHTimeout         duration.Duration `toml:"ssh_timeout"`
 

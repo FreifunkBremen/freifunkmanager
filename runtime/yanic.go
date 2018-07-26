@@ -3,6 +3,7 @@ package runtime
 import (
 	"time"
 
+	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 
 	databaseYanic "github.com/FreifunkBremen/yanic/database"
@@ -14,14 +15,20 @@ import (
 
 type YanicDB struct {
 	databaseYanic.Connection
-	nodes  *Nodes
-	prefix string
+	db        *gorm.DB
+	ssh       *ssh.Manager
+	sendNode  func(*Node, bool)
+	sendStats func(*runtimeYanic.GlobalStats)
+	prefix    string
 }
 
-func NewYanicDB(nodes *Nodes, prefix string) *YanicDB {
+func NewYanicDB(db *gorm.DB, ssh *ssh.Manager, sendNode func(*Node, bool), sendStats func(*runtimeYanic.GlobalStats), prefix string) *YanicDB {
 	return &YanicDB{
-		nodes:  nodes,
-		prefix: prefix,
+		db:        db,
+		ssh:       ssh,
+		sendNode:  sendNode,
+		sendStats: sendStats,
+		prefix:    prefix,
 	}
 }
 
@@ -32,40 +39,42 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 	}
 	node.Lastseen = jsontime.Now()
 	logger := log.WithField("method", "LearnNode").WithField("node_id", node.NodeID)
-	conn.nodes.ListMux.Lock()
-	if lNode := conn.nodes.List[node.NodeID]; lNode != nil {
-		lNode.Lastseen = jsontime.Now()
-		lNode.Stats = node.Stats
-	} else {
-		conn.nodes.List[node.NodeID] = node
-		conn.nodes.notifyNode(node, true)
+	lNode := Node{
+		NodeID: node.NodeID,
 	}
-	conn.nodes.ListMux.Unlock()
-	conn.nodes.CurrentMux.Lock()
-	if _, ok := conn.nodes.Current[node.NodeID]; ok {
-		conn.nodes.Current[node.NodeID] = node
-		conn.nodes.notifyNode(node, false)
-		conn.nodes.CurrentMux.Unlock()
+	if conn.db.First(&lNode).Error == nil {
+		conn.db.Model(&lNode).Update(map[string]interface{}{
+			"Lastseen": jsontime.Now(),
+			//"StatsWireless": node.StatsWireless,
+			//"StatsClients":  node.StatsClients,
+			"Address": node.Address,
+		})
+		conn.sendNode(node, false)
+		if lNode.Blacklist {
+			logger.Debug("on blacklist")
+			return
+		}
+		if !node.IsEqual(&lNode) {
+			lNode.SSHUpdate(conn.ssh, node)
+			logger.Debug("run sshupdate again")
+		}
+		logger.Debug("yanic update")
 		return
 	}
-	// session := nodes.ssh.ConnectTo(node.Address)
-	result, err := conn.nodes.ssh.RunOn(node.GetAddress(conn.nodes.iface), "uptime")
-	if err != nil {
-		logger.Debug("init ssh command not run", err)
-		return
-	}
-	uptime := ssh.SSHResultToString(result)
-	logger.Infof("new node with uptime: %s", uptime)
 
-	conn.nodes.Current[node.NodeID] = node
-	conn.nodes.CurrentMux.Unlock()
-	conn.nodes.ListMux.Lock()
-	if lNode := conn.nodes.List[node.NodeID]; lNode != nil {
-		lNode.Address = node.Address
-		go lNode.SSHUpdate(conn.nodes.ssh, conn.nodes.iface, node)
+	node.Lastseen = jsontime.Now()
+
+	_, err := conn.ssh.RunOn(node.GetAddress(), "uptime")
+	if err != nil {
+		logger.Debug("set on blacklist")
+		node.Blacklist = true
 	}
-	conn.nodes.ListMux.Unlock()
-	conn.nodes.notifyNode(node, false)
+	conn.db.Create(&node)
+	conn.sendNode(node, true)
+	if err == nil {
+		lNode.SSHUpdate(conn.ssh, node)
+		logger.Debug("run sshupdate")
+	}
 }
 
 func (conn *YanicDB) InsertLink(link *runtimeYanic.Link, time time.Time) {
@@ -73,7 +82,7 @@ func (conn *YanicDB) InsertLink(link *runtimeYanic.Link, time time.Time) {
 
 func (conn *YanicDB) InsertGlobals(stats *runtimeYanic.GlobalStats, time time.Time, site string, domain string) {
 	if runtimeYanic.GLOBAL_SITE == site && runtimeYanic.GLOBAL_DOMAIN == domain {
-		conn.nodes.notifyStats(stats)
+		conn.sendStats(stats)
 	}
 
 }

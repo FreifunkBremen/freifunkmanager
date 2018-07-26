@@ -1,7 +1,6 @@
 package runtime
 
 import (
-	"bytes"
 	"net"
 	"strings"
 
@@ -11,14 +10,15 @@ import (
 )
 
 type Node struct {
-	Lastseen jsontime.Time      `json:"lastseen" mapstructure:"-"`
-	NodeID   string             `json:"node_id" mapstructure:"node_id"`
-	Hostname string             `json:"hostname"`
-	Location yanicData.Location `json:"location"`
-	Wireless yanicData.Wireless `json:"wireless"`
-	Owner    string             `json:"owner"`
-	Address  net.IP             `json:"ip" mapstructure:"-"`
-	Stats    struct {
+	Lastseen  jsontime.Time      `json:"lastseen" mapstructure:"-"`
+	NodeID    string             `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
+	Hostname  string             `json:"hostname"`
+	Location  yanicData.Location `json:"location" gorm:"embedded;embedded_prefix:location_"`
+	Wireless  yanicData.Wireless `json:"wireless" gorm:"embedded;embedded_prefix:wireless_"`
+	Owner     string             `json:"owner"`
+	Blacklist bool               `json:"blacklist" gorm:"-" mapstructure:"-"`
+	Address   string             `json:"ip" mapstructure:"-"`
+	Stats     struct {
 		Wireless yanicData.WirelessStatistics `json:"wireless"`
 		Clients  yanicData.Clients            `json:"clients"`
 	} `json:"statistics" mapstructure:"-"`
@@ -35,8 +35,8 @@ func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 				continue
 			}
 			ipAddr := net.ParseIP(ip)
-			if node.Address == nil || ipAddr.IsGlobalUnicast() {
-				node.Address = ipAddr
+			if node.Address == "" || ipAddr.IsGlobalUnicast() {
+				node.Address = ipAddr.String()
 			}
 		}
 		if owner := nodeinfo.Owner; owner != nil {
@@ -56,14 +56,14 @@ func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 	}
 	return nil
 }
-func (n *Node) GetAddress(iface string) net.TCPAddr {
-	return net.TCPAddr{IP: n.Address, Port: 22, Zone: iface}
+func (n *Node) GetAddress() net.TCPAddr {
+	return net.TCPAddr{IP: net.ParseIP(n.Address), Port: 22}
 }
 func (n *Node) Update(node *yanicRuntime.Node) {
 	if nodeinfo := node.Nodeinfo; nodeinfo != nil {
 		n.Hostname = nodeinfo.Hostname
 		n.NodeID = nodeinfo.NodeID
-		n.Address = node.Address.IP
+		n.Address = node.Address.IP.String()
 
 		if owner := nodeinfo.Owner; owner != nil {
 			n.Owner = owner.Contact
@@ -80,7 +80,7 @@ func (n *Node) IsEqual(node *Node) bool {
 	if n.NodeID != node.NodeID {
 		return false
 	}
-	if !bytes.Equal(n.Address, node.Address) {
+	if n.Address != node.Address {
 		return false
 	}
 	if n.Hostname != node.Hostname {

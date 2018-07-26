@@ -3,14 +3,16 @@ package websocket
 import (
 	"net/http"
 
-	wsLib "github.com/genofire/golang-lib/websocket"
+	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
 	"github.com/google/uuid"
+	"github.com/jinzhu/gorm"
 
-	"github.com/FreifunkBremen/freifunkmanager/runtime"
+	"github.com/FreifunkBremen/yanic/runtime"
 )
 
 type WebsocketServer struct {
 	nodes    *runtime.Nodes
+	db       *gorm.DB
 	secret   string
 	loggedIn map[uuid.UUID]bool
 
@@ -19,9 +21,10 @@ type WebsocketServer struct {
 	handlers map[string]WebsocketHandlerFunc
 }
 
-func NewWebsocketServer(secret string, nodes *runtime.Nodes) *WebsocketServer {
+func NewWebsocketServer(secret string, db *gorm.DB, nodes *runtime.Nodes) *WebsocketServer {
 	ownWS := WebsocketServer{
 		nodes:    nodes,
+		db:       db,
 		handlers: make(map[string]WebsocketHandlerFunc),
 		loggedIn: make(map[uuid.UUID]bool),
 		inputMSG: make(chan *wsLib.Message),

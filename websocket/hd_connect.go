@@ -3,7 +3,7 @@ package websocket
 import (
 	log "github.com/sirupsen/logrus"
 
-	wsLib "github.com/genofire/golang-lib/websocket"
+	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
 
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 )
@@ -12,20 +12,25 @@ var wifi24Channels []uint32
 var wifi5Channels []uint32
 
 func (ws *WebsocketServer) connectHandler(logger *log.Entry, msg *wsLib.Message) error {
-	msg.From.Write(&wsLib.Message{Subject: MessageTypeStats, Body: ws.nodes.Statistics})
-	ws.nodes.ListMux.RLock()
+	//msg.From.Write(&wsLib.Message{Subject: MessageTypeStats, Body: ws.nodes.Statistics})
+	var nodes []*runtime.Node
+	var count int
+
+	ws.db.Find(&nodes).Count(&count)
+
+	ws.nodes.Lock()
+	i := 0
 	for _, node := range ws.nodes.List {
+		msg.From.Write(&wsLib.Message{Subject: MessageTypeCurrentNode, Body: node})
+		i++
+	}
+	ws.nodes.Unlock()
+	for _, node := range nodes {
 		msg.From.Write(&wsLib.Message{Subject: MessageTypeSystemNode, Body: node})
 	}
-	ws.nodes.ListMux.RUnlock()
-	ws.nodes.CurrentMux.RLock()
-	for _, node := range ws.nodes.Current {
-		msg.From.Write(&wsLib.Message{Subject: MessageTypeCurrentNode, Body: node})
-	}
-	ws.nodes.CurrentMux.RUnlock()
 	msg.From.Write(&wsLib.Message{Subject: MessageTypeChannelsWifi24, Body: wifi24Channels})
 	msg.From.Write(&wsLib.Message{Subject: MessageTypeChannelsWifi5, Body: wifi5Channels})
-	logger.Debug("done")
+	logger.Debugf("done - fetch %d nodes and send %d", count, i)
 	return nil
 }
 

@@ -281,8 +281,6 @@ export class ListView extends View {
 		channel5Input.value = node.wireless.channel5 || '';
 		channel5Input.type = 'number';
 		channel5Input.min = 36;
-		channel5Input.max = 165;
-		channel5Input.step = 4;
 		channel5Input.readOnly = true;
 		channel5Input.setAttribute('placeholder', '-');
 		channel5Input.addEventListener('dblclick', () => {

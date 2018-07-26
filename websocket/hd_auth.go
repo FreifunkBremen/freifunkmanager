@@ -1,14 +1,30 @@
 package websocket
 
 import (
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/genofire/golang-lib/websocket"
+	"dev.sum7.eu/genofire/golang-lib/websocket"
 )
 
+type Auth struct {
+	SessionID uuid.UUID
+}
+
+func (ws *WebsocketServer) IsLoggedIn(msg *websocket.Message) bool {
+	auth := Auth{
+		SessionID: msg.Session,
+	}
+	err := ws.db.First(&auth)
+	return err.Error == nil
+}
+
 func (ws *WebsocketServer) loginHandler(logger *log.Entry, msg *websocket.Message) error {
-	_, ok := ws.loggedIn[msg.Session]
-	if ok {
+	auth := Auth{
+		SessionID: msg.Session,
+	}
+	err := ws.db.First(&auth)
+	if err.Error == nil {
 		msg.Answer(msg.Subject, true)
 		logger.Warn("already loggedIn")
 		return nil
@@ -21,7 +37,12 @@ func (ws *WebsocketServer) loginHandler(logger *log.Entry, msg *websocket.Messag
 	}
 	ok = (ws.secret == secret)
 	if ok {
-		ws.loggedIn[msg.Session] = true
+		err = ws.db.Create(&auth)
+		if err.Error != nil {
+			log.Warnf("database error: %s", err.Error.Error())
+			msg.Answer(msg.Subject, false)
+			return err.Error
+		}
 		logger.Debug("done")
 	} else {
 		logger.Warn("wrong secret")
@@ -31,25 +52,23 @@ func (ws *WebsocketServer) loginHandler(logger *log.Entry, msg *websocket.Messag
 }
 
 func (ws *WebsocketServer) authStatusHandler(logger *log.Entry, msg *websocket.Message) error {
-	login, ok := ws.loggedIn[msg.Session]
 	defer logger.Debug("done")
-	if !ok {
-		msg.Answer(msg.Subject, false)
-		return nil
-	}
-	msg.Answer(msg.Subject, login)
+
+	msg.Answer(msg.Subject, ws.IsLoggedIn(msg))
 	return nil
 }
 func (ws *WebsocketServer) logoutHandler(logger *log.Entry, msg *websocket.Message) error {
-	_, ok := ws.loggedIn[msg.Session]
-	if !ok {
+	auth := Auth{
+		SessionID: msg.Session,
+	}
+	err := ws.db.First(&auth)
+	if err.Error != nil {
 		msg.Answer(msg.Subject, false)
 		logger.Warn("logout without login")
 		return nil
 	}
-	ws.loggedIn[msg.Session] = false
-	delete(ws.loggedIn, msg.Session)
+	err = ws.db.Delete(&auth)
 	logger.Debug("done")
-	msg.Answer(msg.Subject, true)
-	return nil
+	msg.Answer(msg.Subject, err.Error == nil)
+	return err.Error
 }

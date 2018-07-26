@@ -3,7 +3,7 @@ package websocket
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/genofire/golang-lib/websocket"
+	"dev.sum7.eu/genofire/golang-lib/websocket"
 )
 
 type WebsocketHandlerFunc func(*log.Entry, *websocket.Message) error

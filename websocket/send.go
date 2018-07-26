@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	wsLib "github.com/genofire/golang-lib/websocket"
+	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
 
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
 

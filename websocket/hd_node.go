@@ -4,18 +4,18 @@ import (
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 
-	wsLib "github.com/genofire/golang-lib/websocket"
+	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
 
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 )
 
 func (ws *WebsocketServer) nodeHandler(logger *log.Entry, msg *wsLib.Message) error {
-	if ok, exists := ws.loggedIn[msg.Session]; !ok || !exists {
+	if !ws.IsLoggedIn(msg) {
 		msg.Answer(msg.Subject, false)
 		logger.Warn("not logged in")
 		return nil
 	}
-	node := runtime.Node{}
+	var node runtime.Node
 	if err := mapstructure.Decode(msg.Body, &node); err != nil {
 		msg.Answer(msg.Subject, false)
 		logger.Warnf("not able to decode data: %s", err)
@@ -27,7 +27,30 @@ func (ws *WebsocketServer) nodeHandler(logger *log.Entry, msg *wsLib.Message) er
 		logger.Debugf("%v", node)
 		return nil
 	}
-	msg.Answer(msg.Subject, ws.nodes.UpdateNode(&node))
+	originNode := runtime.Node{
+		NodeID: node.NodeID,
+	}
+	err := ws.db.First(&originNode)
+
+	originNode.Hostname = node.Hostname
+	originNode.Owner = node.Owner
+	originNode.Wireless = node.Wireless
+	originNode.Location = node.Location
+	if err.Error == nil {
+		err = ws.db.Save(&originNode)
+	} else {
+		logger.Debug(err.Error.Error(), err)
+		err = ws.db.Create(&originNode)
+	}
+	hasError := (err.Error != nil)
+
+	msg.Answer(msg.Subject, !hasError)
+
+	if hasError {
+		logger.Warnf("could not change %s: %s", node.NodeID, err.Error.Error())
+		return err.Error
+	}
+	ws.SendNode(&node, true)
 	logger.Infof("change %s", node.NodeID)
 	return nil
 }
