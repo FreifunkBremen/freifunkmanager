@@ -21,7 +21,12 @@ func (ws *WebsocketServer) connectHandler(logger *log.Entry, msg *wsLib.Message)
 	ws.nodes.Lock()
 	i := 0
 	for _, node := range ws.nodes.List {
-		msg.From.Write(&wsLib.Message{Subject: MessageTypeCurrentNode, Body: node})
+		n := runtime.NewNode(node, "")
+		if n == nil {
+			continue
+		}
+		n.Lastseen = node.Lastseen
+		msg.From.Write(&wsLib.Message{Subject: MessageTypeCurrentNode, Body: n})
 		i++
 	}
 	ws.nodes.Unlock()

@@ -44,6 +44,8 @@ function onerror (err) {
 
 function onopen () {
 	connectionEstablished = true;
+	sendjson({'subject': 'auth_status'});
+	sendjson({'subject': 'connect'});
 	render();
 }
 
@@ -123,8 +125,6 @@ function connect () {
 	socket.onerror = onerror;
 	socket.onmessage = onmessage;
 	socket.onclose = onclose;
-	sendjson({'subject': 'auth_status'});
-	sendjson({'subject': 'connect'});
 }
 
 window.setInterval(() => {
