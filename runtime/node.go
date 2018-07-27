@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"fmt"
 	"net"
 	"strings"
 
@@ -80,9 +81,11 @@ func (n *Node) IsEqual(node *Node) bool {
 	if n.NodeID != node.NodeID {
 		return false
 	}
-	if n.Address != node.Address {
-		return false
-	}
+	/*
+		if n.Address != node.Address {
+			return false
+		}
+	*/
 	if n.Hostname != node.Hostname {
 		return false
 	}
@@ -98,16 +101,20 @@ func (n *Node) IsEqual(node *Node) bool {
 	return true
 }
 
+const LOCATION_EQUAL_FORMAT_STRING = "%.6f"
+
 func locationEqual(a, b yanicData.Location) bool {
-	if a.Latitude != b.Latitude {
+	if fmt.Sprintf(LOCATION_EQUAL_FORMAT_STRING, a.Latitude) != fmt.Sprintf(LOCATION_EQUAL_FORMAT_STRING, b.Latitude) {
 		return false
 	}
-	if a.Longitude != b.Longitude {
+	if fmt.Sprintf(LOCATION_EQUAL_FORMAT_STRING, a.Longitude) != fmt.Sprintf(LOCATION_EQUAL_FORMAT_STRING, b.Longitude) {
 		return false
 	}
+
 	if a.Altitude != b.Altitude {
 		return false
 	}
+
 	return true
 }
 

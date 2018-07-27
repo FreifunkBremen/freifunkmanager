@@ -49,16 +49,17 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 			//"StatsClients":  node.StatsClients,
 			"Address": node.Address,
 		})
-		conn.sendNode(node, false)
 		if lNode.Blacklist {
 			logger.Debug("on blacklist")
 			return
 		}
+		conn.sendNode(node, false)
 		if !node.IsEqual(&lNode) {
 			lNode.SSHUpdate(conn.ssh, node)
-			logger.Debug("run sshupdate again")
+			logger.Debug("yanic trigger sshupdate again")
+		} else {
+			logger.Debug("yanic update")
 		}
-		logger.Debug("yanic update")
 		return
 	}
 
@@ -71,10 +72,6 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 	}
 	conn.db.Create(&node)
 	conn.sendNode(node, true)
-	if err == nil {
-		lNode.SSHUpdate(conn.ssh, node)
-		logger.Debug("run sshupdate")
-	}
 }
 
 func (conn *YanicDB) InsertLink(link *runtimeYanic.Link, time time.Time) {
