@@ -194,8 +194,8 @@ export class ListView extends View {
 			freq = domlib.newAt(tr, 'td'),
 			curchannel = domlib.newAt(tr, 'td'),
 			channel = domlib.newAt(tr, 'td'),
-			channel24Input = domlib.newAt(domlib.newAt(channel, 'span'), 'input'),
-			channel5Input = domlib.newAt(domlib.newAt(channel, 'span'), 'input'),
+			channel24Input = domlib.newAt(domlib.newAt(channel, 'span'), 'select'),
+			channel5Input = domlib.newAt(domlib.newAt(channel, 'span'), 'select'),
 			curpower = domlib.newAt(tr, 'td'),
 			power = domlib.newAt(tr, 'td'),
 			power24Input = domlib.newAt(domlib.newAt(power, 'span'), 'input'),
@@ -249,25 +249,21 @@ export class ListView extends View {
 			domlib.newAt(curchannel, 'span').textContent = node._wireless.channel24 || '-';
 			domlib.newAt(curchannel, 'span').textContent = node._wireless.channel5 || '-';
 		}
-		/* eslint-enable no-underscore-dangle */
+		let i = 0;
+		for (i = 0; i < store.channelsWifi24.length; i++) {
+			const opt = domlib.newAt(channel24Input,'option',{
+				'value': store.channelsWifi24[i],
+			},store.channelsWifi24[i]);
 
-
-		channel24Input.value = node.wireless.channel24 || '';
-		channel24Input.type = 'number';
-		channel24Input.min = 1;
-		channel24Input.max = 14;
-		channel24Input.readOnly = true;
-		channel24Input.setAttribute('placeholder', '-');
-		channel24Input.addEventListener('dblclick', () => {
+			if(store.channelsWifi24[i] === node.wireless.channel24) {
+				opt.selected = true;
+			}
+		}
+		channel24Input.addEventListener('focusin', () => {
 			this.editing = true;
-			channel24Input.readOnly = false;
 		});
 		channel24Input.addEventListener('focusout', () => {
-			if (channel24Input.readOnly) {
-				return;
-			}
 			this.editing = false;
-			channel24Input.readOnly = true;
 			const old = node.wireless.channel24;
 			node.wireless.channel24 = parseInt(channel24Input.value, 10);
 			socket.sendnode(node, (msg)=>{
@@ -278,21 +274,20 @@ export class ListView extends View {
 			});
 		});
 
-		channel5Input.value = node.wireless.channel5 || '';
-		channel5Input.type = 'number';
-		channel5Input.min = 36;
-		channel5Input.readOnly = true;
-		channel5Input.setAttribute('placeholder', '-');
-		channel5Input.addEventListener('dblclick', () => {
+		for (i = 0; i < store.channelsWifi5.length; i++) {
+			const opt = domlib.newAt(channel5Input,'option',{
+				'value': store.channelsWifi5[i],
+			},store.channelsWifi5[i]);
+
+			if(store.channelsWifi5[i] === node.wireless.channel5) {
+				opt.selected = true;
+			}
+		}
+		channel5Input.addEventListener('focusin', () => {
 			this.editing = true;
-			channel5Input.readOnly = false;
 		});
 		channel5Input.addEventListener('focusout', () => {
-			if (channel5Input.readOnly) {
-				return;
-			}
 			this.editing = false;
-			channel5Input.readOnly = true;
 			const old = node.wireless.channel5;
 			node.wireless.channel5 = parseInt(channel5Input.value, 10);
 			socket.sendnode(node, (msg)=>{
@@ -314,18 +309,9 @@ export class ListView extends View {
 		power24Input.type = 'number';
 		power24Input.min = 1;
 		power24Input.max = 23;
-		power24Input.readOnly = true;
 		power24Input.setAttribute('placeholder', '-');
-		power24Input.addEventListener('dblclick', () => {
-			this.editing = true;
-			power24Input.readOnly = false;
-		});
 		power24Input.addEventListener('focusout', () => {
-			if (power24Input.readOnly) {
-				return;
-			}
 			this.editing = false;
-			power24Input.readOnly = true;
 			const old = node.wireless.txpower24;
 			node.wireless.txpower24 = parseInt(power24Input.value, 10);
 			socket.sendnode(node, (msg)=>{
@@ -340,18 +326,9 @@ export class ListView extends View {
 		power5Input.type = 'number';
 		power5Input.min = 1;
 		power5Input.max = 23;
-		power5Input.readOnly = true;
 		power5Input.setAttribute('placeholder', '-');
-		power5Input.addEventListener('dblclick', () => {
-			this.editing = true;
-			power5Input.readOnly = false;
-		});
 		power5Input.addEventListener('focusout', () => {
-			if (power5Input.readOnly) {
-				return;
-			}
 			this.editing = false;
-			power5Input.readOnly = true;
 			const old = node.wireless.txpower5;
 			node.wireless.txpower5 = parseInt(power5Input.value, 10);
 			socket.sendnode(node, (msg)=>{
