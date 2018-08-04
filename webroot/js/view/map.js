@@ -1,5 +1,3 @@
-
-import * as domlib from '../domlib';
 import * as gui from '../gui';
 import * as socket from '../socket';
 import * as store from '../store';

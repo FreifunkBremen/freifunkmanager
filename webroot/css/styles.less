@@ -66,11 +66,11 @@ table.nodes tbody tr:nth-child(odd) {
 table.nodes tbody tr:hover {
 	background: #ccc;
 }
-table.nodes tbody tr.offline td:first-child,
-table.nodes tbody tr.offline:hover td:first-child{
+table.nodes tbody tr td.offline,
+table.nodes tbody tr td.offline:hover{
 	background: #dc0067;
 }
-table.nodes tbody tr.unseen:first-child{
+table.nodes tbody tr td.unseen{
 	background: #009ee0;
 }
 
@@ -103,9 +103,10 @@ a {
 }
 
 
-input[readonly] {
+
+input {
 	border: none;
-	border-bottom: 1px solid;
+	border-bottom: 1px solid grey;
 	background: none;
 	padding: 0px;
 	font-size: 15px;
