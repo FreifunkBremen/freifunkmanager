@@ -41,14 +41,18 @@ table th > input {
 	font-weight: bold;
 	background: #fff;
 }
-table th.sortable.sort-down:after {
+table th.sort-header:after {
+	font-size: 0.6em;
+}
+table th.sort-header.sort-down:after {
 	content: " \25BC"
 }
-table th.sortable.sort-up:after {
+table th.sort-header.sort-up:after {
 	content: " \25B2"
 }
-table th.sortable:not(.sort-down):not(.sort-up):after {
+table th.sort-header:not(.sort-down):not(.sort-up):after {
 	content: " \25B4\25BE";
+	color: grey;
 }
 table.nodes, table.stats {
 	width: 100%;

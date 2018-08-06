@@ -4,6 +4,7 @@ import * as lib from '../lib';
 import * as socket from '../socket';
 import * as store from '../store';
 import * as V from 'superfine';
+import Table from '../table';
 import config from '../config';
 import View from '../view';
 import {FromNowAgo} from '../lib';
@@ -23,22 +24,57 @@ export class ListView extends View {
 			this.render();
 		});
 
-		this.table = domlib.newAt(this.el, 'div');
-		this.tableheader = V.h('thead',{},[
-				V.h('tr',{},[
-					V.h('th',{}, 'Lastseen'),
-					V.h('th',{}, 'NodeID'),
-					V.h('th',{}, 'Hostname'),
-					V.h('th',{}, 'Freq'),
-					V.h('th',{}, 'CurCh'),
-					V.h('th',{}, 'Channel'),
-					V.h('th',{}, 'CurPw'),
-					V.h('th',{}, 'Power'),
-					V.h('th',{}, 'Clients'),
-					V.h('th',{}, 'ChanUtil'),
-					V.h('th',{}, 'Options')
-				])
-			]);
+		this.table = new Table(domlib.newAt(this.el, 'div'),{
+			class: 'nodes',
+		},[
+			{
+				name:'Lastseen',
+				sort: (a, b) => a.lastseen - b.lastseen,
+				reverse: false
+			},
+			{
+				name:'NodeID',
+				sort: (a, b) => a.node_id.localeCompare(b.node_id),
+				reverse: false
+			},
+			{
+				name:'Hostname',
+				sort: (a, b) => a.hostname.localeCompare(b.hostname),
+				reverse: false
+			},
+			{ name:'Freq' },
+			{
+				name:'CurCh',
+				sort: (a, b) => (a._wireless ? a._wireless.channel24 : 0) - (b._wireless ? b._wireless.channel24 : 0),
+				reverse: false
+			},
+			{
+				name:'Channel',
+				sort: (a, b) => a.wireless.channel24 - b.wireless.channel24,
+				reverse: false
+			},
+			{
+				name:'CurPW',
+				sort: (a, b) => (a._wireless ? a._wireless.txpower24 : 0) - (b._wireless ? b._wireless.txpower24 : 0),
+				reverse: false
+			},
+			{
+				name:'Power',
+				sort: (a, b) => a.wireless.txpower24 - b.wireless.txpower24,
+				reverse: false
+			},
+			{
+				name:'Clients',
+				sort: (a, b) => a.statistics.clients.wifi24 - b.statistics.clients.wifi24,
+				reverse: false
+			},
+			{
+				name:'ChanUtil',
+				sort: (a, b) => (a.statistics.wireless ? a.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil : 0) - (b.statistics.wireless ? b.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil : 0),
+				reverse: false
+			},
+			{ name:'Options' }
+		], 1, this.renderRow);
 
 		this.maxDisplayedNodes = localStorage.getItem("maxDisplayedNodes");
 		if (this.maxDisplayedNodes == null) {
@@ -210,14 +246,11 @@ export class ListView extends View {
 			numDisplayedNodes = Math.min(this.maxDisplayedNodes, numDisplayedNodes);
 		}
 
-		var tablecontent = [];
+		var data = [];
 		for (let i = 0; i < numDisplayedNodes; i += 1) {
-			tablecontent.push(this.renderRow(nodes[i]));
+			data.push(nodes[i]);
 		}
-		V.render(this.vel, this.vel = V.h('table',{'class':'nodes'},[
-			this.tableheader,
-			V.h('tbody',{},tablecontent)
-		]), this.table);
+		this.table.setData(data)
 
 		this.footerNote.innerHTML = numDisplayedNodes + " of " + nodes.length + " nodes. Show: ";
 	}
