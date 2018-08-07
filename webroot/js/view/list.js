@@ -70,11 +70,11 @@ export class ListView extends View {
 			},
 			{
 				name:'ChanUtil',
-				sort: (a, b) => (a.statistics.wireless ? a.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil : 0) - (b.statistics.wireless ? b.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil : 0),
+				sort: (a, b) => (a.statistics.wireless ? a.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil || 0 : 0) - (b.statistics.wireless ? b.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil || 0 : 0),
 				reverse: false
 			},
 			{ name:'Options' }
-		], 1, this.renderRow);
+		], 1, this.renderRow.bind(this));
 
 		this.maxDisplayedNodes = localStorage.getItem("maxDisplayedNodes");
 		if (this.maxDisplayedNodes == null) {
@@ -124,8 +124,13 @@ export class ListView extends View {
 				}, FromNowAgo(node.lastseen)),
 				V.h('td', {}, node.node_id),
 				V.h('td', {}, V.h('input',{
-					'value': node.hostname,
-					'onfocusout':(e)=>{
+					'value': this._hostname || node.hostname,
+					'oninput':(e) => {
+						this._hostname = e.target.value;
+					},
+					'onfocusout':(e) => {
+						delete this._hostname;
+
 						const old = node.hostname;
 						node.hostname = e.target.value;
 						socket.sendnode(node, (msg)=>{
@@ -179,8 +184,13 @@ export class ListView extends View {
 						'type': 'number',
 						'min': 0,
 						'max': 23,
-						'value': node.wireless.txpower24,
+						'value': this._txpower24 || node.wireless.txpower24,
+						'oninput':(e) => {
+							this._txpower24 = e.target.value;
+						},
 						'onfocusout':(e) => {
+							delete this._txpower24;
+
 							const old = node.wireless.txpower24;
 							node.wireless.txpower24 = parseInt(e.target.value, 10);
 							socket.sendnode(node, (msg)=>{
@@ -195,8 +205,13 @@ export class ListView extends View {
 						'type': 'number',
 						'min': 0,
 						'max': 23,
-						'value': node.wireless.txpower5,
+						'value': this._txpower5 || node.wireless.txpower5,
+						'oninput':(e) => {
+							this._txpower5 = e.target.value;
+						},
 						'onfocusout':(e) => {
+							delete this._txpower5;
+
 							const old = node.wireless.txpower5;
 							node.wireless.txpower5 = parseInt(e.target.value, 10);
 							socket.sendnode(node, (msg)=>{
@@ -213,8 +228,8 @@ export class ListView extends View {
 					V.h('span', {}, node.statistics.clients.wifi5)
 				]),
 				V.h('td', {}, [
-					V.h('span', {}, node.statistics.wireless ? node.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil : '-'),
-					V.h('span', {}, node.statistics.wireless ? node.statistics.wireless.filter((d) => d.frequency > 5000)[0].ChanUtil : '-'),
+					V.h('span', {}, node.statistics.wireless ? (node.statistics.wireless.filter((d) => d.frequency < 5000)[0] || {ChanUtil: '-'}).ChanUtil   : '-'),
+					V.h('span', {}, node.statistics.wireless ? (node.statistics.wireless.filter((d) => d.frequency > 5000)[0] || {ChanUtil: '-'}).ChanUtil  : '-'),
 				]),
 				V.h('td', {}, [
 					V.h('a',{
