@@ -29,7 +29,7 @@ export class ListView extends View {
 		},[
 			{
 				name:'Lastseen',
-				sort: (a, b) => a.lastseen - b.lastseen,
+				sort: (a, b) => new Date(a.lastseen) - new Date(b.lastseen),
 				reverse: false
 			},
 			{
