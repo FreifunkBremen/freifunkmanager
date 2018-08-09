@@ -75,25 +75,6 @@ export class ListView extends View {
 			},
 			{ name:'Options' }
 		], 1, this.renderRow.bind(this));
-
-		this.maxDisplayedNodes = localStorage.getItem("maxDisplayedNodes");
-		if (this.maxDisplayedNodes == null) {
-			this.maxDisplayedNodes = 20;
-		}
-
-		this.footerNote = domlib.newAt(this.el, 'span');
-
-		var footerLinkContents = [["5", 5], ["10", 10], ["20", 20], ["50", 50], ["All", -1]];
-		for (var i = 0; i < footerLinkContents.length; i++) {
-			var link = domlib.newAt(this.el, 'a', null, footerLinkContents[i][0]);
-			link.classList.add('btn');
-			const newValue = footerLinkContents[i][1];
-			link.addEventListener('click', () => {
-				this.maxDisplayedNodes = newValue;
-				localStorage.setItem("maxDisplayedNodes", this.maxDisplayedNodes);
-				this.render();
-			});
-		}
 	}
 
 	renderRow (node) {
@@ -256,17 +237,6 @@ export class ListView extends View {
 			});
 		}
 
-		var numDisplayedNodes = nodes.length;
-		if (this.maxDisplayedNodes != -1) {
-			numDisplayedNodes = Math.min(this.maxDisplayedNodes, numDisplayedNodes);
-		}
-
-		var data = [];
-		for (let i = 0; i < numDisplayedNodes; i += 1) {
-			data.push(nodes[i]);
-		}
-		this.table.setData(data)
-
-		this.footerNote.innerHTML = numDisplayedNodes + " of " + nodes.length + " nodes. Show: ";
+		this.table.setData(nodes);
 	}
 }

@@ -9,6 +9,11 @@ export default class Table {
 		this.sortIndex = sortIndex;
 		this.renderRow = renderRow;
 		this.properties = properties;
+		this.maxDisplayedRows = localStorage.getItem("maxDisplayedRows");
+
+		if (this.maxDisplayedRows == null) {
+			this.maxDisplayedRows = 20;
+		}
 	}
 
 	sortTable(i) {
@@ -37,7 +42,7 @@ export default class Table {
 				if (!d.sort) {
 					return V.h('th', properties, name);
 				}
-				
+
 				properties.onclick = () => self.sortTable(i);
 				properties.class = 'sort-header';
 
@@ -53,9 +58,33 @@ export default class Table {
 				rows = rows.reverse();
 			}
 
+			var maxDisplayedRows = rows.length;
+			if (this.maxDisplayedRows != -1) {
+				maxDisplayedRows = Math.min(this.maxDisplayedRows, maxDisplayedRows);
+			}
+
+			var visibleRows = [];
+			for (let i = 0; i < maxDisplayedRows; i += 1) {
+				visibleRows.push(rows[i]);
+			}
+
+
 			children.push(V.h('thead', {}, V.h('tr', {}, th)));
-			children.push(V.h('tbody', {}, rows.map(this.renderRow)));
+			children.push(V.h('tbody', {}, visibleRows.map(this.renderRow)));
+			children.push(V.h('tfoot', {}, V.h('tr', {}, V.h('td',{colspan: th.length},
+				[V.h('span',{}, maxDisplayedRows + " of " + rows.length + " nodes. Show: ")].concat(
+					[["5", 5], ["10", 10], ["20", 20], ["50", 50], ["All", -1]].map((item)=>
+							V.h('a',{
+								class: 'btn',
+								onclick:()=> {
+									this.maxDisplayedRows = item[1];
+									localStorage.setItem("maxDisplayedRows", this.maxDisplayedRows);
+								}
+							}, item[0])
+					))
+				))));
 		}
+
 		V.render(this.vel, this.vel = V.h('table',this.properties, children), this.el);
 	}
 
