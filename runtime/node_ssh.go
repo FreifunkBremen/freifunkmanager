@@ -9,10 +9,10 @@ import (
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 )
 
-func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) {
+func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 	client, err := sshmgmt.ConnectTo(n.GetAddress())
 	if err != nil {
-		return
+		return false
 	}
 	defer client.Close()
 
@@ -53,7 +53,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) {
 			echo "radio1";
 		fi;`)
 	if err != nil {
-		return
+		return true
 	}
 	radio := ssh.SSHResultToString(result)
 	ch := GetChannel(n.Wireless.Channel24)
@@ -82,7 +82,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) {
 			echo "radio1";
 		fi;`)
 	if err != nil {
-		return
+		return true
 	}
 	radio = ssh.SSHResultToString(result)
 	ch = GetChannel(n.Wireless.Channel5)
@@ -103,4 +103,5 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) {
 				radio, n.Wireless.Channel5))
 		}
 	}
+	return true
 }

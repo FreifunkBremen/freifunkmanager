@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	yanicData "github.com/FreifunkBremen/yanic/data"
 	"github.com/FreifunkBremen/yanic/lib/jsontime"
@@ -11,19 +12,19 @@ import (
 )
 
 type Node struct {
-	Lastseen  jsontime.Time `json:"lastseen" mapstructure:"-"`
+	Lastseen  jsontime.Time `json:"lastseen" gorm:"-"`
 	NodeID    string        `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
-	Blacklist bool          `json:"blacklist"`
+	Blacklist *time.Time    `json:"-"`
 	Address   string        `json:"ip"`
 
 	Hostname         string             `json:"hostname"`
-	HostnameRespondd string             `json:"hostname_Respondd" gorm:"-"`
+	HostnameRespondd string             `json:"hostname_respondd" gorm:"-"`
 	Owner            string             `json:"owner"`
-	OwnerRespondd    string             `json:"owner_Respondd" gorm:"-"`
+	OwnerRespondd    string             `json:"owner_respondd" gorm:"-"`
 	Location         yanicData.Location `json:"location" gorm:"embedded;embedded_prefix:location_"`
-	LocationRespondd yanicData.Location `json:"location_Respondd" gorm:"-"`
+	LocationRespondd yanicData.Location `json:"location_respondd" gorm:"-"`
 	Wireless         yanicData.Wireless `json:"wireless" gorm:"embedded;embedded_prefix:wireless_"`
-	WirelessRespondd yanicData.Wireless `json:"wireless_Respondd" gorm:"-"`
+	WirelessRespondd yanicData.Wireless `json:"wireless_respondd" gorm:"-"`
 
 	StatisticsRespondd struct {
 		Wireless yanicData.WirelessStatistics `json:"wireless"`
@@ -58,6 +59,7 @@ func (n *Node) Update(node *yanicRuntime.Node, ipPrefix string) {
 	if node == nil {
 		return
 	}
+	n.Lastseen = jsontime.Now()
 	if nodeinfo := node.Nodeinfo; nodeinfo != nil {
 		n.HostnameRespondd = nodeinfo.Hostname
 

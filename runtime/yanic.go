@@ -7,7 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	databaseYanic "github.com/FreifunkBremen/yanic/database"
-	"github.com/FreifunkBremen/yanic/lib/jsontime"
 	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
@@ -15,50 +14,52 @@ import (
 
 type YanicDB struct {
 	databaseYanic.Connection
-	db        *gorm.DB
-	ssh       *ssh.Manager
-	sendNode  func(*Node)
-	sendStats func(*runtimeYanic.GlobalStats)
-	prefix    string
+	blacklistFor time.Duration
+	db           *gorm.DB
+	ssh          *ssh.Manager
+	sendNode     func(*Node)
+	sendStats    func(*runtimeYanic.GlobalStats)
+	prefix       string
 }
 
-func NewYanicDB(db *gorm.DB, ssh *ssh.Manager, sendNode func(*Node), sendStats func(*runtimeYanic.GlobalStats), prefix string) *YanicDB {
+func NewYanicDB(db *gorm.DB, ssh *ssh.Manager, blacklistFor time.Duration, sendNode func(*Node), sendStats func(*runtimeYanic.GlobalStats), prefix string) *YanicDB {
 	return &YanicDB{
-		db:        db,
-		ssh:       ssh,
-		sendNode:  sendNode,
-		sendStats: sendStats,
-		prefix:    prefix,
+		db:           db,
+		ssh:          ssh,
+		blacklistFor: blacklistFor,
+		sendNode:     sendNode,
+		sendStats:    sendStats,
+		prefix:       prefix,
 	}
 }
 
 func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
-	nodeid := ""
-	if nodeinfo := n.Nodeinfo; nodeinfo != nil {
-		nodeid = nodeinfo.NodeID
-	} else {
+	if n.Nodeinfo == nil {
 		return
 	}
-	logger := log.WithField("method", "LearnNode").WithField("node_id", nodeid)
+	now := time.Now()
+
+	logger := log.WithField("method", "LearnNode").WithField("node_id", n.Nodeinfo.NodeID)
+
 	lNode := Node{
-		NodeID: nodeid,
+		NodeID: n.Nodeinfo.NodeID,
 	}
 	if conn.db.First(&lNode).Error == nil {
 		lNode.Update(n, conn.prefix)
-		conn.db.Model(&lNode).Update(map[string]interface{}{
-			"Lastseen": jsontime.Now(),
-			//"StatsWireless": node.StatsWireless,
-			//"StatsClients":  node.StatsClients,
-			"Address": lNode.Address,
-		})
-		if lNode.Blacklist {
+		conn.db.Model(&lNode).Update(map[string]interface{}{"address": lNode.Address})
+
+		if lNode.Blacklist != nil && lNode.Blacklist.After(now.Add(-conn.blacklistFor)) {
 			logger.Debug("on blacklist")
 			return
 		}
 		conn.sendNode(&lNode)
 		if !lNode.CheckRespondd() {
-			lNode.SSHUpdate(conn.ssh)
-			logger.Debug("yanic trigger sshupdate again")
+			if !lNode.SSHUpdate(conn.ssh) {
+				conn.db.Model(&lNode).Update(map[string]interface{}{"blacklist": &now})
+				logger.Warn("yanic trigger sshupdate failed - set blacklist")
+			} else {
+				logger.Debug("yanic trigger sshupdate again")
+			}
 		} else {
 			logger.Debug("yanic update")
 		}
@@ -68,15 +69,14 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 	if node == nil {
 		return
 	}
-	node.Lastseen = jsontime.Now()
 
 	_, err := conn.ssh.RunOn(node.GetAddress(), "uptime")
 	if err != nil {
 		logger.Debugf("set on blacklist: %s", err.Error())
-		node.Blacklist = true
+		node.Blacklist = &now
 	}
 	conn.db.Create(&node)
-	if !node.Blacklist {
+	if node.Blacklist == nil {
 		conn.sendNode(node)
 	}
 }

@@ -53,9 +53,9 @@ func main() {
 	sshmanager := ssh.NewManager(config.SSHPrivateKey, config.SSHTimeout.Duration)
 	nodesYanic := runtimeYanic.NewNodes(&runtimeYanic.NodesConfig{})
 
-	ws := websocket.NewWebsocketServer(config.Secret, config.SSHIPAddressPrefix, db, nodesYanic)
+	ws := websocket.NewWebsocketServer(config.Secret, config.SSHIPAddressPrefix, db, config.BlacklistFor.Duration, nodesYanic)
 
-	yanic := runtime.NewYanicDB(db, sshmanager, ws.SendNode, ws.SendStats, config.SSHIPAddressPrefix)
+	yanic := runtime.NewYanicDB(db, sshmanager, config.BlacklistFor.Duration, ws.SendNode, ws.SendStats, config.SSHIPAddressPrefix)
 
 	if config.YanicEnable {
 		if duration := config.YanicSynchronize.Duration; duration > 0 {

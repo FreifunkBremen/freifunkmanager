@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"net/http"
+	"time"
 
 	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
 	"github.com/jinzhu/gorm"
@@ -10,24 +11,26 @@ import (
 )
 
 type WebsocketServer struct {
-	nodes    *runtime.Nodes
-	db       *gorm.DB
-	secret   string
-	ipPrefix string
+	nodes        *runtime.Nodes
+	db           *gorm.DB
+	blacklistFor time.Duration
+	secret       string
+	ipPrefix     string
 
 	inputMSG chan *wsLib.Message
 	ws       *wsLib.Server
 	handlers map[string]WebsocketHandlerFunc
 }
 
-func NewWebsocketServer(secret string, ipPrefix string, db *gorm.DB, nodes *runtime.Nodes) *WebsocketServer {
+func NewWebsocketServer(secret string, ipPrefix string, db *gorm.DB, blacklistFor time.Duration, nodes *runtime.Nodes) *WebsocketServer {
 	ownWS := WebsocketServer{
-		nodes:    nodes,
-		db:       db,
-		handlers: make(map[string]WebsocketHandlerFunc),
-		inputMSG: make(chan *wsLib.Message),
-		secret:   secret,
-		ipPrefix: ipPrefix,
+		nodes:        nodes,
+		db:           db,
+		blacklistFor: blacklistFor,
+		handlers:     make(map[string]WebsocketHandlerFunc),
+		inputMSG:     make(chan *wsLib.Message),
+		secret:       secret,
+		ipPrefix:     ipPrefix,
 	}
 	ownWS.ws = wsLib.NewServer(ownWS.inputMSG, wsLib.NewSessionManager())
 

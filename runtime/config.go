@@ -17,6 +17,8 @@ type Config struct {
 	// path to deliver static content
 	Webroot string `toml:"webroot"`
 
+	BlacklistFor duration.Duration `toml:"blacklist_for"`
+
 	// auth secret
 	Secret string `toml:"secret"`
 

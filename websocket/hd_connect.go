@@ -1,6 +1,8 @@
 package websocket
 
 import (
+	"time"
+
 	log "github.com/sirupsen/logrus"
 
 	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
@@ -12,16 +14,19 @@ var wifi24Channels []uint32
 var wifi5Channels []uint32
 
 func (ws *WebsocketServer) connectHandler(logger *log.Entry, msg *wsLib.Message) error {
-	//msg.From.Write(&wsLib.Message{Subject: MessageTypeStats, Body: ws.nodes.Statistics})
 	var nodes []*runtime.Node
 	var count int
 
-	ws.db.Where("blacklist = false").Find(&nodes).Count(&count)
+	now := time.Now()
+
+	ws.db.Find(&nodes).Count(&count)
 
 	ws.nodes.Lock()
 	i := 0
 	for _, node := range nodes {
-		//TODO skip blacklist
+		if node.Blacklist != nil && node.Blacklist.After(now.Add(-ws.blacklistFor)) {
+			continue
+		}
 		node.Update(ws.nodes.List[node.NodeID], ws.ipPrefix)
 		msg.From.Write(&wsLib.Message{Subject: MessageTypeNode, Body: node})
 		i++
