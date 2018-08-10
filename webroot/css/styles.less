@@ -41,14 +41,18 @@ table th > input {
 	font-weight: bold;
 	background: #fff;
 }
-table th.sortable.sort-down:after {
+table th.sort-header:after {
+	font-size: 0.6em;
+}
+table th.sort-header.sort-down:after {
 	content: " \25BC"
 }
-table th.sortable.sort-up:after {
+table th.sort-header.sort-up:after {
 	content: " \25B2"
 }
-table th.sortable:not(.sort-down):not(.sort-up):after {
+table th.sort-header:not(.sort-down):not(.sort-up):after {
 	content: " \25B4\25BE";
+	color: grey;
 }
 table.nodes, table.stats {
 	width: 100%;
@@ -66,11 +70,11 @@ table.nodes tbody tr:nth-child(odd) {
 table.nodes tbody tr:hover {
 	background: #ccc;
 }
-table.nodes tbody tr.offline td:first-child,
-table.nodes tbody tr.offline:hover td:first-child{
+table.nodes tbody tr td.offline,
+table.nodes tbody tr td.offline:hover{
 	background: #dc0067;
 }
-table.nodes tbody tr.unseen:first-child{
+table.nodes tbody tr td.unseen{
 	background: #009ee0;
 }
 
@@ -103,9 +107,10 @@ a {
 }
 
 
-input[readonly] {
+
+input {
 	border: none;
-	border-bottom: 1px solid;
+	border-bottom: 1px solid grey;
 	background: none;
 	padding: 0px;
 	font-size: 15px;

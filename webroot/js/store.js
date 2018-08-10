@@ -16,6 +16,7 @@ export function getNode (nodeid) {
 		// eslint-disable-next-line no-underscore-dangle
 		node._wireless = cNode.wireless;
 		node.lastseen = cNode.lastseen;
+		node.statistics = cNode.statistics;
 	}
 	return node;
 };
