@@ -48,7 +48,7 @@ func main() {
 	if err != nil {
 		log.Panic("failed to connect database")
 	}
-	db.AutoMigrate(&runtime.Node{}, &websocket.Auth{})
+	db.AutoMigrate(&runtime.Node{}, &websocket.Session{})
 
 	sshmanager := ssh.NewManager(config.SSHPrivateKey, config.SSHTimeout.Duration)
 	nodesYanic := runtimeYanic.NewNodes(&runtimeYanic.NodesConfig{})

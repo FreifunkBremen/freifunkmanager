@@ -10,7 +10,7 @@ import (
 )
 
 func (ws *WebsocketServer) nodeHandler(logger *log.Entry, msg *wsLib.Message) error {
-	if !ws.IsLoggedIn(msg) {
+	if _, ok := ws.IsLoggedIn(msg); !ok {
 		msg.Answer(msg.Subject, false)
 		logger.Warn("not logged in")
 		return nil
