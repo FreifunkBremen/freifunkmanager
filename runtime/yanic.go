@@ -17,12 +17,12 @@ type YanicDB struct {
 	databaseYanic.Connection
 	db        *gorm.DB
 	ssh       *ssh.Manager
-	sendNode  func(*Node, bool)
+	sendNode  func(*Node)
 	sendStats func(*runtimeYanic.GlobalStats)
 	prefix    string
 }
 
-func NewYanicDB(db *gorm.DB, ssh *ssh.Manager, sendNode func(*Node, bool), sendStats func(*runtimeYanic.GlobalStats), prefix string) *YanicDB {
+func NewYanicDB(db *gorm.DB, ssh *ssh.Manager, sendNode func(*Node), sendStats func(*runtimeYanic.GlobalStats), prefix string) *YanicDB {
 	return &YanicDB{
 		db:        db,
 		ssh:       ssh,
@@ -33,45 +33,52 @@ func NewYanicDB(db *gorm.DB, ssh *ssh.Manager, sendNode func(*Node, bool), sendS
 }
 
 func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
-	node := NewNode(n, conn.prefix)
-	if node == nil {
+	nodeid := ""
+	if nodeinfo := n.Nodeinfo; nodeinfo != nil {
+		nodeid = nodeinfo.NodeID
+	} else {
 		return
 	}
-	node.Lastseen = jsontime.Now()
-	logger := log.WithField("method", "LearnNode").WithField("node_id", node.NodeID)
+	logger := log.WithField("method", "LearnNode").WithField("node_id", nodeid)
 	lNode := Node{
-		NodeID: node.NodeID,
+		NodeID: nodeid,
 	}
 	if conn.db.First(&lNode).Error == nil {
+		lNode.Update(n, conn.prefix)
 		conn.db.Model(&lNode).Update(map[string]interface{}{
 			"Lastseen": jsontime.Now(),
 			//"StatsWireless": node.StatsWireless,
 			//"StatsClients":  node.StatsClients,
-			"Address": node.Address,
+			"Address": lNode.Address,
 		})
 		if lNode.Blacklist {
 			logger.Debug("on blacklist")
 			return
 		}
-		conn.sendNode(node, false)
-		if !node.IsEqual(&lNode) {
-			lNode.SSHUpdate(conn.ssh, node)
+		conn.sendNode(&lNode)
+		if !lNode.CheckRespondd() {
+			lNode.SSHUpdate(conn.ssh)
 			logger.Debug("yanic trigger sshupdate again")
 		} else {
 			logger.Debug("yanic update")
 		}
 		return
 	}
-
+	node := NewNode(n, conn.prefix)
+	if node == nil {
+		return
+	}
 	node.Lastseen = jsontime.Now()
 
 	_, err := conn.ssh.RunOn(node.GetAddress(), "uptime")
 	if err != nil {
-		logger.Debug("set on blacklist")
+		logger.Debugf("set on blacklist: %s", err.Error())
 		node.Blacklist = true
 	}
 	conn.db.Create(&node)
-	conn.sendNode(node, true)
+	if !node.Blacklist {
+		conn.sendNode(node)
+	}
 }
 
 func (conn *YanicDB) InsertLink(link *runtimeYanic.Link, time time.Time) {

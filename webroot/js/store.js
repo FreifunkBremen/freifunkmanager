@@ -10,14 +10,7 @@ export function getNode (nodeid) {
 	}
 
 	let node = list[nodeid];
-	if (current[nodeid]) {
-		const cNode = current[nodeid];
-
-		// eslint-disable-next-line no-underscore-dangle
-		node._wireless = cNode.wireless;
-		node.lastseen = cNode.lastseen;
-		node.statistics = cNode.statistics;
-	}
+	// keep structur for pings later
 	return node;
 };
 
@@ -38,12 +31,8 @@ export function createNode (nodeid) {
 
 // Overwrites the values for the specified node (identified by its node_id) with new values.
 // If system==false, the special "current" node will be modified instead.
-export function updateNode (node, system) {
-	if (system) {
-		list[node.node_id] = node;
-	} else {
-		current[node.node_id] = node;
-	}
+export function updateNode (node) {
+	list[node.node_id] = node;
 };
 
 // Returns a list of all known nodes.

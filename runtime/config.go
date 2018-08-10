@@ -22,7 +22,7 @@ type Config struct {
 
 	// SSH private key
 	SSHPrivateKey      string            `toml:"ssh_key"`
-	SSHIPAddressSuffix string            `toml:"ssh_ipaddress_suffix"`
+	SSHIPAddressPrefix string            `toml:"ssh_ipaddress_prefix"`
 	SSHTimeout         duration.Duration `toml:"ssh_timeout"`
 
 	// yanic socket

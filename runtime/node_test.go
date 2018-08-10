@@ -27,10 +27,9 @@ func TestNode(t *testing.T) {
 	assert.NotNil(n1)
 	assert.Equal(float64(13), n1.Location.Altitude)
 
-	n2 := NewNode(node1, "")
-	assert.True(n2.IsEqual(n1))
+	assert.True(n1.CheckRespondd())
 
 	node1.Nodeinfo.Owner.Contact = "blub2"
-	n2.Update(node1)
-	assert.False(n2.IsEqual(n1))
+	n1.Update(node1, "")
+	assert.False(n1.CheckRespondd())
 }

@@ -50,7 +50,11 @@ func (ws *WebsocketServer) nodeHandler(logger *log.Entry, msg *wsLib.Message) er
 		logger.Warnf("could not change %s: %s", node.NodeID, err.Error.Error())
 		return err.Error
 	}
-	ws.SendNode(&node, true)
+	ws.nodes.Lock()
+	nodeRespondd := ws.nodes.List[node.NodeID]
+	ws.nodes.Unlock()
+	node.Update(nodeRespondd, ws.ipPrefix)
+	ws.SendNode(&node)
 	logger.Infof("change %s", node.NodeID)
 	return nil
 }

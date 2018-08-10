@@ -16,23 +16,17 @@ func (ws *WebsocketServer) connectHandler(logger *log.Entry, msg *wsLib.Message)
 	var nodes []*runtime.Node
 	var count int
 
-	ws.db.Find(&nodes).Count(&count)
+	ws.db.Where("blacklist = false").Find(&nodes).Count(&count)
 
 	ws.nodes.Lock()
 	i := 0
-	for _, node := range ws.nodes.List {
-		n := runtime.NewNode(node, "")
-		if n == nil {
-			continue
-		}
-		n.Lastseen = node.Lastseen
-		msg.From.Write(&wsLib.Message{Subject: MessageTypeCurrentNode, Body: n})
+	for _, node := range nodes {
+		//TODO skip blacklist
+		node.Update(ws.nodes.List[node.NodeID], ws.ipPrefix)
+		msg.From.Write(&wsLib.Message{Subject: MessageTypeNode, Body: node})
 		i++
 	}
 	ws.nodes.Unlock()
-	for _, node := range nodes {
-		msg.From.Write(&wsLib.Message{Subject: MessageTypeSystemNode, Body: node})
-	}
 	msg.From.Write(&wsLib.Message{Subject: MessageTypeChannelsWifi24, Body: wifi24Channels})
 	msg.From.Write(&wsLib.Message{Subject: MessageTypeChannelsWifi5, Body: wifi5Channels})
 	logger.Debugf("done - fetch %d nodes and send %d", count, i)

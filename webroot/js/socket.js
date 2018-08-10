@@ -162,7 +162,7 @@ export function delEvent (to, func) {
 }
 
 export function sendnode(node, callback) {
-	sendjson({'subject':'node-system','body': node}, (msg) => {
+	sendjson({'subject':'node','body': node}, (msg) => {
 		if(!msg.body) {
 			notify.send({
 				'header': 'Speichern',
@@ -190,10 +190,7 @@ setEvent('auth_status', (msg) => {
 	render();
 });
 
-addEvent('node-system', (msg) => {
-	store.updateNode(msg.body, true);
-});
-addEvent('node-current', (msg) => {
+addEvent('node', (msg) => {
 	store.updateNode(msg.body);
 });
 addEvent('channels_wifi24', (msg) => {
