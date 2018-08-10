@@ -12,7 +12,7 @@ import (
 )
 
 type Node struct {
-	Lastseen  jsontime.Time `json:"lastseen" gorm:"-"`
+	Lastseen  jsontime.Time `json:"lastseen" mapstructure:"-" gorm:"-"`
 	NodeID    string        `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
 	Blacklist *time.Time    `json:"-"`
 	Address   string        `json:"ip"`
