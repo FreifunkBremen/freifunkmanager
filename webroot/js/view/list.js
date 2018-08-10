@@ -45,7 +45,7 @@ export class ListView extends View {
 			{ name:'Freq' },
 			{
 				name:'CurCh',
-				sort: (a, b) => (a._wireless ? a._wireless.channel24 : 0) - (b._wireless ? b._wireless.channel24 : 0),
+				sort: (a, b) => (a.wireless_respondd ? a.wireless_respondd.channel24 : 0) - (b.wireless_respondd ? b.wireless_respondd.channel24 : 0),
 				reverse: false
 			},
 			{
@@ -55,7 +55,7 @@ export class ListView extends View {
 			},
 			{
 				name:'CurPW',
-				sort: (a, b) => (a._wireless ? a._wireless.txpower24 : 0) - (b._wireless ? b._wireless.txpower24 : 0),
+				sort: (a, b) => (a.wireless_respondd ? a.wireless_respondd.txpower24 : 0) - (b.wireless_respondd ? b.wireless_respondd.txpower24 : 0),
 				reverse: false
 			},
 			{
@@ -65,12 +65,12 @@ export class ListView extends View {
 			},
 			{
 				name:'Clients',
-				sort: (a, b) => a.statistics.clients.wifi24 - b.statistics.clients.wifi24,
+				sort: (a, b) => a.statistics_respondd.clients.wifi24 - b.statistics_respondd.clients.wifi24,
 				reverse: false
 			},
 			{
 				name:'ChanUtil',
-				sort: (a, b) => (a.statistics.wireless ? a.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil || 0 : 0) - (b.statistics.wireless ? b.statistics.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil || 0 : 0),
+				sort: (a, b) => (a.statistics_respondd.wireless ? a.statistics_respondd.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil || 0 : 0) - (b.statistics_respondd.wireless ? b.statistics_respondd.wireless.filter((d) => d.frequency < 5000)[0].ChanUtil || 0 : 0),
 				reverse: false
 			},
 			{ name:'Options' }
@@ -101,7 +101,7 @@ export class ListView extends View {
 
 		return V.h('tr', {},[
 				V.h('td', {
-					'class':(new Date(node.lastseen) < startdate)?'offline':(!node._wireless)?'unseen':''
+					'class':(new Date(node.lastseen) < startdate)?'offline':(!node.wireless_respondd)?'unseen':''
 				}, FromNowAgo(node.lastseen)),
 				V.h('td', {}, node.node_id),
 				V.h('td', {}, V.h('input',{
@@ -127,8 +127,8 @@ export class ListView extends View {
 					V.h('span', {},'5 GHz')
 				]),
 				V.h('td', {}, [
-					V.h('span', {}, node._wireless ? node._wireless.channel24 || '-':'-'),
-					V.h('span', {}, node._wireless ? node._wireless.channel5 || '-':'-')
+					V.h('span', {}, node.wireless_respondd ? node.wireless_respondd.channel24 || '-':'-'),
+					V.h('span', {}, node.wireless_respondd ? node.wireless_respondd.channel5 || '-':'-')
 				]),
 				V.h('td', {}, [
 					V.h('span', {},  V.h('select',{
@@ -157,8 +157,8 @@ export class ListView extends View {
 					}, channel5Options))
 				]),
 				V.h('td', {}, [
-					V.h('span', {}, node._wireless ? node._wireless.txpower24 || '-':'-'),
-					V.h('span', {}, node._wireless ? node._wireless.txpower5 || '-':'-')
+					V.h('span', {}, node.wireless_respondd ? node.wireless_respondd.txpower24 || '-':'-'),
+					V.h('span', {}, node.wireless_respondd ? node.wireless_respondd.txpower5 || '-':'-')
 				]),
 				V.h('td', {}, [
 					V.h('span', {},  V.h('input',{
@@ -205,12 +205,12 @@ export class ListView extends View {
 					}))
 				]),
 				V.h('td', {}, [
-					V.h('span', {}, node.statistics.clients.wifi24),
-					V.h('span', {}, node.statistics.clients.wifi5)
+					V.h('span', {}, node.statistics_respondd.clients.wifi24),
+					V.h('span', {}, node.statistics_respondd.clients.wifi5)
 				]),
 				V.h('td', {}, [
-					V.h('span', {}, node.statistics.wireless ? (node.statistics.wireless.filter((d) => d.frequency < 5000)[0] || {ChanUtil: '-'}).ChanUtil   : '-'),
-					V.h('span', {}, node.statistics.wireless ? (node.statistics.wireless.filter((d) => d.frequency > 5000)[0] || {ChanUtil: '-'}).ChanUtil  : '-'),
+					V.h('span', {}, node.statistics_respondd.wireless ? (node.statistics_respondd.wireless.filter((d) => d.frequency < 5000)[0] || {ChanUtil: '-'}).ChanUtil   : '-'),
+					V.h('span', {}, node.statistics_respondd.wireless ? (node.statistics_respondd.wireless.filter((d) => d.frequency > 5000)[0] || {ChanUtil: '-'}).ChanUtil  : '-'),
 				]),
 				V.h('td', {}, [
 					V.h('a',{

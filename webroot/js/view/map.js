@@ -108,9 +108,9 @@ export class MapView extends View {
 		}
 
 
-		if (node.statistics && node.statistics.clients) {
+		if (node.statistics_respondd && node.statistics_respondd.clients) {
 			// eslint-disable-next-line prefer-destructuring
-			wifi24 = node.statistics.clients.wifi24;
+			wifi24 = node.statistics_respondd.clients.wifi24;
 
 			if (wifi24 < config.map.icon.warn.wifi24 && wifi24 > 0) {
 				className += ' client24';
@@ -120,7 +120,7 @@ export class MapView extends View {
 				className += ' client24-crit';
 			}
 			// eslint-disable-next-line prefer-destructuring
-			wifi5 = node.statistics.clients.wifi5;
+			wifi5 = node.statistics_respondd.clients.wifi5;
 
 			if (wifi5 < config.map.icon.warn.wifi5 && wifi5 > 0) {
 				className += ' client5';
@@ -182,13 +182,13 @@ export class MapView extends View {
 		this.clientLayer24.setData(nodes.filter((node) => {
 			return (node.location && node.location.latitude && node.location.longitude);
 		}).map((node) => {
-			return [node.location.latitude, node.location.longitude, node.statistics.clients.wifi24 || 0];
+			return [node.location.latitude, node.location.longitude, node.statistics_respondd.clients.wifi24 || 0];
 		}));
 
 		this.clientLayer5.setData(nodes.filter((node) => {
 			return (node.location && node.location.latitude && node.location.longitude);
 		}).map((node) => {
-			return [node.location.latitude, node.location.longitude, node.statistics.clients.wifi5 || 0];
+			return [node.location.latitude, node.location.longitude, node.statistics_respondd.clients.wifi5 || 0];
 		}));
 		this.map.invalidateSize();
 	}

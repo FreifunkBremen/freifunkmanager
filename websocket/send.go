@@ -8,12 +8,8 @@ import (
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
 )
 
-func (ws *WebsocketServer) SendNode(node *runtime.Node, system bool) {
-	msgType := MessageTypeCurrentNode
-	if system {
-		msgType = MessageTypeSystemNode
-	}
-	ws.ws.SendAll(&wsLib.Message{Subject: msgType, Body: node})
+func (ws *WebsocketServer) SendNode(node *runtime.Node) {
+	ws.ws.SendAll(&wsLib.Message{Subject: MessageTypeNode, Body: node})
 }
 
 func (ws *WebsocketServer) SendStats(data *yanicRuntime.GlobalStats) {

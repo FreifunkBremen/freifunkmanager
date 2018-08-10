@@ -52,7 +52,7 @@ export class StatisticsView extends View {
 				this.clientsWifi5.innerHTML = msg.body.ClientsWifi5;
 			}
 		});
-		socket.addEvent('node-current', this.updateChannelTable.bind(this));
+		socket.addEvent('node', this.updateChannelTable.bind(this));
 		socket.addEvent('channels_wifi24', this.updateChannelTable.bind(this));
 		socket.addEvent('channels_wifi5', this.updateChannelTable.bind(this));
 	}

@@ -11,18 +11,24 @@ import (
 )
 
 type Node struct {
-	Lastseen  jsontime.Time      `json:"lastseen" mapstructure:"-"`
-	NodeID    string             `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
-	Hostname  string             `json:"hostname"`
-	Location  yanicData.Location `json:"location" gorm:"embedded;embedded_prefix:location_"`
-	Wireless  yanicData.Wireless `json:"wireless" gorm:"embedded;embedded_prefix:wireless_"`
-	Owner     string             `json:"owner"`
-	Blacklist bool               `json:"blacklist" gorm:"-" mapstructure:"-"`
-	Address   string             `json:"ip" mapstructure:"-"`
-	Stats     struct {
+	Lastseen  jsontime.Time `json:"lastseen" mapstructure:"-"`
+	NodeID    string        `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
+	Blacklist bool          `json:"blacklist"`
+	Address   string        `json:"ip"`
+
+	Hostname         string             `json:"hostname"`
+	HostnameRespondd string             `json:"hostname_Respondd" gorm:"-"`
+	Owner            string             `json:"owner"`
+	OwnerRespondd    string             `json:"owner_Respondd" gorm:"-"`
+	Location         yanicData.Location `json:"location" gorm:"embedded;embedded_prefix:location_"`
+	LocationRespondd yanicData.Location `json:"location_Respondd" gorm:"-"`
+	Wireless         yanicData.Wireless `json:"wireless" gorm:"embedded;embedded_prefix:wireless_"`
+	WirelessRespondd yanicData.Wireless `json:"wireless_Respondd" gorm:"-"`
+
+	StatisticsRespondd struct {
 		Wireless yanicData.WirelessStatistics `json:"wireless"`
 		Clients  yanicData.Clients            `json:"clients"`
-	} `json:"statistics" mapstructure:"-"`
+	} `json:"statistics_respondd" mapstructure:"-"`
 }
 
 func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
@@ -30,15 +36,6 @@ func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 		node := &Node{
 			Hostname: nodeinfo.Hostname,
 			NodeID:   nodeinfo.NodeID,
-		}
-		for _, ip := range nodeinfo.Network.Addresses {
-			if !strings.HasPrefix(ip, ipPrefix) {
-				continue
-			}
-			ipAddr := net.ParseIP(ip)
-			if node.Address == "" || ipAddr.IsGlobalUnicast() {
-				node.Address = ipAddr.String()
-			}
 		}
 		if owner := nodeinfo.Owner; owner != nil {
 			node.Owner = owner.Contact
@@ -49,10 +46,7 @@ func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 		if wireless := nodeinfo.Wireless; wireless != nil {
 			node.Wireless = *wireless
 		}
-		if stats := nodeOrigin.Statistics; stats != nil {
-			node.Stats.Clients = stats.Clients
-			node.Stats.Wireless = stats.Wireless
-		}
+		node.Update(nodeOrigin, ipPrefix)
 		return node
 	}
 	return nil
@@ -60,42 +54,49 @@ func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 func (n *Node) GetAddress() net.TCPAddr {
 	return net.TCPAddr{IP: net.ParseIP(n.Address), Port: 22}
 }
-func (n *Node) Update(node *yanicRuntime.Node) {
+func (n *Node) Update(node *yanicRuntime.Node, ipPrefix string) {
+	if node == nil {
+		return
+	}
 	if nodeinfo := node.Nodeinfo; nodeinfo != nil {
-		n.Hostname = nodeinfo.Hostname
-		n.NodeID = nodeinfo.NodeID
-		n.Address = node.Address.IP.String()
+		n.HostnameRespondd = nodeinfo.Hostname
+
+		for _, ip := range nodeinfo.Network.Addresses {
+			if !strings.HasPrefix(ip, ipPrefix) {
+				continue
+			}
+			ipAddr := net.ParseIP(ip)
+			if n.Address == "" || ipAddr.IsGlobalUnicast() || !ipAddr.IsLinkLocalUnicast() {
+				n.Address = ip
+			}
+		}
 
 		if owner := nodeinfo.Owner; owner != nil {
-			n.Owner = owner.Contact
+			n.OwnerRespondd = owner.Contact
 		}
 		if location := nodeinfo.Location; location != nil {
-			n.Location = *location
+			n.LocationRespondd = *location
 		}
 		if wireless := nodeinfo.Wireless; wireless != nil {
-			n.Wireless = *wireless
+			n.WirelessRespondd = *wireless
 		}
+	}
+	if stats := node.Statistics; stats != nil {
+		n.StatisticsRespondd.Clients = stats.Clients
+		n.StatisticsRespondd.Wireless = stats.Wireless
 	}
 }
-func (n *Node) IsEqual(node *Node) bool {
-	if n.NodeID != node.NodeID {
+func (n *Node) CheckRespondd() bool {
+	if n.Hostname != n.HostnameRespondd {
 		return false
 	}
-	/*
-		if n.Address != node.Address {
-			return false
-		}
-	*/
-	if n.Hostname != node.Hostname {
+	if n.Owner != n.OwnerRespondd {
 		return false
 	}
-	if n.Owner != node.Owner {
+	if !locationEqual(n.Location, n.LocationRespondd) {
 		return false
 	}
-	if !locationEqual(n.Location, node.Location) {
-		return false
-	}
-	if !wirelessEqual(n.Wireless, node.Wireless) {
+	if !wirelessEqual(n.Wireless, n.WirelessRespondd) {
 		return false
 	}
 	return true

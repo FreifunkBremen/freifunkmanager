@@ -1,14 +1,6 @@
 package websocket
 
-import (
-	"fmt"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/FreifunkBremen/freifunkmanager/runtime"
-)
-
+/*
 func TestConnectChannelInit(t *testing.T) {
 	assert := assert.New(t)
 
@@ -25,3 +17,4 @@ func TestConnectChannelInit(t *testing.T) {
 	assert.Len(wifi5Channels, 35)
 
 }
+*/
