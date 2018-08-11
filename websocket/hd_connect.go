@@ -43,7 +43,7 @@ func init() {
 		if runtime.ChannelEU && !channel.AllowedInEU {
 			continue
 		}
-		if channel.Frequenz > runtime.FREQ_THREASHOLD {
+		if channel.Frequency > runtime.FREQ_THREASHOLD {
 			wifi5Channels = append(wifi5Channels, ch)
 		} else {
 			wifi24Channels = append(wifi24Channels, ch)

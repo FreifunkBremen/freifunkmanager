@@ -11,6 +11,51 @@ import (
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
 )
 
+type WirelessSettings struct {
+	TxPower24 uint32 `json:"txpower24,omitempty"`
+	Channel24 uint32 `json:"channel24,omitempty"`
+	TxPower5  uint32 `json:"txpower5,omitempty"`
+	Channel5  uint32 `json:"channel5,omitempty"`
+}
+
+func GetWirelessSettings(node *yanicRuntime.Node) *WirelessSettings {
+	if stats := node.Statistics; stats != nil {
+
+		settings := &WirelessSettings{}
+		for _, wifi := range stats.Wireless {
+			ch, channel := GetChannelByFrequency(wifi.Frequency)
+			if channel == nil || ChannelEU && !channel.AllowedInEU {
+				continue
+			}
+			if channel.Frequency > FREQ_THREASHOLD {
+				settings.Channel5 = ch
+			} else {
+				settings.Channel24 = ch
+			}
+		}
+		if nodeinfo := node.Nodeinfo; nodeinfo != nil {
+			if wifi := nodeinfo.Wireless; wifi != nil {
+				/* skip to only use airtime frequency (current really used - not configurated)
+				if settings.Channel24 == 0 {
+					settings.Channel24 = wifi.Channel24
+				}
+				if settings.Channel5 == 0 {
+					settings.Channel5 = wifi.Channel5
+				}
+				*/
+				if settings.TxPower24 == 0 {
+					settings.TxPower24 = wifi.TxPower24
+				}
+				if settings.TxPower5 == 0 {
+					settings.TxPower5 = wifi.TxPower5
+				}
+			}
+		}
+		return settings
+	}
+	return nil
+}
+
 type Node struct {
 	Lastseen  jsontime.Time `json:"lastseen" mapstructure:"-" gorm:"-"`
 	NodeID    string        `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
@@ -23,8 +68,8 @@ type Node struct {
 	OwnerRespondd    string             `json:"owner_respondd" gorm:"-"`
 	Location         yanicData.Location `json:"location" gorm:"embedded;embedded_prefix:location_"`
 	LocationRespondd yanicData.Location `json:"location_respondd" gorm:"-"`
-	Wireless         yanicData.Wireless `json:"wireless" gorm:"embedded;embedded_prefix:wireless_"`
-	WirelessRespondd yanicData.Wireless `json:"wireless_respondd" gorm:"-"`
+	Wireless         WirelessSettings   `json:"wireless" gorm:"embedded;embedded_prefix:wireless_"`
+	WirelessRespondd WirelessSettings   `json:"wireless_respondd" gorm:"-"`
 
 	StatisticsRespondd struct {
 		Wireless yanicData.WirelessStatistics `json:"wireless"`
@@ -44,7 +89,7 @@ func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 		if location := nodeinfo.Location; location != nil {
 			node.Location = *location
 		}
-		if wireless := nodeinfo.Wireless; wireless != nil {
+		if wireless := GetWirelessSettings(nodeOrigin); wireless != nil {
 			node.Wireless = *wireless
 		}
 		node.Update(nodeOrigin, ipPrefix)
@@ -79,7 +124,7 @@ func (n *Node) Update(node *yanicRuntime.Node, ipPrefix string) {
 		if location := nodeinfo.Location; location != nil {
 			n.LocationRespondd = *location
 		}
-		if wireless := nodeinfo.Wireless; wireless != nil {
+		if wireless := GetWirelessSettings(node); wireless != nil {
 			n.WirelessRespondd = *wireless
 		}
 	}
@@ -121,7 +166,7 @@ func locationEqual(a, b yanicData.Location) bool {
 	return true
 }
 
-func wirelessEqual(a, b yanicData.Wireless) bool {
+func wirelessEqual(a, b WirelessSettings) bool {
 	if a.Channel24 != b.Channel24 {
 		return false
 	}

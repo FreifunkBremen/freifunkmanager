@@ -70,7 +70,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 				ubus call hostapd.%s switch_chan '{"freq":%d}'
 				uci set wireless.%s.channel='%d';
 				uci commit wireless;`,
-				strings.Replace(radio, "radio", "client", 1), ch.Frequenz,
+				strings.Replace(radio, "radio", "client", 1), ch.Frequency,
 				radio, n.Wireless.Channel24))
 
 		}
@@ -99,7 +99,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 				ubus call hostapd.%s switch_chan '{"freq":%d}'
 				uci set wireless.%s.channel='%d';
 				uci commit wireless;`,
-				strings.Replace(radio, "radio", "client", 1), ch.Frequenz,
+				strings.Replace(radio, "radio", "client", 1), ch.Frequency,
 				radio, n.Wireless.Channel5))
 		}
 	}
