@@ -15,3 +15,14 @@ func (ws *WebsocketServer) SendNode(node *runtime.Node) {
 func (ws *WebsocketServer) SendStats(data *yanicRuntime.GlobalStats) {
 	ws.ws.SendAll(&wsLib.Message{Subject: MessageTypeStats, Body: data})
 }
+func (ws *WebsocketServer) SendPing(data interface{}) {
+	var sessions []*Session
+	msg := &wsLib.Message{Subject: MessageTypePing, Body: data}
+
+	ws.db.Find(&sessions)
+	for _, session := range sessions {
+		if session.Ping {
+			ws.ws.SendSession(session.SessionID, msg)
+		}
+	}
+}

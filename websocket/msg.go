@@ -13,4 +13,6 @@ const (
 
 	MessageTypeNode  = "node"
 	MessageTypeStats = "stats"
+
+	MessageTypePing = "ping"
 )
