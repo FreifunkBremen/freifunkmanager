@@ -1,7 +1,6 @@
 import config from './config';
 
-const current = {},
-	list = {};
+const list = {};
 
 // Returns the node with specified id (or null if node doesn't exist).
 export function getNode (nodeid) {
@@ -30,7 +29,6 @@ export function createNode (nodeid) {
 };
 
 // Overwrites the values for the specified node (identified by its node_id) with new values.
-// If system==false, the special "current" node will be modified instead.
 export function updateNode (node) {
 	list[node.node_id] = node;
 };

@@ -178,6 +178,7 @@ export function sendnode(node, callback) {
 
 setEvent('auth_status', (msg) => {
 	if (msg.body) {
+		store.settings = msg.body
 		store.isLogin = true;
 
 		notify.send({

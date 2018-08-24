@@ -1,11 +1,11 @@
 package websocket
 
 import (
-	"net/http"
 	"time"
 
 	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
 	"github.com/jinzhu/gorm"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/FreifunkBremen/yanic/runtime"
 )
@@ -16,10 +16,21 @@ type WebsocketServer struct {
 	blacklistFor time.Duration
 	secret       string
 	ipPrefix     string
+	ws           *wsLib.WebsocketHandlerService
+}
 
-	inputMSG chan *wsLib.Message
-	ws       *wsLib.Server
-	handlers map[string]WebsocketHandlerFunc
+func websocketHandlerFunc(f func(logger *log.Entry, msg *wsLib.Message) error) wsLib.MessageHandleFunc {
+	return func(msg *wsLib.Message) {
+		logger := log.WithFields(log.Fields{
+			"session": msg.Session,
+			"id":      msg.ID,
+			"subject": msg.Subject,
+		})
+		err := f(logger, msg)
+		if err != nil {
+			logger.Warnf("websocket message '%s' cound not handle: %s", msg.Subject, err)
+		}
+	}
 }
 
 func NewWebsocketServer(secret string, ipPrefix string, db *gorm.DB, blacklistFor time.Duration, nodes *runtime.Nodes) *WebsocketServer {
@@ -27,27 +38,33 @@ func NewWebsocketServer(secret string, ipPrefix string, db *gorm.DB, blacklistFo
 		nodes:        nodes,
 		db:           db,
 		blacklistFor: blacklistFor,
-		handlers:     make(map[string]WebsocketHandlerFunc),
-		inputMSG:     make(chan *wsLib.Message),
 		secret:       secret,
 		ipPrefix:     ipPrefix,
 	}
-	ownWS.ws = wsLib.NewServer(ownWS.inputMSG, wsLib.NewSessionManager())
+	ownWS.ws = wsLib.NewWebsocketHandlerService()
 
 	// Register Handlers
-	ownWS.handlers[MessageTypeConnect] = ownWS.connectHandler
+	ownWS.ws.SetHandler(MessageTypeConnect, websocketHandlerFunc(ownWS.connectHandler))
 
-	ownWS.handlers[MessageTypeLogin] = ownWS.loginHandler
-	ownWS.handlers[MessageTypeAuthStatus] = ownWS.authStatusHandler
-	ownWS.handlers[MessageTypeLogout] = ownWS.logoutHandler
+	ownWS.ws.SetHandler(MessageTypeLogin, websocketHandlerFunc(ownWS.loginHandler))
+	ownWS.ws.SetHandler(MessageTypeAuthStatus, websocketHandlerFunc(ownWS.authStatusHandler))
+	ownWS.ws.SetHandler(MessageTypeSettings, websocketHandlerFunc(ownWS.settingsHandler))
+	ownWS.ws.SetHandler(MessageTypeLogout, websocketHandlerFunc(ownWS.logoutHandler))
 
-	ownWS.handlers[MessageTypeNode] = ownWS.nodeHandler
+	ownWS.ws.SetHandler(MessageTypeNode, websocketHandlerFunc(ownWS.nodeHandler))
 
-	http.HandleFunc("/ws", ownWS.ws.Handler)
-	go ownWS.MessageHandler()
+	ownWS.ws.FallbackHandler = func(msg *wsLib.Message) {
+		log.WithFields(log.Fields{
+			"session": msg.Session,
+			"id":      msg.ID,
+			"subject": msg.Subject,
+		}).Warnf("websocket message '%s' cound not handle", msg.Subject)
+	}
+
+	ownWS.ws.Listen("/ws")
 	return &ownWS
 }
 
 func (ws *WebsocketServer) Close() {
-	close(ws.inputMSG)
+	ws.ws.Close()
 }

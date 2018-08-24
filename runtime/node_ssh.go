@@ -2,7 +2,6 @@ package runtime
 
 import (
 	"fmt"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -66,12 +65,13 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 			runWifi = true
 		}
 		if n.Wireless.Channel24 != n.WirelessRespondd.Channel24 {
+			//ubus call hostapd.%s switch_chan '{"freq":%d}'
 			ssh.Execute(n.Address, client, fmt.Sprintf(`
-				ubus call hostapd.%s switch_chan '{"freq":%d}'
 				uci set wireless.%s.channel='%d';
 				uci commit wireless;`,
-				strings.Replace(radio, "radio", "client", 1), ch.Frequency,
+				//strings.Replace(radio, "radio", "client", 1), ch.Frequency,
 				radio, n.Wireless.Channel24))
+			runWifi = true
 
 		}
 	}
@@ -95,12 +95,13 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 			runWifi = true
 		}
 		if n.Wireless.Channel5 != n.WirelessRespondd.Channel5 {
+			//ubus call hostapd.%s switch_chan '{"freq":%d}'
 			ssh.Execute(n.Address, client, fmt.Sprintf(`
-				ubus call hostapd.%s switch_chan '{"freq":%d}'
 				uci set wireless.%s.channel='%d';
 				uci commit wireless;`,
-				strings.Replace(radio, "radio", "client", 1), ch.Frequency,
+				//strings.Replace(radio, "radio", "client", 1), ch.Frequency,
 				radio, n.Wireless.Channel5))
+			runWifi = true
 		}
 	}
 	return true

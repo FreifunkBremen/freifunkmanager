@@ -12,6 +12,7 @@ import config from './config';
 import {ListView} from './view/list';
 import {MapView} from './view/map';
 import {StatisticsView} from './view/statistics';
+import {SettingsView} from './view/settings';
 
 import {NodeView} from './view/node';
 
@@ -20,6 +21,7 @@ window.onload = () => {
 	const listView = new ListView();
 	const mapView = new MapView();
 	const statisticsView = new StatisticsView();
+	const settingsView = new SettingsView();
 
 	const nodeView = new NodeView();
 
@@ -27,6 +29,7 @@ window.onload = () => {
 		'/list': () => gui.setView(listView),
 		'/map': () => gui.setView(mapView),
 		'/statistics': () => gui.setView(statisticsView),
+		'/settings': () => gui.setView(settingsView),
 		'/n/:nodeID': {
 			'as': 'node',
 			// eslint-disable-next-line func-name-matching

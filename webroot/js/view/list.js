@@ -107,6 +107,7 @@ export class ListView extends View {
 				V.h('td', {}, V.h('input',{
 					'value': this._hostname || node.hostname,
 					'oninput':(e) => {
+						this._node_id = node.node_id;
 						this._hostname = e.target.value;
 					},
 					'onfocusout':(e) => {
@@ -167,6 +168,7 @@ export class ListView extends View {
 						'max': 23,
 						'value': this._txpower24 || node.wireless.txpower24,
 						'oninput':(e) => {
+							this._node_id = node.node_id;
 							this._txpower24 = e.target.value;
 						},
 						'onfocusout':(e) => {
@@ -188,6 +190,7 @@ export class ListView extends View {
 						'max': 23,
 						'value': this._txpower5 || node.wireless.txpower5,
 						'oninput':(e) => {
+							this._node_id = node.node_id;
 							this._txpower5 = e.target.value;
 						},
 						'onfocusout':(e) => {

@@ -21,9 +21,14 @@ nav {
 		list-style-type: none;
 	}
 
-	ul > li {
+	ul > li,
+	ul li.right {
 		float:left;
 		display: inline-block;
+
+		&.right {
+			float: right;
+		}
 
 		a,
 		span {

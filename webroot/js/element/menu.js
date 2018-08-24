@@ -31,6 +31,7 @@ export class MenuView extends View {
 	login() {
 		socket.sendjson({'subject': 'login', 'body': this._loginInput}, (msg) => {
 			if (msg.body) {
+				store.settings = msg.body;
 				store.isLogin = true;
 				render();
 			}else {
@@ -60,7 +61,7 @@ export class MenuView extends View {
 	render () {
 		const socketStatus = socket.getStatus();
 		let statusClass = 'status ',
-			vLogin = V.h('li', {
+			vLogin = [V.h('li', {
 				'class': 'login',
 			}, [
 				V.h('input', {
@@ -70,15 +71,24 @@ export class MenuView extends View {
 				}),
 				V.h('a', {
 					'onclick': this.login.bind(this)
-				}, 'Login'
-				)
-			]);
+				}, 'Login')
+			])];
 
 		if (store.isLogin) {
-			vLogin = V.h('li', {
-				'class': 'login',
-				'onclick': this.logout.bind(this)
-			}, 'Logout');
+			vLogin = [
+				V.h('li', {
+					'class': 'login',
+				},[
+					V.h('a', {
+						'onclick': this.logout.bind(this)
+					}, 'Logout')
+				]),
+				V.h('li', {
+					'class':'right item-3'
+				},[V.h('a', {
+						'href': '#/settings'
+					}, 'Settings')])
+			];
 		}
 
 		if (socketStatus !== 1) {
@@ -93,6 +103,6 @@ export class MenuView extends View {
 		V.render(this.vMenu, this.vMenu = V.h('span',{},[V.h('li', {
 			'class': statusClass,
 			'onclick': () => location.reload(true)
-		}), vLogin]), this.menuList);
+		})].concat(vLogin)), this.menuList);
 	}
 }

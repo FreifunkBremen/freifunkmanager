@@ -4,15 +4,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 
 	"dev.sum7.eu/genofire/golang-lib/websocket"
 )
 
 type Session struct {
-	SessionID uuid.UUID  `json:"-" gorm:"primary_key"`
-	Lastseen  *time.Time `json:"-"`
-	Ping      bool       `json:"ping"`
+	SessionID uuid.UUID  `json:"-" gorm:"primary_key" mapstructure:"-"`
+	Lastseen  *time.Time `json:"-" mapstructure:"-"`
+	Ping      bool       `json:"ping" mapstructure:"ping"`
 }
 
 func (ws *WebsocketServer) IsLoggedIn(msg *websocket.Message) (*Session, bool) {
@@ -35,7 +36,10 @@ func (ws *WebsocketServer) loginHandler(logger *log.Entry, msg *websocket.Messag
 	}
 	err := ws.db.First(&session)
 	if err.Error == nil {
-		msg.Answer(msg.Subject, true)
+		msg.Answer(msg.Subject, session)
+		now := time.Now()
+		session.Lastseen = &now
+		ws.db.Save(&session)
 		logger.Warn("already loggedIn")
 		return nil
 	}
@@ -73,6 +77,31 @@ func (ws *WebsocketServer) authStatusHandler(logger *log.Entry, msg *websocket.M
 	}
 	return nil
 }
+
+func (ws *WebsocketServer) settingsHandler(logger *log.Entry, msg *websocket.Message) error {
+	session, ok := ws.IsLoggedIn(msg)
+	if !ok {
+		msg.Answer(msg.Subject, false)
+		logger.Warn("logout without login")
+		return nil
+	}
+
+	var setting Session
+	if err := mapstructure.Decode(msg.Body, &setting); err != nil {
+		msg.Answer(msg.Subject, false)
+		logger.Warnf("not able to decode data: %s", err)
+		return nil
+	}
+	setting.SessionID = session.SessionID
+	setting.Lastseen = session.Lastseen
+
+	err := ws.db.Save(&setting)
+
+	logger.Debug("done")
+	msg.Answer(msg.Subject, err.Error == nil)
+	return err.Error
+}
+
 func (ws *WebsocketServer) logoutHandler(logger *log.Entry, msg *websocket.Message) error {
 	session := Session{
 		SessionID: msg.Session,

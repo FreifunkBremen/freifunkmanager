@@ -5,6 +5,7 @@ const (
 
 	MessageTypeLogin      = "login"
 	MessageTypeAuthStatus = "auth_status"
+	MessageTypeSettings   = "settings"
 	MessageTypeLogout     = "logout"
 
 	MessageTypeChannelsWifi24 = "channels_wifi24"
