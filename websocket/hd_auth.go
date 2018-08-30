@@ -17,6 +17,9 @@ type Session struct {
 }
 
 func (ws *WebsocketServer) IsLoggedIn(msg *websocket.Message) (*Session, bool) {
+	if msg == nil || msg.Session == uuid.Nil {
+		return nil, false
+	}
 	session := Session{
 		SessionID: msg.Session,
 	}
@@ -31,6 +34,10 @@ func (ws *WebsocketServer) IsLoggedIn(msg *websocket.Message) (*Session, bool) {
 }
 
 func (ws *WebsocketServer) loginHandler(logger *log.Entry, msg *websocket.Message) error {
+	if msg == nil || msg.Session == uuid.Nil {
+		logger.Warn("no session for this message detected")
+		return nil
+	}
 	session := Session{
 		SessionID: msg.Session,
 	}
@@ -82,7 +89,7 @@ func (ws *WebsocketServer) settingsHandler(logger *log.Entry, msg *websocket.Mes
 	session, ok := ws.IsLoggedIn(msg)
 	if !ok {
 		msg.Answer(msg.Subject, false)
-		logger.Warn("logout without login")
+		logger.Warn("try set settings without login")
 		return nil
 	}
 
@@ -103,6 +110,10 @@ func (ws *WebsocketServer) settingsHandler(logger *log.Entry, msg *websocket.Mes
 }
 
 func (ws *WebsocketServer) logoutHandler(logger *log.Entry, msg *websocket.Message) error {
+	if msg == nil || msg.Session == uuid.Nil {
+		logger.Warn("no session for this message detected")
+		return nil
+	}
 	session := Session{
 		SessionID: msg.Session,
 	}
