@@ -62,7 +62,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 				uci set wireless.%s.txpower='%d';
 				uci commit wireless;`,
 				radio, n.Wireless.TxPower24))
-			runWifi = true
+			//runWifi = true
 		}
 		if n.Wireless.Channel24 != n.WirelessRespondd.Channel24 {
 			//ubus call hostapd.%s switch_chan '{"freq":%d}'
@@ -92,7 +92,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 				uci set wireless.%s.txpower='%d';
 				uci commit wireless;`,
 				radio, n.Wireless.TxPower5))
-			runWifi = true
+			//runWifi = true
 		}
 		if n.Wireless.Channel5 != n.WirelessRespondd.Channel5 {
 			//ubus call hostapd.%s switch_chan '{"freq":%d}'

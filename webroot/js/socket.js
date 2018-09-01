@@ -11,6 +11,7 @@ const RECONNECT_AFTER = 5000,
 
 let connectionID = localStorage.getItem('session'),
 	socket = null,
+	sessionInit = false,
 	connectionEstablished = false;
 
 function newUUID () {
@@ -51,7 +52,7 @@ function onopen () {
 
 
 export function sendjson (obj, callback) {
-	if (socket.readyState !== 1) {
+	if (socket.readyState !== 1 || (!sessionInit && obj.subject !== 'session_init')) {
 		query.push({
 			'callback': callback,
 			'obj': obj
@@ -79,6 +80,7 @@ function onmessage (raw) {
 		msg.id = connectionID;
 		sendjson(msg);
 		render();
+		sessionInit = true;
 		return;
 	}
 
