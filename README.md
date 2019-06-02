@@ -84,3 +84,24 @@ When node settings are changed in the web interface, an SSH connection is opened
 
 All changes are also saved to a state file (eg. /tmp/freifunkmanager.json - can be changed in config file).
 And all of the received node data is also stored in a database (see `db_type` and `db_connection` config options).
+
+## Creating dummy respondd data
+
+- create dummy "eth10" network interface:
+```
+sudo -s
+modprobe dummy
+ifconfig dummy0 hw ether 00:22:22:ff:ff:ff
+ipaddr=`ipv6calc --in prefix+mac --action prefixmac2ipv6 --out ipv6addr fe80:: 00:22:22:ff:ff:ff`
+ip a add dev dummy0 scope link $ipaddr/64
+ip link set dummy0 up
+```
+
+- edit tools/example-response.json to set network addresses for each node that are reachable with SSH (otherwise the nodes will be blacklisted immediately)
+    - also, if necessary adjust the `ssh_ipaddress_prefix` setting in config_example.conf to match the addresses from example-response.json
+- edit config_example.conf: in [yanic] section set ifname="dummy0"
+- edit $GOPATH/src/github.com/FreifunkBremen/yanic/respond/respond.go: change port=10001
+- go to $GOPATH/src/github.com/FreifunkBremen/freifunkmanager/ and run "go build"
+- start FFMan as usual (`./freifunkmanager -config config_example.conf`)
+- in another shell run `./tools/respondd-sim.py -p 10001 -i dummy0 -f tools/example-response.json`
+- FFMan should now display two new nodes with the example hostnames

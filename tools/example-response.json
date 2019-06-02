@@ -1,0 +1,26 @@
+[
+    {
+        "nodeinfo": {
+            "node_id": "002222ff1001",
+            "hostname": "testnode_101",
+            "network" : {
+                "addresses" : [
+                    "1234::5678",
+                    "9012::3456"
+                ]
+            }
+        }
+    },
+    {
+        "nodeinfo": {
+            "node_id": "002222ff1002",
+            "hostname": "testnode_102",
+            "network" : {
+                "addresses" : [
+                    "1234::5678",
+                    "9012::3456"
+                ]
+            }
+        }
+    }
+]
