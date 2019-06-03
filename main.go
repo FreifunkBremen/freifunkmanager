@@ -56,6 +56,12 @@ func main() {
 	ws := websocket.NewWebsocketServer(config.Secret, config.SSHIPAddressPrefix, db, config.BlacklistFor.Duration, nodesYanic)
 
 	yanic := runtime.NewYanicDB(db, sshmanager, config.BlacklistFor.Duration, ws.SendNode, ws.SendStats, config.SSHIPAddressPrefix)
+	
+	pinger, err := runtime.NewPinger(db, config.BlacklistFor.Duration, ws.SendPing)
+	if err != nil {
+		log.Panic(err)
+	}
+	go pinger.Start()
 
 	if config.YanicEnable {
 		if duration := config.YanicSynchronize.Duration; duration > 0 {
