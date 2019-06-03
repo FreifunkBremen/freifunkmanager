@@ -18,7 +18,7 @@ func TestNode(t *testing.T) {
 	n1 := NewNode(node1, "")
 	assert.Nil(n1)
 
-	node1.Nodeinfo = &yanicData.NodeInfo{
+	node1.Nodeinfo = &yanicData.Nodeinfo{
 		Owner:    &yanicData.Owner{Contact: "blub"},
 		Wireless: &yanicData.Wireless{},
 		Location: &yanicData.Location{Altitude: 13},
