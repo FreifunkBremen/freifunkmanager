@@ -72,9 +72,36 @@ Navigation bar at top of page:
 
 ## Technical Details
 
-List of known access points will be retrieved from [Yanic](https://github.com/FreifunkBremen/yanic) (ie. representing live data from APs).
-Additionally, APs can be added manually by visiting a page like /#/n/apname (where "apname" is the node-id of the new AP), and then setting a hostname.
+List of known nodes will be retrieved with the [respondd](https://github.com/freifunk-gluon/packages/tree/master/net/respondd) protocol (ie. by periodic UDP multicast requests to all reachable nodes). For this, FFMan uses a built-in [Yanic](https://github.com/FreifunkBremen/yanic) instance. The respondd protocol provides configuration details and statistics for each node.
 
-Each browser tab has a websocket connection to the server, so changes made in one tab will appear immediately in other tabs as well
+Alternatively, FFMan can also be configured to just listen to respondd responses (without sending requests); this is useful to "listen in" on the responses requested by a separate Yanic process running on the same network. This mode can be enabled by setting `yanic_collect_interval` to `0s` and settings `yanic.send_no_request` to `true`.
 
-All changes are saved to state file (eg. /tmp/freifunkmanager.json - can be changed in config file).
+Additionally, nodes can be added manually by visiting a page like /#/n/apname (where "apname" is the node-id of the new device), and then setting a hostname.
+
+The web interface displays all nodes that were found (except for nodes which don't respond to SSH - these are blacklisted). The web interface is updated live, by using a websocket connection; this also means that changes made in one tab will appear immediately in other tabs as well.
+
+When node settings are changed in the web interface, an SSH connection is opened to the node to apply the new settings.
+
+All changes are also saved to a state file (eg. /tmp/freifunkmanager.json - can be changed in config file).
+And all of the received node data is also stored in a database (see `db_type` and `db_connection` config options).
+
+## Creating dummy respondd data
+
+- create dummy "eth10" network interface:
+```
+sudo -s
+modprobe dummy
+ifconfig dummy0 hw ether 00:22:22:ff:ff:ff
+ipaddr=`ipv6calc --in prefix+mac --action prefixmac2ipv6 --out ipv6addr fe80:: 00:22:22:ff:ff:ff`
+ip a add dev dummy0 scope link $ipaddr/64
+ip link set dummy0 up
+```
+
+- edit tools/example-response.json to set network addresses for each node that are reachable with SSH (otherwise the nodes will be blacklisted immediately)
+    - also, if necessary adjust the `ssh_ipaddress_prefix` setting in config_example.conf to match the addresses from example-response.json
+- edit config_example.conf: in [yanic] section set ifname="dummy0"
+- edit $GOPATH/src/github.com/FreifunkBremen/yanic/respond/respond.go: change port=10001
+- go to $GOPATH/src/github.com/FreifunkBremen/freifunkmanager/ and run "go build"
+- start FFMan as usual (`./freifunkmanager -config config_example.conf`)
+- in another shell run `./tools/respondd-sim.py -p 10001 -i dummy0 -f tools/example-response.json`
+- FFMan should now display two new nodes with the example hostnames
