@@ -6,12 +6,12 @@ stages:
 before_script:
   - mkdir -p /go/src/github.com/FreifunkBremen/
   - cp -R $CI_PROJECT_DIR /go/src/github.com/FreifunkBremen/
-  - go get -v github.com/FreifunkBremen/$CI_PROJECT_NAME
   - cd /go/src/github.com/FreifunkBremen/$CI_PROJECT_NAME
 
 build-my-project:
   stage: build
   script:
+    - go get -v github.com/FreifunkBremen/$CI_PROJECT_NAME
     - mkdir $CI_PROJECT_DIR/bin/
     - cp /go/bin/$CI_PROJECT_NAME $CI_PROJECT_DIR/bin/$CI_PROJECT_NAME
   artifacts:
@@ -24,12 +24,12 @@ test-my-project:
   script:
     - ./.ci/check-gofmt
     - ./.ci/check-testfiles
-    - go get -d github.com/stretchr/testify/assert
+    - go get -t -v github.com/FreifunkBremen/$CI_PROJECT_NAME
     - go test $(go list ./... | grep -v /vendor/ | grep -v /webroot/) -v -coverprofile .testCoverage.txt
     - go tool cover -func=.testCoverage.txt
 
 test-race-my-project:
   stage: test
   script:
-    - go get -d github.com/stretchr/testify/assert
+    - go get -t -v github.com/FreifunkBremen/$CI_PROJECT_NAME
     - go test -race ./...
