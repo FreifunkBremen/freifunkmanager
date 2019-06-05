@@ -202,5 +202,7 @@ addEvent('channels_wifi24', (msg) => {
 addEvent('channels_wifi5', (msg) => {
 	store.channelsWifi5 = msg.body.sort((a, b) => a - b);
 });
-
+addEvent('ping', (msg) => {
+	store.updateNodePing(msg.body);
+});
 connect();
