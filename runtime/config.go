@@ -27,6 +27,9 @@ type Config struct {
 	SSHIPAddressPrefix string            `toml:"ssh_ipaddress_prefix"`
 	SSHTimeout         duration.Duration `toml:"ssh_timeout"`
 
+	// Pinger
+	Pinger PingerConfig `toml:"pinger"`
+
 	// yanic socket
 	YanicEnable          bool                         `toml:"yanic_enable"`
 	YanicSynchronize     duration.Duration            `toml:"yanic_synchronize"`
