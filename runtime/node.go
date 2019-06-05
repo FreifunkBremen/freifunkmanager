@@ -7,7 +7,6 @@ import (
 	"time"
 
 	yanicData "github.com/FreifunkBremen/yanic/data"
-	"github.com/FreifunkBremen/yanic/lib/jsontime"
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
 )
 
@@ -57,10 +56,10 @@ func GetWirelessSettings(node *yanicRuntime.Node) *WirelessSettings {
 }
 
 type Node struct {
-	Lastseen  jsontime.Time `json:"lastseen" mapstructure:"-" gorm:"-"`
-	NodeID    string        `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
-	Blacklist *time.Time    `json:"-"`
-	Address   string        `json:"ip"`
+	Lastseen  time.Time  `json:"lastseen" mapstructure:"-" gorm:"lastseen"`
+	NodeID    string     `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
+	Blacklist *time.Time `json:"-"`
+	Address   string     `json:"ip"`
 
 	Hostname         string             `json:"hostname"`
 	HostnameRespondd string             `json:"hostname_respondd" gorm:"-"`
@@ -104,7 +103,7 @@ func (n *Node) Update(node *yanicRuntime.Node, ipPrefix string) {
 	if node == nil {
 		return
 	}
-	n.Lastseen = jsontime.Now()
+	n.Lastseen = time.Now()
 	if nodeinfo := node.Nodeinfo; nodeinfo != nil {
 		n.HostnameRespondd = nodeinfo.Hostname
 

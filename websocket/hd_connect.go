@@ -18,13 +18,17 @@ func (ws *WebsocketServer) connectHandler(logger *log.Entry, msg *wsLib.Message)
 	var count int
 
 	now := time.Now()
+	before := now.Add(-ws.blacklistFor)
 
 	ws.db.Find(&nodes).Count(&count)
 
 	ws.nodes.Lock()
 	i := 0
 	for _, node := range nodes {
-		if node.Blacklist != nil && node.Blacklist.After(now.Add(-ws.blacklistFor)) {
+		if node.Blacklist != nil && node.Blacklist.After(before) {
+			continue
+		}
+		if node.Lastseen.Before(before) {
 			continue
 		}
 		node.Update(ws.nodes.List[node.NodeID], ws.ipPrefix)

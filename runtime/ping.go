@@ -68,6 +68,7 @@ func (pinger *Pinger) Stop() {
 func (pinger *Pinger) run() {
 	result := &data.PingResult{}
 	now := time.Now()
+	before := now.Add(-pinger.blacklistFor)
 
 	count := 0
 	var nodes []*Node
@@ -80,7 +81,7 @@ func (pinger *Pinger) run() {
 	for _, node := range nodes {
 		go func(n *Node) {
 			defer wg.Done()
-			if n.Blacklist.After(now.Add(-pinger.blacklistFor)) {
+			if n.Blacklist != nil && n.Blacklist.After(before) {
 				return
 			}
 
