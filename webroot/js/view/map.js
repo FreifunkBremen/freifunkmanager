@@ -104,7 +104,11 @@ export class MapView extends View {
 
 		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
 		if (new Date(node.lastseen) < startdate) {
-			className += ' offline';
+			if (node.pingstate.some((x)=>x)) {
+				className += ' warn';
+			}else{
+				className += ' offline';
+			}
 		}
 
 
