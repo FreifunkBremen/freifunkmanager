@@ -1,7 +1,7 @@
 import config from './config';
 
 const list = {},
-	storeMaxPing = 5,
+	storeMaxPing = 5;
 
 // Returns the node with specified id (or null if node doesn't exist).
 export function getNode (nodeid) {
