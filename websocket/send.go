@@ -5,8 +5,8 @@ import (
 
 	yanicRuntime "github.com/FreifunkBremen/yanic/runtime"
 
-	"github.com/FreifunkBremen/freifunkmanager/runtime"
 	"github.com/FreifunkBremen/freifunkmanager/data"
+	"github.com/FreifunkBremen/freifunkmanager/runtime"
 )
 
 func (ws *WebsocketServer) SendNode(node *runtime.Node) {
