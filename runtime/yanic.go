@@ -46,23 +46,26 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 	}
 	if conn.db.First(&lNode).Error == nil {
 		lNode.Update(n, conn.prefix)
-		conn.db.Model(&lNode).Update(map[string]interface{}{"address": lNode.Address})
+		conn.db.Model(&lNode).Update(map[string]interface{}{
+			"address":  lNode.Address,
+			"lastseen": now,
+		})
 
 		if lNode.Blacklist != nil && lNode.Blacklist.After(now.Add(-conn.blacklistFor)) {
 			logger.Debug("on blacklist")
 			return
 		}
-		conn.sendNode(&lNode)
 		if !lNode.CheckRespondd() {
 			if !lNode.SSHUpdate(conn.ssh) {
 				conn.db.Model(&lNode).Update(map[string]interface{}{"blacklist": &now})
 				logger.Warn("yanic trigger sshupdate failed - set blacklist")
-			} else {
-				logger.Debug("yanic trigger sshupdate again")
+				return
 			}
+			logger.Debug("yanic trigger sshupdate again")
 		} else {
 			logger.Debug("yanic update")
 		}
+		conn.sendNode(&lNode)
 		return
 	}
 	node := NewNode(n, conn.prefix)
