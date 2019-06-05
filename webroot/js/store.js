@@ -1,6 +1,7 @@
 import config from './config';
 
-const list = {};
+const list = {},
+	storeMaxPing = 5,
 
 // Returns the node with specified id (or null if node doesn't exist).
 export function getNode (nodeid) {
@@ -24,13 +25,31 @@ export function createNode (nodeid) {
 			'channel24': config.node.channel24,
 			'channel5': config.node.channel5,
 		},
-		'location': {}
+		'location': {},
+		'pingstate':[]
 	};
 };
 
 // Overwrites the values for the specified node (identified by its node_id) with new values.
 export function updateNode (node) {
 	list[node.node_id] = node;
+};
+
+function updateNodePingTo(value){
+	return (nodeid) => {
+		if (!list[nodeid]) {
+			return;
+		}
+		list[nodeid]['pingstate'].unshift(value);
+		if (list[nodeid]['pingstate'].length > storeMaxPing) {
+			list[nodeid]['pingstate'].length = storeMaxPing;
+		}
+	}
+}
+
+export function updateNodePing(ping) {
+	ping["true"].forEach(updateNodePingTo(true));
+	ping["false"].forEach(updateNodePingTo(false));
 };
 
 // Returns a list of all known nodes.
