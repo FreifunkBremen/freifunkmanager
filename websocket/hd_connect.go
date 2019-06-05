@@ -1,8 +1,6 @@
 package websocket
 
 import (
-	"time"
-
 	log "github.com/sirupsen/logrus"
 
 	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
@@ -17,18 +15,12 @@ func (ws *WebsocketServer) connectHandler(logger *log.Entry, msg *wsLib.Message)
 	var nodes []*runtime.Node
 	var count int
 
-	now := time.Now()
-	before := now.Add(-ws.blacklistFor)
-
 	ws.db.Find(&nodes).Count(&count)
 
 	ws.nodes.Lock()
 	i := 0
 	for _, node := range nodes {
-		if node.Blacklist != nil && node.Blacklist.After(before) {
-			continue
-		}
-		if node.Lastseen.Before(before) {
+		if node.TimeFilter(ws.blacklistFor) {
 			continue
 		}
 		node.Update(ws.nodes.List[node.NodeID], ws.ipPrefix)

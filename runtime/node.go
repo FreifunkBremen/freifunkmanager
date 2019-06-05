@@ -56,7 +56,7 @@ func GetWirelessSettings(node *yanicRuntime.Node) *WirelessSettings {
 }
 
 type Node struct {
-	Lastseen  time.Time  `json:"lastseen" mapstructure:"-" gorm:"lastseen"`
+	Lastseen  *time.Time `json:"lastseen" mapstructure:"-" gorm:"lastseen"`
 	NodeID    string     `json:"node_id" gorm:"primary_key" mapstructure:"node_id"`
 	Blacklist *time.Time `json:"-"`
 	Address   string     `json:"ip"`
@@ -99,11 +99,19 @@ func NewNode(nodeOrigin *yanicRuntime.Node, ipPrefix string) *Node {
 func (n *Node) GetAddress() net.TCPAddr {
 	return net.TCPAddr{IP: net.ParseIP(n.Address), Port: 22}
 }
+
+func (n *Node) TimeFilter(d time.Duration) bool {
+	now := time.Now()
+	before := now.Add(-d)
+	return n.Lastseen == nil || n.Lastseen.Before(before) || n.Blacklist != nil && n.Blacklist.After(before)
+}
+
 func (n *Node) Update(node *yanicRuntime.Node, ipPrefix string) {
 	if node == nil {
 		return
 	}
-	n.Lastseen = time.Now()
+	now := time.Now()
+	n.Lastseen = &now
 	if nodeinfo := node.Nodeinfo; nodeinfo != nil {
 		n.HostnameRespondd = nodeinfo.Hostname
 
