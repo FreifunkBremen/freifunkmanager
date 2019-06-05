@@ -51,7 +51,7 @@ func (conn *YanicDB) InsertNode(n *runtimeYanic.Node) {
 			"lastseen": now,
 		})
 
-		if lNode.Blacklist != nil && lNode.Blacklist.After(now.Add(-conn.blacklistFor)) {
+		if lNode.TimeFilter(conn.blacklistFor) {
 			logger.Debug("on blacklist")
 			return
 		}
