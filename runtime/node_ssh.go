@@ -3,7 +3,7 @@ package runtime
 import (
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/bdlm/log"
 
 	"github.com/FreifunkBremen/freifunkmanager/ssh"
 )

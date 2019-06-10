@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/bdlm/log"
 	"golang.org/x/crypto/ssh"
 )
 

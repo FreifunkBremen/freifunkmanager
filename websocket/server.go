@@ -4,8 +4,8 @@ import (
 	"time"
 
 	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
+	"github.com/bdlm/log"
 	"github.com/jinzhu/gorm"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/FreifunkBremen/yanic/runtime"
 )

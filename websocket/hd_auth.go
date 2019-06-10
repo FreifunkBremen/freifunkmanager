@@ -3,9 +3,9 @@ package websocket
 import (
 	"time"
 
+	"github.com/bdlm/log"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
-	log "github.com/sirupsen/logrus"
 
 	"dev.sum7.eu/genofire/golang-lib/websocket"
 )
