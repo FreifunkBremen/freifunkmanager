@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	log "github.com/sirupsen/logrus"
+	"github.com/bdlm/log"
 
 	wsLib "dev.sum7.eu/genofire/golang-lib/websocket"
 

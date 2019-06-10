@@ -3,8 +3,8 @@ package runtime
 import (
 	"time"
 
+	"github.com/bdlm/log"
 	"github.com/jinzhu/gorm"
-	log "github.com/sirupsen/logrus"
 
 	databaseYanic "github.com/FreifunkBremen/yanic/database"
 	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"

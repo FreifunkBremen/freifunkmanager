@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"net"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/bdlm/log"
 	"golang.org/x/crypto/ssh"
 )
 

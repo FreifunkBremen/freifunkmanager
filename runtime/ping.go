@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/FreifunkBremen/yanic/lib/duration"
+	"github.com/bdlm/log"
 	"github.com/digineo/go-ping"
 	"github.com/jinzhu/gorm"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/FreifunkBremen/freifunkmanager/data"
 )

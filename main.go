@@ -10,7 +10,7 @@ import (
 
 	"dev.sum7.eu/genofire/golang-lib/file"
 	"github.com/NYTimes/gziphandler"
-	log "github.com/sirupsen/logrus"
+	"github.com/bdlm/log"
 
 	respondYanic "github.com/FreifunkBremen/yanic/respond"
 	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
