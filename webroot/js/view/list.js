@@ -80,7 +80,8 @@ export class ListView extends View {
 	renderRow (node) {
 		const startdate = new Date(),
 			channel24Options = [],
-			channel5Options = [];
+			channel5Options = [],
+			pingerResult = [];
 		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
 
 
@@ -97,12 +98,18 @@ export class ListView extends View {
 				'selected': (store.channelsWifi5[i] === node.wireless.channel5),
 			}, store.channelsWifi5[i]));
 		}
-
+		for (i = 0; i < node.pingstate.length; i++) {
+			pingerResult.push(V.h('div',{'class':node.pingstate[i]?'online':''}));
+		}
 
 		return V.h('tr', {},[
 				V.h('td', {
 					'class':(new Date(node.lastseen) < startdate)?'offline':(!node.wireless_respondd)?'unseen':''
-				}, FromNowAgo(node.lastseen)),
+				},[ 
+
+					V.h('span', {}, FromNowAgo(node.lastseen)),
+					V.h('span', {'class': 'pinger'}, pingerResult),
+				]),
 				V.h('td', {}, node.node_id),
 				V.h('td', {}, V.h('input',{
 					'value': this._hostname || node.hostname,
