@@ -43,6 +43,7 @@ go get github.com/mattn/goveralls
 go get golang.org/x/tools/cmd/cover
 cd $GOPATH/src/github.com/FreifunkBremen/freifunkmanager/
 go build
+sudo setcap cap_net_raw+ep freifunkmanager # necessary for sending ping packets
 cd webroot
 yarn install
 yarn gulp build
