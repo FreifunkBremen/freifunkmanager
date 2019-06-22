@@ -3,7 +3,7 @@
 
 export default {
 	'title': 'FreifunkManager - Breminale',
-	'backend': `ws${location.protocol == 'https:' ? 's' : ''}://${location.host}/ws`,
+	'backend': `ws${location.protocol == 'https:' ? 's' : ''}://${location.host}${location.pathname}ws`,
 	'node': {
 		'channel24': 6,
 		'channel5': 44,
