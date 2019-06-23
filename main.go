@@ -99,7 +99,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-sigs
 
-	log.Debug("stop recieve:", sig)
+	log.Debug("stop receive:", sig)
 
 	ws.Close()
 

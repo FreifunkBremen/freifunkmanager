@@ -21,7 +21,7 @@ def get_handler(inputFile):
                 if name in nodeData:
                     ret[name] = nodeData[name]
 
-            print("reponse: %s" % ret)
+            print("response: %s" % ret)
             return compress(str.encode(json.dumps(ret)))[2:-4]
 
         def handle(self):
