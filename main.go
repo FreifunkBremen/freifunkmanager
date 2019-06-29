@@ -46,7 +46,7 @@ func main() {
 
 	db, err := gorm.Open(config.DatabaseType, config.DatabaseConnection)
 	if err != nil {
-		log.Panic("failed to connect database")
+		log.Panicf("failed to connect database: %s", err)
 	}
 	db.AutoMigrate(&runtime.Node{}, &websocket.Session{})
 
