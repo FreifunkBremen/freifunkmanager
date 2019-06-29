@@ -16,6 +16,7 @@ import (
 	runtimeYanic "github.com/FreifunkBremen/yanic/runtime"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"github.com/FreifunkBremen/freifunkmanager/runtime"
