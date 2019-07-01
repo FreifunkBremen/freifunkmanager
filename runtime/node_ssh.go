@@ -83,7 +83,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 				uci set wireless.priv_%s.ssid='offline-%s';
 				uci commit wireless;`,
 				n.Hostname))
-			runWifi = true
+ 			// runWifi = true <- not needed for offline-ssid
 	    }
 	}
 
