@@ -82,7 +82,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 			ssh.Execute(n.Address, client, fmt.Sprintf(`
 				uci set wireless.priv_%s.ssid='offline-%s';
 				uci commit wireless;`,
-				n.Hostname))
+				radio, n.Hostname))
  			// runWifi = true <- not needed for offline-ssid
 	    }
 	}
