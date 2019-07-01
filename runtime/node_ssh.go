@@ -45,6 +45,7 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 		}
 	}()
 
+	// update settings for 2.4GHz (802.11g) radio
 	result, err := ssh.Run(n.Address, client, `
 		if [ "$(uci get wireless.radio0.hwmode | grep -c g)" -ne 0 ]; then
 			echo "radio0";
@@ -56,25 +57,37 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 	}
 	radio := ssh.SSHResultToString(result)
 	ch := GetChannel(n.Wireless.Channel24)
-	if radio != "" && ch != nil {
-		if n.Wireless.TxPower24 != n.WirelessRespondd.TxPower24 {
-			ssh.Execute(n.Address, client, fmt.Sprintf(`
-				uci set wireless.%s.txpower='%d';
-				uci commit wireless;`,
-				radio, n.Wireless.TxPower24))
-			//runWifi = true
-		}
-		if n.Wireless.Channel24 != n.WirelessRespondd.Channel24 {
-			//ubus call hostapd.%s switch_chan '{"freq":%d}'
-			ssh.Execute(n.Address, client, fmt.Sprintf(`
-				uci set wireless.%s.channel='%d';
-				uci commit wireless;`,
-				//strings.Replace(radio, "radio", "client", 1), ch.Frequency,
-				radio, n.Wireless.Channel24))
-			runWifi = true
+	if radio != "" {
+		if ch != nil {
+			if n.Wireless.TxPower24 != n.WirelessRespondd.TxPower24 {
+				ssh.Execute(n.Address, client, fmt.Sprintf(`
+					uci set wireless.%s.txpower='%d';
+					uci commit wireless;`,
+					radio, n.Wireless.TxPower24))
+				//runWifi = true
+			}
+			if n.Wireless.Channel24 != n.WirelessRespondd.Channel24 {
+				//ubus call hostapd.%s switch_chan '{"freq":%d}'
+				ssh.Execute(n.Address, client, fmt.Sprintf(`
+					uci set wireless.%s.channel='%d';
+					uci commit wireless;`,
+					//strings.Replace(radio, "radio", "client", 1), ch.Frequency,
+					radio, n.Wireless.Channel24))
+				runWifi = true
 
+			}
 		}
+
+		if n.Hostname != n.HostnameRespondd {
+			ssh.Execute(n.Address, client, fmt.Sprintf(`
+				uci set wireless.priv_%s.ssid='offline-%s';
+				uci commit wireless;`,
+				n.Hostname))
+			runWifi = true
+	    }
 	}
+
+	// update settings for 5GHz (802.11a) radio
 	result, err = ssh.Run(n.Address, client, `
 		if [ "$(uci get wireless.radio0.hwmode | grep -c a)" -ne 0 ]; then
 			echo "radio0";
@@ -86,23 +99,33 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 	}
 	radio = ssh.SSHResultToString(result)
 	ch = GetChannel(n.Wireless.Channel5)
-	if radio != "" && ch != nil {
-		if n.Wireless.TxPower5 != n.WirelessRespondd.TxPower5 {
-			ssh.Execute(n.Address, client, fmt.Sprintf(`
-				uci set wireless.%s.txpower='%d';
-				uci commit wireless;`,
-				radio, n.Wireless.TxPower5))
-			//runWifi = true
+	if radio != "" {
+		if ch != nil {
+			if n.Wireless.TxPower5 != n.WirelessRespondd.TxPower5 {
+				ssh.Execute(n.Address, client, fmt.Sprintf(`
+					uci set wireless.%s.txpower='%d';
+					uci commit wireless;`,
+					radio, n.Wireless.TxPower5))
+				//runWifi = true
+			}
+			if n.Wireless.Channel5 != n.WirelessRespondd.Channel5 {
+				//ubus call hostapd.%s switch_chan '{"freq":%d}'
+				ssh.Execute(n.Address, client, fmt.Sprintf(`
+					uci set wireless.%s.channel='%d';
+					uci commit wireless;`,
+					//strings.Replace(radio, "radio", "client", 1), ch.Frequency,
+					radio, n.Wireless.Channel5))
+				runWifi = true
+			}
 		}
-		if n.Wireless.Channel5 != n.WirelessRespondd.Channel5 {
-			//ubus call hostapd.%s switch_chan '{"freq":%d}'
+		if n.Hostname != n.HostnameRespondd {
 			ssh.Execute(n.Address, client, fmt.Sprintf(`
-				uci set wireless.%s.channel='%d';
+				uci set wireless.priv_%s.ssid='offline-%s';
 				uci commit wireless;`,
-				//strings.Replace(radio, "radio", "client", 1), ch.Frequency,
-				radio, n.Wireless.Channel5))
+				n.Hostname))
 			runWifi = true
-		}
+	    }
 	}
+
 	return true
 }
