@@ -83,8 +83,8 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 				uci set wireless.priv_%s.ssid='offline-%s';
 				uci commit wireless;`,
 				radio, n.Hostname))
- 			// runWifi = true <- not needed for offline-ssid
-	    }
+			// runWifi = true <- not needed for offline-ssid
+		}
 	}
 
 	// update settings for 5GHz (802.11a) radio
@@ -122,9 +122,9 @@ func (n *Node) SSHUpdate(sshmgmt *ssh.Manager) bool {
 			ssh.Execute(n.Address, client, fmt.Sprintf(`
 				uci set wireless.priv_%s.ssid='offline-%s';
 				uci commit wireless;`,
-				n.Hostname))
-			runWifi = true
-	    }
+				radio, n.Hostname))
+			// runWifi = true <- not needed for offline-ssid
+		}
 	}
 
 	return true
