@@ -103,8 +103,14 @@ export class MapView extends View {
 			tx5 = node.wireless.txpower5 || '-';
 
 		startdate.setMinutes(startdate.getMinutes() - config.node.offline);
-		if (new Date(node.lastseen) < startdate) {
-			if (node.pingstate.some((x)=>x)) {
+		const reachableByRespondd = (new Date(node.lastseen) >= startdate);
+		const reachableByPing = (node.pingstate.some((x)=>x));
+		if (reachableByPing) {
+			if (!reachableByRespondd) {
+				className += ' warn';
+			}
+		}else{
+			if (reachableByRespondd) {
 				className += ' warn';
 			}else{
 				className += ' offline';
