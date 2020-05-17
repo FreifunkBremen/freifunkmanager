@@ -72,7 +72,11 @@ func main() {
 			log.Printf("delaying %0.1f seconds", delay.Seconds())
 			time.Sleep(delay)
 		}
-		collector = respondYanic.NewCollector(yanic, nodesYanic, make(map[string][]string), []respondYanic.InterfaceConfig{config.Yanic})
+		collector = respondYanic.NewCollector(yanic, nodesYanic, &respondYanic.Config{
+			Enable: true,
+			Interfaces: []respondYanic.InterfaceConfig{config.Yanic},
+			Sites: make(map[string]respondYanic.SiteConfig),
+		})
 		if duration := config.YanicCollectInterval.Duration; duration > 0 {
 			collector.Start(config.YanicCollectInterval.Duration)
 		}
